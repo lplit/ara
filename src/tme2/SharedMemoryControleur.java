@@ -9,7 +9,7 @@ import peersim.core.CommonState;
 import peersim.core.Control;
 import peersim.core.Network;
 import peersim.core.Node;
-import tme2_shadow.Task3;
+//import tme2_shadow.Task3;
 
 
 public class SharedMemoryControleur implements Control{
