@@ -44,7 +44,6 @@ public class ReliableBroadcast implements EDProtocol, BroadcastProtocol {
 			long idDest=Network.get(i).getID();
 			ReliableBroadcastMessage broadcast_m = new ReliableBroadcastMessage(idsrc, idDest, idsrc, cur_num_seq, "ReliableBroadcast", m,protocol_id);
 			tr.send(src, dst, broadcast_m,protocol_id);
-			
 		}
 		cur_num_seq++;
 	}
