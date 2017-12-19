@@ -96,9 +96,7 @@ public class FIFOTransport implements Transport, EDProtocol {
 					}
 					i++;
 				}
-				
 			}
-			
 		}else {
 			throw new RuntimeException("Receive unknown type event");
 		}
