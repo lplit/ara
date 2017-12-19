@@ -251,6 +251,7 @@ public class GraphicalMonitor extends JPanel implements Control {
 			Node n= Network.get(i);
 			if(n.getID() == id){
 				return n;
+
 			}
 		}
 		
