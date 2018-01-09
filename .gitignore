@@ -24,3 +24,8 @@ hs_err_pid*
 # Emacs and temps
 *#
 .*~
+
+# Editor and IDE files
+.idea
+.code
+out
