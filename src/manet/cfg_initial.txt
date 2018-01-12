@@ -1,4 +1,4 @@
-debug.config full
+config.debug full
 
 simulation.endtime 50000
 random.seed 5
@@ -18,8 +18,14 @@ protocol.position.width 1000
 protocol.position.height 1000
 protocol.position.pause 0
 
+protocol.emitter EmitterImpl
+protocol.emitter.latency 3
+protocol.emitter.scope 10
+protocol.emitter.positionprotocol position
+
 initial_position_strategy Strategy1InitNext
 next_destination_strategy Strategy1InitNext
 
 initial_position_strategy.positionprotocol position
 next_destination_strategy.positionprotocol position
+
