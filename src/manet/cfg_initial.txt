@@ -20,13 +20,13 @@ protocol.position.height 1000
 protocol.position.pause 0
 
 protocol.emitter EmitterImpl
-protocol.emitter.latency 1000
+protocol.emitter.latency 45
 protocol.emitter.scope 50
 protocol.emitter.positionprotocol position
 
 protocol.neighbor NeighborProtocolImpl
-protocol.neighbor.period 300
-protocol.neighbor.timer_delay 90
+protocol.neighbor.period 3000
+protocol.neighbor.timer_delay 3500
 
 
 initial_position_strategy Strategy1InitNext
