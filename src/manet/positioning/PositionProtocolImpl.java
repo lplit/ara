@@ -109,7 +109,6 @@ public class PositionProtocolImpl implements PositionProtocol, EDProtocol {
 	
 	
 	private void move(Node host){
-
 		// If not moving
 		if(!isMoving()){
 			moving=true;
