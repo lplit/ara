@@ -13,19 +13,19 @@ control.graph.step 1
 control.graph.emitter emitter
 
 protocol.position PositionProtocolImpl
-protocol.position.maxspeed 100
-protocol.position.minspeed 0
+protocol.position.maxspeed 500
+protocol.position.minspeed 100
 protocol.position.width 1000
 protocol.position.height 1000
 protocol.position.pause 0
 
 protocol.emitter EmitterImpl
-protocol.emitter.latency 100
+protocol.emitter.latency 1000
 protocol.emitter.scope 50
 protocol.emitter.positionprotocol position
 
 protocol.neighbor NeighborProtocolImpl
-protocol.neighbor.period 90
+protocol.neighbor.period 300
 protocol.neighbor.timer_delay 90
 
 
