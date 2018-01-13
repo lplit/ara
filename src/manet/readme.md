@@ -6,50 +6,48 @@
 > En analysant le code de la classe `PositionProtocolImpl`, donnez l'algorithme général
 de déplacement d'un noeud. Il ne vous est pas demandé de code dans cette question.
 
-```java
-private void move(Node host){
-
-// If not moving
-if(!isMoving()){
-    moving=true;
-    // Random speed
-    this.current_speed= (int) (CommonState.r.nextDouble()*((double)speed_max-(double)speed_min)+(double)speed_min);
-    // Make it slower than max in case
-    this.current_speed= Math.min(current_speed, speed_max);
-    // Gets next destination from the factory
-    this.current_destination = PositioningStrategiesFactory.getNextDestinationStrategy().getNextDestination(host, this.current_speed);
-}
-
-// Distance to next destination
-double distance = this.getCurrentPosition().distance(this.current_destination);//en metre
-// Distance par time slice
-double distance_to_next = (double)current_speed/1000.0;//on le traduit en metre par milisecondes
-
-// If too far to reach in one hop
-if(distance_to_next - distance < 0.0){
-    double next_x =  ( distance_to_next * ( (current_destination.getX() - current_position.getX()) / distance )) +current_position.getX();
-    double next_y =  ( distance_to_next * ( (current_destination.getY() - current_position.getY()) / distance )) +current_position.getY();
-    this.current_position=new Position(next_x, next_y);
-}else{
-    this.current_position=this.current_destination;
-}		
-
-// Destination reached, stop
-if(current_position.equals(current_destination)){
-    moving=false;
-    
-    EDSimulator.add(pause, loop_event, host, my_pid);
-// Continue moving
-}else{
-    EDSimulator.add(1, loop_event, host, my_pid);
-}
-
-}
-```
-
 Movement protocol:
 
 - if not moving
     - assign random speed lower than max
-    - use ``
-    
+- moving 
+    - use `PositioningStrategiesFactory` to get next destination
+    - Calc distance to next destination
+    - if too far to reach `destination` in one hop
+        - calculate next `x` and `y` 
+        - move to that position 
+    - if destination reached, stop
+    - else continue running
+
+
+L'algorithme utilise le protocole de déplacement suivant:
+Une valeur de la vitesse est aléatoirement choisie dans l'intervalle [speed_min; speed_max].
+Vu qu'on est en temps discretisé, `distance_to_next` représente la distance parcourue au
+ Une fois la destination atteinte, le noeud s'arrête pendant un tic.
+
+## Q2
+
+```
+simulation.endtime 50000 
+random.seed 5 
+network.size 10 
+init.initialisation Initialisation 
+control.graph GraphicalMonitor 
+control.graph.positionprotocol position 
+control.graph.time_slow 0.0002 
+control.graph.step 1
+```
+
+## Q3 
+
+> Que fait strat 1?
+La stratégie 1 choisit aléatoirement la prochaine destination dans les intervalles
+[0; maxX] et [0; maxY].
+
+## Q4
+
+> Re-testez en prenant en SD, la stratégie 2 (la stratégie 1 reste la SPI). Que fait la
+  stratégie 2 ?
+  
+  La stratégie 2 choisit comme destination l'endroit courant du noeud, celui-ci reste immobile.
+

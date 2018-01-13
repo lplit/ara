@@ -30,8 +30,8 @@ protocol.neighbor.period 1000
 protocol.neighbor.timer_delay 3500
 
 
-initial_position_strategy Strategy5Init
-next_destination_strategy Strategy4Next
+initial_position_strategy Strategy3InitNext
+next_destination_strategy Strategy3InitNext
 
 initial_position_strategy.positionprotocol position
 initial_position_strategy.emitter emitter
