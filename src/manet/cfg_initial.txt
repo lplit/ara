@@ -26,13 +26,19 @@ protocol.emitter.scope 50
 protocol.emitter.positionprotocol position
 
 protocol.neighbor NeighborProtocolImpl
-protocol.neighbor.period 3000
+protocol.neighbor.period 1000
 protocol.neighbor.timer_delay 3500
 
 
-initial_position_strategy Strategy1InitNext
-next_destination_strategy Strategy1InitNext
+initial_position_strategy Strategy5Init
+next_destination_strategy Strategy4Next
 
 initial_position_strategy.positionprotocol position
+initial_position_strategy.emitter emitter
+
+
 next_destination_strategy.positionprotocol position
+next_destination_strategy.emitter emitter
+next_destination_strategy.distance_min 100
+next_destination_strategy.distance_max 500
 
