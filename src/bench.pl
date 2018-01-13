@@ -1,8 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use DateTime;
-use Time::Piece;
 
 my $key_control_init =
 my $str_network_size = "network.size";
@@ -108,7 +106,9 @@ sub date {
 
 #    my $wanted = "$date $time";   # creates 'yyyy-mm-dd hh:mm:ss' string
 #    return join("_",$dt->ymd, dt->hms);
-    return localtime->strftime('%F-%X');
+#    return localtime->strftime('%F-%X');
+    my $ret = `date +%F-%T`;
+    return chomp($ret);
 }
 
 sub bench {
@@ -133,15 +133,14 @@ sub bench {
 	print $bench_file join(" ", $key_scope, $i), "\n";
 	$run_cmd = join(" ",
 			"make run",
-			join("=", $key_cfg, $filename),,
+			join("=", $key_cfg, $filename),
 			join("=", $key_peersim, $val_peersim)
 	    );
-	print $run_cmd, "\nExecuting:\n";
+	print "Executing `", $run_cmd, "`\n";
 	#    print $bench_file
 	close $filename;
-	print `$run_cmd`;
-    }
-}
+	system($run_cmd);
+   } }
 
 #[
 #~pod
