@@ -91,29 +91,11 @@ $strat_move = 1;
 $value_spi = "Strategy1InitNext";
 $value_sd = "Strategy1InitNext";
 
-
-my $results_file;
-
-for ($i = 125; $i <= 1000; $i += 125) {
-    $scope = $i;
-    $filename =  join "_", $file_base, $scope, $strat_position, $strat_move;
-    push @scopes, $i;
-    $filename = join "/", $bench_dir, $filename;
-    open (my $bench_file, '>', $filename) or die "Could not open file ";
-    print $bench_file $file_first, "\n", join(" ", $key_spi, $value_spi), "\n";
-    print $bench_file join(" ", $key_sd, $value_sd), "\n";
-    print $bench_file join(" ", $key_scope, $i), "\n";
-    $run_cmd = join(" ",
-	       "make run",
-	       join("=", $key_cfg, $filename),,
-	       join("=", $key_peersim, $val_peersim)
-	);
-    print $run_cmd;
-    print "\n";
-#    print $bench_file
-    close $filename;
-    print "\nOUAIS", `$run_cmd`;
+for (my $j = 0; $j < 5; $j++) {
+    bench($strat_move, $strat_position, $value_spi, $value_sd);
 }
+
+
 
 $strat_position = 3;
 $strat_move = 3;
@@ -124,14 +106,18 @@ for (my $j = 0; $j < 5; $j++) {
     bench($strat_move, $strat_position, $value_spi, $value_sd);
 }
 
+
+
 sub bench {
     my $i;
     my $str_mov = shift;
     my $str_pos = shift;
     my $val_spi = shift;
     my $val_sd = shift;;
+    my $results_file;
 
-    print $str_mov, " ", $str_pos, " ", $val_spi, " ", $val_sd, "\n";
+
+    print "\n\n", $str_mov, " ", $str_pos, " ", $val_spi, " ", $val_sd, "\n-------\n";
 
     for ($i = 125; $i <= 1000; $i += 125) {
 	my $filename =  join "_", $file_base, $scope, $str_pos, $str_mov;
