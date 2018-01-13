@@ -73,15 +73,20 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                 - "Heartbeat" (self-bootstrap)
                 - "Timer" pour déclencher les timers des gens
              */
-            if (msg.getIdSrc() == msg.getIdDest()) {
+            if (msg.getIdDest() == 0) {
                 switch (msg.getTag()) {
                     case "Heartbeat":
-                        EDSimulator.add(this.period, event, node, pid);
-
+                        EDSimulator.add(this.period, new Message(node.getID(), 0, "Heartbeat", "Heartbeat", this_pid), node, this_pid);
+                        System.err.println(("recvd msg src" + msg.getIdSrc() + " dest " + msg.getIdDest()) + " " + msg.getTag() + neighbor_list);
                         // salut y'a-t-il des nouveaux potos dans mon scope
                         impl.emit(node, new Message(msg.getIdSrc(), msg.getIdDest(), "Heartbeat", "Heartbeat", this_pid));
 
 
+                        break;
+                    case "Timer":
+                        if (neighbor_list.contains(msg.getContent())) {
+                            neighbor_list.remove(msg.getContent());
+                        }
                         break;
                 }
             } else { // du coup là on ne traite plus que les messages des autres
@@ -91,7 +96,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                             neighbor_list.add(msg.getIdSrc());
                             for (Long l : neighbor_list) {
                                 // pour tous les voisins dans la liste, on s'ajoute un timer
-                                EDSimulator.add(this.timer_delay, new Message(l, pid, "Timer", l, this_pid), node, this_pid);
+                                EDSimulator.add(this.timer_delay, new Message(l, 0, "Timer", l, this_pid), node, this_pid);
                             }
                         }
                         //System.out.println(neighbor_list);

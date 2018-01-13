@@ -1,7 +1,7 @@
 config.debug full
 
 simulation.endtime 50000
-random.seed 19
+random.seed 4
 network.size 20
 
 init.initialisation Initialisation
@@ -20,7 +20,7 @@ protocol.position.maxspeed 500
 protocol.position.minspeed 100
 protocol.position.width 1000
 protocol.position.height 1000
-protocol.position.pause 1
+protocol.position.pause 500
 
 protocol.emitter EmitterImpl
 protocol.emitter.latency 45
@@ -32,8 +32,8 @@ protocol.neighbor.period 100
 protocol.neighbor.timer_delay 1000
 
 
-initial_position_strategy Strategy6Init
-next_destination_strategy Strategy2Next
+initial_position_strategy Strategy1InitNext
+next_destination_strategy Strategy1InitNext
 
 initial_position_strategy.positionprotocol position
 initial_position_strategy.emitter emitter
