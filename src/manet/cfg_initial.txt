@@ -13,6 +13,8 @@ control.graph.step 1
 control.graph.emitter emitter
 control.graph.neighborprotocol neighbor
 
+
+
 protocol.position PositionProtocolImpl
 protocol.position.maxspeed 500
 protocol.position.minspeed 100

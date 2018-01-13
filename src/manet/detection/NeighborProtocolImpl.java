@@ -8,6 +8,9 @@ import peersim.edsim.EDProtocol;
 import peersim.edsim.EDSimulator;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
@@ -22,9 +25,11 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
     Integer timeStamp = 0;
 
     private List<Long> neighbor_list;
+    private Map<Node, Integer> neighbor_timers;
 
     public NeighborProtocolImpl(String prefix) {
         neighbor_list = new ArrayList<>();
+        neighbor_timers = new HashMap<Node, Integer>();
 
         String tmp[]=prefix.split("\\.");
         this_pid= Configuration.lookupPid(tmp[tmp.length-1]);
@@ -60,29 +65,54 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
         EmitterImpl impl = (EmitterImpl) node.getProtocol(emitter_pid);
         Message msg = (Message) event;
 
+        neighbor_timers.replaceAll((k, v) -> (int) v - this.period);
+
+
         if (event instanceof Message) {
-            switch (msg.getTag()) {
-                case "Heartbeat":
-                    //System.out.println("Heartbeat from " + node.getID());
-                    if (msg.getIdSrc() == msg.getIdDest()) {
-                        //System.out.println("Stamp "+ timeStamp++);
+            /* on filtre déjà nos messages à nous
+                - "Heartbeat" (self-bootstrap)
+                - "Timer" pour déclencher les timers des gens
+             */
+            if (msg.getIdSrc() == msg.getIdDest()) {
+                switch (msg.getTag()) {
+                    case "Heartbeat":
                         EDSimulator.add(this.period, event, node, pid);
+
+                        // salut y'a-t-il des nouveaux potos dans mon scope
                         impl.emit(node, new Message(node.getID(), 0, "Heartbeat", "Heartbeat", this_pid));
-                    }
-                    else {
-                        if(!neighbor_list.contains(msg.getIdSrc()))
+
+
+                        break;
+                    case "Timer":
+                        if (neighbor_list.contains(msg.getContent())) {
+                            neighbor_list.remove(msg.getContent());
+                        }
+
+                        break;
+                }
+            } else { // du coup là on ne traite plus que les messages des autres
+                switch (msg.getTag()) {
+                    case "Heartbeat": // salutations mon nouveau poto
+                        if (!neighbor_list.contains(msg.getIdSrc())) {
                             neighbor_list.add(msg.getIdSrc());
+                            for (Long l : neighbor_list) {
+                                // pour tous les voisins dans la liste, on s'ajoute un timer
+
+                                EDSimulator.add(this.timer_delay, new Message(l, pid, "Timer", l, pid), node, pid);
+                                //   neighbor_timers.forEach((k, v) -> System.out.println("node " + k + " ttl " + v));
+                            }
+                        }
                         //System.out.println(neighbor_list);
                         break;
-                    }
-                    break;
-                default:
-                    System.out.println("IN DEFAULT");
+                    case "Timer":
+                    default:
+                        System.out.println("IN DEFAULT");
+                        break;
+                }
             }
+
         }
-        else {
-            System.out.println("no good message");
-        }
+
         return;
     }
 }
