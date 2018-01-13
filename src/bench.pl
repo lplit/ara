@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-
-
+use DateTime;
+use Time::Piece;
 
 my $key_control_init =
 my $str_network_size = "network.size";
@@ -14,7 +14,7 @@ my $file_base;
 
 my $file_first = "
 debug_config none
-simulation.endtime 50000
+simulation.endtime 28800000
 random.seed 4
 network.size 50
 
@@ -76,7 +76,7 @@ my  $strat_position;
 my $strat_move;
 my $i;
 
-my $bench_dir = "bench";
+my $bench_dir = join("_", "bench", date());
 
 mkdir $bench_dir;
 
@@ -91,22 +91,25 @@ $strat_move = 1;
 $value_spi = "Strategy1InitNext";
 $value_sd = "Strategy1InitNext";
 
-for (my $j = 0; $j < 5; $j++) {
-    bench($strat_move, $strat_position, $value_spi, $value_sd);
-}
-
-
+bench($strat_move, $strat_position, $value_spi, $value_sd);
 
 $strat_position = 3;
 $strat_move = 3;
 $value_spi = "Strategy3InitNext";
 $value_sd = "Strategy3InitNext";
 
-for (my $j = 0; $j < 5; $j++) {
-    bench($strat_move, $strat_position, $value_spi, $value_sd);
+bench($strat_move, $strat_position, $value_spi, $value_sd);
+
+
+sub date {
+#    my $dt   = DateTime->now;   # Stores current date and time as datetime object
+#    my $date = $dt->ymd;   # Retrieves date as a string in 'yyyy-mm-dd' format
+#    my $time = $dt->hms;   # Retrieves time as a string in 'hh:mm:ss' format
+
+#    my $wanted = "$date $time";   # creates 'yyyy-mm-dd hh:mm:ss' string
+#    return join("_",$dt->ymd, dt->hms);
+    return localtime->strftime('%F-%X');
 }
-
-
 
 sub bench {
     my $i;
@@ -116,7 +119,7 @@ sub bench {
     my $val_sd = shift;;
     my $results_file;
 
-
+    print date();
     print "\n\n", $str_mov, " ", $str_pos, " ", $val_spi, " ", $val_sd, "\n-------\n";
 
     for ($i = 125; $i <= 1000; $i += 125) {
@@ -136,7 +139,7 @@ sub bench {
 	print $run_cmd, "\nExecuting:\n";
 	#    print $bench_file
 	close $filename;
-	system($run_cmd);
+	print `$run_cmd`;
     }
 }
 
