@@ -17,13 +17,7 @@ public class Strategy2Next implements NextDestinationStrategy {
 	
 	@Override
 	public Position getNextDestination(Node host, int speed) {
-		
 		return ((PositionProtocol)host.getProtocol(position_pid)).getCurrentPosition();
-/*		return new Position(
-				((PositionProtocol) host.getProtocol(position_pid)).getCurrentPosition().getX()+5.0,
-				((PositionProtocol) host.getProtocol(position_pid)).getCurrentPosition().getY()+5.0);
-				*/
-//		return new Position(0.0, 0.0);
 	}
 
 }

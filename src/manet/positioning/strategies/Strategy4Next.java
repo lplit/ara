@@ -35,10 +35,18 @@ public class Strategy4Next implements NextDestinationStrategy {
 	private Node currentMoving;
 	
 	public Strategy4Next(String prefix) {
+		System.err.println("How'd you do");
 		position_pid=Configuration.getPid(prefix+"."+PAR_POSITIONPID);
+		System.err.println("How'd you do pid " + position_pid);
+
 		emitter_pid=Configuration.getPid(prefix+"."+PAR_EMITTERPID);
+		System.err.println("How'd you do emitterpid " + emitter_pid);
+
 		distance_min=Configuration.getInt(prefix+"."+PAR_DISTANCEMIN,0);
+		System.err.println("How'd you do distance_min " + distance_min);
+
 		distance_max=Configuration.getInt(prefix+"."+PAR_DISTANCEMAX, Integer.MAX_VALUE);
+		System.err.println("How'd you do distance_max" + distance_max);
 	}
 	
 	
@@ -91,6 +99,7 @@ public class Strategy4Next implements NextDestinationStrategy {
 			return pos_proto_host.getCurrentPosition();//le mouvement de host entraine un split du reseau
 		}
 		currentMoving=host;
+		System.err.println("sup?");
 		return new_position;
 	}
 	

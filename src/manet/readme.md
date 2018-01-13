@@ -51,3 +51,200 @@ La stratégie 1 choisit aléatoirement la prochaine destination dans les interva
   
   La stratégie 2 choisit comme destination l'endroit courant du noeud, celui-ci reste immobile.
 
+## Q5
+
+```java
+package manet.communication;
+
+import manet.Message;
+import manet.positioning.Position;
+import manet.positioning.PositionProtocol;
+import peersim.config.Configuration;
+import peersim.core.Network;
+import peersim.core.Node;
+import peersim.core.Protocol;
+import peersim.edsim.EDSimulator;
+
+public class EmitterImpl implements Emitter {
+
+    private int latency;
+    private int scope;
+    private int this_pid;
+    private int position_protocol;
+
+    private static final String PAR_LATENCY = "latency";
+    private static final String PAR_SCOPE = "scope";
+    private static final String PAR_POSITIONPROTOCOL = "positionprotocol";
+
+    public EmitterImpl(String prefix) {
+        String tmp[]=prefix.split("\\.");
+        this_pid=Configuration.lookupPid(tmp[tmp.length-1]);
+        //System.out.println(prefix + "." + PAR_POSITIONPROTOCOL);
+        this.position_protocol=Configuration.getPid(prefix+"."+PAR_POSITIONPROTOCOL);
+        this.latency = Configuration.getInt(prefix + "." + PAR_LATENCY);
+        this.scope = Configuration.getInt(prefix + "." + PAR_SCOPE);
+        //System.out.println("WOAH");
+    }
+
+    @Override
+    public void emit(Node host, Message msg) {
+        PositionProtocol prot = (PositionProtocol) host.getProtocol(position_protocol);
+
+        for (int i=0; i < Network.size(); i++) {
+            Node n = Network.get(i);
+            PositionProtocol prot2 = (PositionProtocol) n.getProtocol(position_protocol);
+            double dist =prot.getCurrentPosition().distance(prot2.getCurrentPosition());
+            if (dist < scope && n.getID() != host.getID()) {
+                EDSimulator.add(latency, new Message(msg.getIdSrc(), n.getID(), msg.getTag(), msg.getContent(), msg.getPid()), n, msg.getPid());
+                //                System.out.println("yeah lele woah");
+                //                EDSimulator.add(0, msg, n, );
+            }
+        }
+
+    }
+
+    @Override
+    public int getLatency() {
+        return latency;
+    }
+
+    @Override
+    public int getScope() {
+        return scope;
+    }
+
+    @Override
+    public Object clone(){
+        EmitterImpl res=null;
+        try {
+            res=(EmitterImpl)super.clone();
+        } catch (CloneNotSupportedException e) {}
+        return res;
+    }
+}
+```
+
+## Q6
+
+```java
+package manet.detection;
+
+import manet.Message;
+import manet.communication.EmitterImpl;
+import peersim.config.Configuration;
+import peersim.core.Node;
+import peersim.edsim.EDProtocol;
+import peersim.edsim.EDSimulator;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
+    private int this_pid;
+    private int period;
+    private int timer_delay;
+    private int listener_pid;
+
+    private static final String PAR_PERIOD = "period";
+    private static final String PAR_TIMERDELAY = "timer_delay";
+    private static final String PAR_LISTENER_PID = "listenerpid";
+    Integer timeStamp = 0;
+
+    private List<Long> neighbor_list;
+
+    public NeighborProtocolImpl(String prefix) {
+        neighbor_list = new ArrayList<>();
+
+        String tmp[]=prefix.split("\\.");
+        this_pid= Configuration.lookupPid(tmp[tmp.length-1]);
+
+        this.period = Configuration.getInt(prefix+"."+PAR_PERIOD);
+        this.timer_delay = Configuration.getInt(prefix + "." + PAR_TIMERDELAY);
+        this.listener_pid = Configuration.getPid(prefix + "." + PAR_LISTENER_PID,-1);
+
+
+        }
+
+    @Override
+    public List<Long> getNeighbors() {
+        return neighbor_list;
+    }
+
+    @Override
+    public Object clone() {
+        NeighborProtocolImpl res = null;
+        try {
+            res = (NeighborProtocolImpl) super.clone();
+            neighbor_list = new ArrayList<>();
+            timeStamp = new Integer(0);
+        } catch (CloneNotSupportedException e) {
+
+        }
+        return res;
+    }
+
+    @Override
+    public void processEvent(Node node, int pid, Object event) {
+        int emitter_pid = Configuration.lookupPid("emitter");
+        EmitterImpl impl = (EmitterImpl) node.getProtocol(emitter_pid);
+        Message msg = (Message) event;
+
+        if (event instanceof Message) {
+            switch (msg.getTag()) {
+                case "Heartbeat":
+                    //System.out.println("Heartbeat from " + node.getID());
+                    if (msg.getIdSrc() == msg.getIdDest()) {
+                        //System.out.println("Stamp "+ timeStamp++);
+                        EDSimulator.add(this.period, event, node, pid);
+                        impl.emit(node, new Message(node.getID(), 0, "Heartbeat", "Heartbeat", this_pid));
+                    }
+                    else {
+                        if(!neighbor_list.contains(msg.getIdSrc()))
+                            neighbor_list.add(msg.getIdSrc());
+                        //System.out.println(neighbor_list);
+                        break;
+                    }
+                    break;
+                default:
+                    System.out.println("IN DEFAULT");
+            }
+        }
+        else {
+            System.out.println("no good message");
+        }
+        return;
+    }
+}
+```
+
+## Q7.
+
+Oui.
+
+## Q8.
+Strategy3InitNext fait converger les points vers le milieu, et assure que tous
+les noeuds sont à portée les uns des autres, dans un rayon de `scope -
+marge`.
+
+| Stratégie de placement initial | stratégie de déplacement | Graphe | Commentaires |
+|--------------------------------|---|---| --- |
+| Strategy1InitNext | Strategy1InitNext | Connexe |
+| Strategy1InitNext | Strategy2Next |  | bouge ap normal |
+| Strategy1InitNext | Strategy3InitNext | Connexe | Converge vers le milieu |
+| Strategy1InitNext | Strategy4Next | | bouge ap, ça bouge seulement si on a exactement deux noeuds dans le réseau |
+| Strategy3InitNext | Strategy1InitNext | Connexe | Connexe dès le début
+| Strategy3InitNext | Strategy2Next | Connexe | spawn au milieu et ne bouge pas |
+| Strategy3InitNext | Strategy3InitNext | Connexe |
+| Strategy3InitNext | Strategy4Next | Connexe | Ça chill dans le scope |
+| Strategy5Init | Strategy1InitNext | Connexe| Connexe dès le début car apparaissent au même endroit, après les nodes se barrent de ouf |
+| Strategy5Init | Strategy2Next | Connexe | Connexe et ne bouge pas |
+| Strategy5Init | Strategy3InitNext | Connexe | cf Protocol3 |
+| Strategy5Init | Strategy4Next | Connexe | Trenquille dans le scope |
+| Strategy6Init | Strategy1InitNext | Connexe| `protocol.emitter.latency 0` |
+| Strategy6Init | Strategy2Next | Connexe | `protocol.emitter.latency 0` |
+| Strategy6Init | Strategy3InitNext | Connexe | `protocol.emitter.latency 0` |
+| Strategy6Init | Strategy4Next | Connexe | `protocol.emitter.latency 0` |
+
+Les stratégies font genre des formes. Étoile toussa, 'pis aussi un genre
+de tas.
+
