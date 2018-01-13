@@ -4,7 +4,6 @@ import manet.detection.NeighborProtocolImpl;
 import peersim.config.Configuration;
 import peersim.core.Control;
 import peersim.core.Network;
-import peersim.core.Node;
 
 import java.util.ArrayList;
 
@@ -15,17 +14,18 @@ public class DensityController implements Control {
 
     private final int this_pid;
     private double
-            dit = 0.0, // la moyenne du nombre de voisins par noeud à l'instant t (densite)
-            eit = 0.0, // l'écart-type de dit
-            dt  = 0.0, // densité moyenne sur le temps (avg of d_dt)
-            et  = 0.0, // disparité moyenne de densité sur le temps (avg of d_et)
-            edt = 0.0; // variation de la densité au cours du temps
+            dit = 0.0,  // la moyenne du nombre de voisins par noeud à l'instant t (densite)
+            eit = 0.0,  // l'écart-type de dit (donc a l'instant t)
+            dt  = 0.0,  // densité moyenne sur le temps (avg of d_dt)
+            et  = 0.0,  // disparité moyenne de densité sur le temps (avg of d_et)
+            edt = 0.0;  // variation de la densité au cours du temps (ecart type des valeurs d_dt,
+                        // donc de toute la sim jusqu'a mtn)
 
     // Arrays containing data for dt, et and edt calculations
     private ArrayList<Double>
             d_dt  = new ArrayList<Double>(), // Updated by dit()
             d_et  = new ArrayList<Double>(), // Updated by eit()
-            d_edt = new ArrayList<Double>(); // Updates by evo_edt()
+            d_edt = new ArrayList<Double>(); // Updates by edt()
 
     public DensityController(String prefix) {
         this.this_pid = Configuration.getPid(prefix+"."+PAR_NEIGHBOR);
@@ -36,9 +36,9 @@ public class DensityController implements Control {
     // @return true if the simulation has to be stopped, false otherwise.
     public boolean execute() {
         // Over-time averages
-        dt = evo_dt();
-        et = evo_et();
-        edt = evo_edt();
+        dt = dt();
+        et = et();
+        edt = edt();
 
         // 'Live' values
         dit = dit();
@@ -47,7 +47,7 @@ public class DensityController implements Control {
         return false;
     }
 
-    /* A l'instant T */
+    /** A l'instant T **/
 
     /**
      * Calculates the average number of neighbours in the
@@ -99,7 +99,7 @@ public class DensityController implements Control {
 
 
 
-    /* Stats for all until current */
+    /** Stats for all until current **/
 
     /**
      * La moyenne de l'ensemble des valeurs D_i(t') pour tout t' < t
@@ -109,14 +109,12 @@ public class DensityController implements Control {
      *
      * @return average density so far
      */
-    public double evo_dt() {
+    public double dt() {
         double avg = 0.0;
         if (!d_dt.isEmpty()) {
-            int size = d_dt.size();
-            for (Double d : d_dt) {
+            for (Double d : d_dt)
                 avg += d;
-            }
-            avg = avg / size;
+            avg = avg / d_dt.size();
         }
         return avg;
     }
@@ -129,14 +127,12 @@ public class DensityController implements Control {
      *
      * @return average density so far
      */
-    public double evo_et() {
+    public double et() {
         double avg = 0.0;
         if (!d_et.isEmpty()) {
-            int size = d_et.size();
-            for (Double d : d_et) {
+            for (Double d : d_et)
                 avg += d;
-            }
-            avg = avg / size;
+            avg = avg / d_et.size();
         }
         return avg;
     }
@@ -145,22 +141,21 @@ public class DensityController implements Control {
      * L'ecart type des valeurs D_i(t'), pour tout t' <= t, ce qui
      * permet de juger de la variation de la densite au cours du temps.
      * Plus le @return de cette fonction est elevee par rapport au resultat
-     * de evo_et(), plus le reseau a change de densite moyenne au cours
+     * de et(), plus le reseau a change de densite moyenne au cours
      * du temps.
      *
      * Updates recalculates etd, works with history array
      *
      * @return
      */
-    public double evo_edt() {
+    public double edt() {
         double stdDev = 0.0;
-        if (!d_edt.isEmpty()) {
-            int size = d_edt.size();
-            for (Double d : d_edt) {
-                stdDev += d;
-            }
-            stdDev = stdDev / size;
+        if (!d_dt.isEmpty()) {
+            for (Double d : d_dt)
+                stdDev += Math.pow(dt - d, 2);
+            stdDev = stdDev / d_dt.size();
         }
+        d_edt.add(stdDev);
         return stdDev;
     }
 
@@ -185,4 +180,14 @@ public class DensityController implements Control {
     public double getDit() {
         return dit;
     }
+
+    /** We're lazy so functions for q10
+     * Col1 = D(t=end)
+     * Col2 = E(t=end) / D(t=end)
+     * Col3 = ED(t=end) / D(t=end)
+     * **/
+    public double col1() { return getDt(); }
+    public double col2() { return (getEt() / getDt()); }
+    public double col3() { return (getEdt() / getDt()); }
+
 }
