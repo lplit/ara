@@ -1,3 +1,5 @@
+
+
 config.debug full
 
 simulation.endtime 50000
@@ -16,7 +18,7 @@ control.graph.neighborprotocol neighbor
 control.density DensityController
 control.density.neighbours neighbor
 control.density.step 1000
-control.density.verbose 0
+control.density.verbose 1
 
 protocol.position PositionProtocolImpl
 protocol.position.maxspeed 20

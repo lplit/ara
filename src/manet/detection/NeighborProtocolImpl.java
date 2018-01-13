@@ -51,11 +51,13 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
         NeighborProtocolImpl res = null;
         try {
             res = (NeighborProtocolImpl) super.clone();
+            res.neighbor_list= new ArrayList<>();
         } catch (CloneNotSupportedException e) {
-
+            System.err.println("Neighbor clone error");
         }
         return res;
     }
+
 
 
     @Override
@@ -84,15 +86,16 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                             impl.emit(node, new Message(msg.getIdSrc(), -1, "Heartbeat", "Heartbeat", this_pid));
                         }
                         else { // du coup là on ne traite plus que les messages des autres
-                        // salutations mon nouveau poto
-                        if (!neighbor_list.contains(msg.getIdSrc())) {
-                            neighbor_list.add(msg.getIdSrc());
-                            for (Long l : neighbor_list) {
-                                // pour tous les voisins dans la liste, on s'ajoute un timer
-                                EDSimulator.add(this.timer_delay, new Message(l, -1, "Timer", l, this_pid), node, this_pid);
+                            // salutations mon nouveau poto
+                            if (!neighbor_list.contains(msg.getIdSrc())) {
+                                neighbor_list.add(msg.getIdSrc());
+                        //        for (Long l : neighbor_list) {
+                                    // pour tous les voisins dans la liste, on s'ajoute un timer
+                                    EDSimulator.add(this.timer_delay, new Message(node.getID(), -1, "Timer", msg.getIdSrc(), this_pid), node, this_pid);
+                          //      }
+    //                            System.out.println("Sup from node " + msg.getIdSrc() + ", list " + neighbor_list);
                             }
-                        }
-                        //System.out.println(neighbor_list);
+                            //System.out.println(neighbor_list);
                         }
 
                         break;
@@ -100,6 +103,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 //                           System.err.println("TIMER Node " + node.getID() + " msg src " + msg.getIdSrc() + " dest " + msg.getIdDest() + " " + msg.getTag() + " " + msg.getContent());
                             if (neighbor_list.contains(msg.getContent())) {
                                 neighbor_list.remove(msg.getContent());
+//                                System.out.println(node.getID() + ": list " + neighbor_list + "removed " + msg.getContent());
                             }
                         break;
                         default:
