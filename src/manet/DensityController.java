@@ -24,14 +24,18 @@ public class DensityController implements Control {
         return false;
     }
 
+    /**
+     *     A l'instant T
+      */
 
     /**
      * Calculates the standart deviation
+     * E_i(t) : L'ecart type de D_i(t) (avgNeighborsT())
      * @return
      */
-    public double standardDeviation() {
+    public double standardDeviationT() {
         double
-            avg = avgNeighbors(),
+            avg = avgNeighborsT(),
             stdDev = 0.0;
         int n_size = Network.size();
 
@@ -46,9 +50,10 @@ public class DensityController implements Control {
     /**
      * Calculates the average number of neighbors in the
      * network when called
+     * D_i(t) : Moyenne du nombre de voisins par noeud a l'instant t
      * @return double average neighbors per node
      */
-    public double avgNeighbors() {
+    public double avgNeighborsT() {
         double
             sum = 0.0,
             avg = 0.0;
@@ -63,9 +68,44 @@ public class DensityController implements Control {
         return avg;
     }
 
+    /**
+     * Pour tout t' < t
+     */
 
+    /**
+     * La moyenne de l'ensemble des valeurs D_i(t') pour tout t' < t
+     * donc densite moyenne sur le temps
+     * @return average density so far
+     */
+    public double avgNeighbors() {
+        double avg = 0.0;
 
+        return avg;
+    }
 
+    /**
+     * La moyenne de l'ensemble des valeurs E_i(t') pour tout t' < t
+     * donc disparite moyenne de densite sur le temps
+     * @return average density so far
+     */
+    public double stdDeviation() {
+        double stdDev = 0.0;
 
+        return stdDev;
+    }
+
+    /**
+     * L'ecart type des valeurs D_i(t'), pour tout t' <= t, ce qui
+     * permet de juger de la variation de la densite au cours du temps.
+     * Plus le @return de cette fonction est elevee par rapport au resultat
+     * de stdDeviation(), plus le reseau a change de densite moyenne au cours
+     * du temps.
+     * @return
+     */
+    public double stdDevEvolution() {
+        double stdDev = 0.0;
+
+        return stdDev;
+    }
 
 }
