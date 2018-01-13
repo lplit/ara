@@ -79,14 +79,8 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                         EDSimulator.add(this.period, event, node, pid);
 
                         // salut y'a-t-il des nouveaux potos dans mon scope
-                        impl.emit(node, new Message(node.getID(), 0, "Heartbeat", "Heartbeat", this_pid));
+                        impl.emit(node, new Message(msg.getIdSrc(), msg.getIdDest(), "Heartbeat", "Heartbeat", this_pid));
 
-
-                        break;
-                    case "Timer":
-                        if (neighbor_list.contains(msg.getContent())) {
-                            neighbor_list.remove(msg.getContent());
-                        }
 
                         break;
                 }
@@ -97,14 +91,16 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                             neighbor_list.add(msg.getIdSrc());
                             for (Long l : neighbor_list) {
                                 // pour tous les voisins dans la liste, on s'ajoute un timer
-
-                                EDSimulator.add(this.timer_delay, new Message(l, pid, "Timer", l, pid), node, pid);
-                                //   neighbor_timers.forEach((k, v) -> System.out.println("node " + k + " ttl " + v));
+                                EDSimulator.add(this.timer_delay, new Message(l, pid, "Timer", l, this_pid), node, this_pid);
                             }
                         }
                         //System.out.println(neighbor_list);
                         break;
                     case "Timer":
+                        if (neighbor_list.contains(msg.getContent())) {
+                            neighbor_list.remove(msg.getContent());
+                        }
+                        break;
                     default:
                         System.out.println("IN DEFAULT");
                         break;
