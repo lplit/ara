@@ -2,9 +2,11 @@ package manet;
 
 import manet.detection.NeighborProtocolImpl;
 import peersim.config.Configuration;
+import peersim.core.CommonState;
 import peersim.core.Control;
 import peersim.core.Network;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 public class DensityController implements Control {
@@ -12,10 +14,12 @@ public class DensityController implements Control {
 
     private static final String PAR_NEIGHBOR = "neighbours";
     private static final String PAR_VERBOSE = "verbose";
+    private static final String PAR_STEP = "step";
 
     private final int this_pid;
 
     private int verbose = 0; // Est-ce que l'on print les résultats sur stdout
+    private int step; // step du controlleur. hdxlk
 
     private double
             dit = 0.0,  // la moyenne du nombre de voisins par noeud à l'instant t (densite)
@@ -34,6 +38,8 @@ public class DensityController implements Control {
     public DensityController(String prefix) {
         this.this_pid = Configuration.getPid(prefix+"."+PAR_NEIGHBOR);
         this.verbose = Configuration.getInt(prefix + "." + PAR_VERBOSE);
+        this.step = Configuration.getInt(prefix + "." + PAR_STEP);
+        System.err.println("verbose " + this.verbose + " step " + this.step);
     }
 
 
@@ -49,8 +55,11 @@ public class DensityController implements Control {
         dit = dit();
         eit = eit();
 
-        if (this.verbose != 0)
-            printState();
+        if (this.verbose != 0) {
+            if (CommonState.getTime() >= CommonState.getEndTime()-step) {
+                printState();
+            }
+        }
 
         return false;
     }
@@ -188,33 +197,30 @@ public class DensityController implements Control {
     }
 
     public void printState() {
+            String ddt = "[";
+            String det = "[";
+            String dedt = "[";
 
-        String ddt = "[";
-        String det = "[";
-        String dedt = "[";
+            for (Double d : d_dt)
+                ddt += String.format(" %.2f\t", d);
 
-        for (Double d : d_dt)
-            ddt += String.format(" %.2f\t", d);
+            for (Double d : d_et)
+                det += String.format(" %.2f\t", d);
 
-        for (Double d : d_et)
-            det += String.format(" %.2f\t", d);
+            for (Double d : d_edt)
+                dedt += String.format(" %.2f\t", d);
 
-        for (Double d : d_edt)
-            dedt += String.format(" %.2f\t", d);
+            ddt += "]";
+            det += "]";
+            dedt += "]";
 
-        ddt += "]";
-        det += "]";
-        dedt += "]";
-
-        String s = String.format("dit: %.2f\teit: %.2f\tdt: %.2f\tet: %.2f\tedt: %.2f\n" +
-                "d_dt:\t%s\n" +
-                "d_et:\t%s\n" +
-                "d_edt:\t%s\n",
-                dit, eit, dt, et, edt, ddt, det, dedt);
-
+            String s = String.format("dit: %.2f\teit: %.2f\tdt: %.2f\tet: %.2f\tedt: %.2f\n" +
+                            "d_dt:\t%s\n" +
+                            "d_et:\t%s\n" +
+                            "d_edt:\t%s\n",
+                    dit, eit, dt, et, edt, ddt, det, dedt);
 
 
-        System.out.println(s);
-    }
-
+            System.out.println(s);
+        }
 }
