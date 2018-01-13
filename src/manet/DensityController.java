@@ -39,7 +39,7 @@ public class DensityController implements Control {
         this.this_pid = Configuration.getPid(prefix+"."+PAR_NEIGHBOR);
         this.verbose = Configuration.getInt(prefix + "." + PAR_VERBOSE);
         this.step = Configuration.getInt(prefix + "." + PAR_STEP);
-        System.err.println("verbose " + this.verbose + " step " + this.step);
+//        System.err.println("verbose " + this.verbose + " step " + this.step);
     }
 
 
@@ -57,7 +57,7 @@ public class DensityController implements Control {
 
         if (this.verbose != 0) {
             if (CommonState.getTime() >= CommonState.getEndTime()-step) {
-                printState();
+                printCols();
             }
         }
 
