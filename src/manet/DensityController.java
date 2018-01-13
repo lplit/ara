@@ -17,8 +17,8 @@ public class DensityController implements Control {
     private double
             dit = 0.0, // la moyenne du nombre de voisins par noeud à l'instant t (densite)
             eit = 0.0, // l'écart-type de dit
-            dt  = 0.0, // densité moyenne sur le temps
-            et  = 0.0, // disparité moyenne de densité sur le temps
+            dt  = 0.0, // densité moyenne sur le temps (avg of d_dt)
+            et  = 0.0, // disparité moyenne de densité sur le temps (avg of d_et)
             edt = 0.0; // variation de la densité au cours du temps
 
     // Arrays containing data for dt, et and edt calculations
@@ -35,10 +35,12 @@ public class DensityController implements Control {
     @Override
     // @return true if the simulation has to be stopped, false otherwise.
     public boolean execute() {
-        dt  = evo_dt();
-        et  = evo_et();
-        edt = evo_etd();
+        // Over-time averages
+        dt = evo_dt();
+        et = evo_et();
+        edt = evo_edt();
 
+        // 'Live' values
         dit = dit();
         eit = eit();
 
@@ -69,9 +71,7 @@ public class DensityController implements Control {
         }
 
         avg = sum / Network.size();
-        dt = evo_dt(); // Update "up-to-now" avgs
-        d_dt.add(avg); // Add to history
-
+        d_dt.add(avg);  // Add to history
         return avg;
     }
 
@@ -85,27 +85,21 @@ public class DensityController implements Control {
      */
     public double eit() {
         double stdDev = 0.0;
-        int n_size = Network.size();
-
-        for (int i = 0 ; i < n_size ; i++ ) {
+        for (int i = 0 ; i < Network.size() ; i++ ) {
             double n_neigs = ((NeighborProtocolImpl) Network.get(i)
                     .getProtocol(this_pid))
                     .getNeighbors().size();
             stdDev += Math.pow(n_neigs - dit, 2);
         }
 
-        stdDev = Math.sqrt(stdDev/n_size);
-        et = evo_et();      // Update "up-to-now" avgs
+        stdDev = Math.sqrt(stdDev/Network.size());
         d_et.add(stdDev);   // Add to history
-
         return stdDev;
     }
 
 
 
     /* Stats for all until current */
-
-    // TODO: Need to be implemented
 
     /**
      * La moyenne de l'ensemble des valeurs D_i(t') pour tout t' < t
@@ -138,8 +132,8 @@ public class DensityController implements Control {
     public double evo_et() {
         double avg = 0.0;
         if (!d_et.isEmpty()) {
-            int size = d_dt.size();
-            for (Double d : d_dt) {
+            int size = d_et.size();
+            for (Double d : d_et) {
                 avg += d;
             }
             avg = avg / size;
@@ -158,9 +152,15 @@ public class DensityController implements Control {
      *
      * @return
      */
-    public double evo_etd() {
+    public double evo_edt() {
         double stdDev = 0.0;
-
+        if (!d_edt.isEmpty()) {
+            int size = d_edt.size();
+            for (Double d : d_edt) {
+                stdDev += d;
+            }
+            stdDev = stdDev / size;
+        }
         return stdDev;
     }
 
