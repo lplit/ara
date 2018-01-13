@@ -44,6 +44,9 @@ public class DensityController implements Control {
         dit = dit();
         eit = eit();
 
+//        System.err.println("Controler: dt " + dt + " et " + et + " edt " + edt + " dit " + dit + " eit " + eit);
+        System.out.println(col1() + " " + col2() + " " + col3());
+
         return false;
     }
 

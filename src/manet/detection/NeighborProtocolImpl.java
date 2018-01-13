@@ -73,26 +73,18 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                 - "Heartbeat" (self-bootstrap)
                 - "Timer" pour déclencher les timers des gens
              */
-            if (msg.getIdDest() == -1) {
+
                 switch (msg.getTag()) {
                     case "Heartbeat":
-                        EDSimulator.add(this.period, new Message(node.getID(), -1, "Heartbeat", "Heartbeat", this_pid), node, this_pid);
-//                        System.err.println(("recvd msg src" + msg.getIdSrc() + " dest " + msg.getIdDest()) + " " + msg.getTag() + neighbor_list);
-                        // salut y'a-t-il des nouveaux potos dans mon scope
-//                        System.err.println("emitting from neighbor");
-                        impl.emit(node, new Message(msg.getIdSrc(), -1, "Heartbeat", "Heartbeat", this_pid));
-
-
-                        break;
-                    case "Timer":
-                        if (neighbor_list.contains(msg.getContent())) {
-                            neighbor_list.remove(msg.getContent());
+                        if (msg.getIdDest() == -1) {
+                            EDSimulator.add(this.period, new Message(node.getID(), -1, "Heartbeat", "Heartbeat", this_pid), node, this_pid);
+                            //                        System.err.println(("recvd msg src" + msg.getIdSrc() + " dest " + msg.getIdDest()) + " " + msg.getTag() + neighbor_list);
+                            // salut y'a-t-il des nouveaux potos dans mon scope
+                            //                        System.err.println("emitting from neighbor");
+                            impl.emit(node, new Message(msg.getIdSrc(), -1, "Heartbeat", "Heartbeat", this_pid));
                         }
-                        break;
-                }
-            } else { // du coup là on ne traite plus que les messages des autres
-                switch (msg.getTag()) {
-                    case "Heartbeat": // salutations mon nouveau poto
+                        else { // du coup là on ne traite plus que les messages des autres
+                        // salutations mon nouveau poto
                         if (!neighbor_list.contains(msg.getIdSrc())) {
                             neighbor_list.add(msg.getIdSrc());
                             for (Long l : neighbor_list) {
@@ -101,19 +93,20 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                             }
                         }
                         //System.out.println(neighbor_list);
-                        break;
-                    case "Timer":
-                        System.err.println("TIMER should not be here");
-                        System.err.println("TIMER Node " + node.getID() + " msg src " + msg.getIdSrc() + " dest " + msg.getIdDest() + " " + msg.getTag() + " " + msg.getContent());
-                        if (neighbor_list.contains(msg.getContent())) {
-                            neighbor_list.remove(msg.getContent());
                         }
+
                         break;
-                    default:
-                        System.out.println("IN DEFAULT");
+                        case "Timer":
+//                           System.err.println("TIMER Node " + node.getID() + " msg src " + msg.getIdSrc() + " dest " + msg.getIdDest() + " " + msg.getTag() + " " + msg.getContent());
+                            if (neighbor_list.contains(msg.getContent())) {
+                                neighbor_list.remove(msg.getContent());
+                            }
+                        break;
+                        default:
+                            System.out.println("IN DEFAULT");
                         break;
                 }
-            }
+
 
         }
 

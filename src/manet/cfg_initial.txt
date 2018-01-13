@@ -13,7 +13,9 @@ control.graph.step 1
 control.graph.emitter emitter
 control.graph.neighborprotocol neighbor
 
-
+control.density DensityController
+control.density.neighbours neighbor
+control.density.step 1000
 
 protocol.position PositionProtocolImpl
 protocol.position.maxspeed 20
