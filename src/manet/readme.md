@@ -3,6 +3,7 @@
 # Exo1
 
 ## Q1
+
 > En analysant le code de la classe `PositionProtocolImpl`, donnez l'algorithme général
 de déplacement d'un noeud. Il ne vous est pas demandé de code dans cette question.
 
@@ -14,42 +15,41 @@ Movement protocol:
     - use `PositioningStrategiesFactory` to get next destination
     - Calc distance to next destination
     - if too far to reach `destination` in one hop
-        - calculate next `x` and `y` 
-        - move to that position 
+        - calculate next `x` and `y`
+        - move to that position
     - if destination reached, stop
     - else continue running
 
-
 L'algorithme utilise le protocole de déplacement suivant:
-Une valeur de la vitesse est aléatoirement choisie dans l'intervalle [speed_min; speed_max].
+Une valeur de la vitesse est aléatoirement choisie dans l'intervalle `[speed_min; speed_max]`.
 Vu qu'on est en temps discretisé, `distance_to_next` représente la distance parcourue au
  Une fois la destination atteinte, le noeud s'arrête pendant un tic.
 
 ## Q2
 
 ```
-simulation.endtime 50000 
-random.seed 5 
-network.size 10 
-init.initialisation Initialisation 
-control.graph GraphicalMonitor 
-control.graph.positionprotocol position 
-control.graph.time_slow 0.0002 
+simulation.endtime 50000
+random.seed 5
+network.size 10
+init.initialisation Initialisation
+control.graph GraphicalMonitor
+control.graph.positionprotocol position
+control.graph.time_slow 0.0002
 control.graph.step 1
 ```
 
 ## Q3 
 
 > Que fait strat 1?
+
 La stratégie 1 choisit aléatoirement la prochaine destination dans les intervalles
 [0; maxX] et [0; maxY].
 
 ## Q4
 
-> Re-testez en prenant en SD, la stratégie 2 (la stratégie 1 reste la SPI). Que fait la
-  stratégie 2 ?
-  
-  La stratégie 2 choisit comme destination l'endroit courant du noeud, celui-ci reste immobile.
+> Re-testez en prenant en SD, la stratégie 2 (la stratégie 1 reste la SPI). Que fait la stratégie 2 ?
+
+La stratégie 2 choisit comme destination l'endroit courant du noeud, celui-ci reste immobile.
 
 ## Q5
 
@@ -79,11 +79,9 @@ public class EmitterImpl implements Emitter {
     public EmitterImpl(String prefix) {
         String tmp[]=prefix.split("\\.");
         this_pid=Configuration.lookupPid(tmp[tmp.length-1]);
-        //System.out.println(prefix + "." + PAR_POSITIONPROTOCOL);
         this.position_protocol=Configuration.getPid(prefix+"."+PAR_POSITIONPROTOCOL);
         this.latency = Configuration.getInt(prefix + "." + PAR_LATENCY);
         this.scope = Configuration.getInt(prefix + "." + PAR_SCOPE);
-        //System.out.println("WOAH");
     }
 
     @Override
@@ -96,22 +94,16 @@ public class EmitterImpl implements Emitter {
             double dist =prot.getCurrentPosition().distance(prot2.getCurrentPosition());
             if (dist < scope && n.getID() != host.getID()) {
                 EDSimulator.add(latency, new Message(msg.getIdSrc(), n.getID(), msg.getTag(), msg.getContent(), msg.getPid()), n, msg.getPid());
-                //                System.out.println("yeah lele woah");
-                //                EDSimulator.add(0, msg, n, );
             }
         }
 
     }
 
     @Override
-    public int getLatency() {
-        return latency;
-    }
+    public int getLatency() { return latency; }
 
     @Override
-    public int getScope() {
-        return scope;
-    }
+    public int getScope() { return scope; }
 
     @Override
     public Object clone(){
@@ -157,18 +149,13 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 
         String tmp[]=prefix.split("\\.");
         this_pid= Configuration.lookupPid(tmp[tmp.length-1]);
-
         this.period = Configuration.getInt(prefix+"."+PAR_PERIOD);
         this.timer_delay = Configuration.getInt(prefix + "." + PAR_TIMERDELAY);
         this.listener_pid = Configuration.getPid(prefix + "." + PAR_LISTENER_PID,-1);
-
-
         }
 
     @Override
-    public List<Long> getNeighbors() {
-        return neighbor_list;
-    }
+    public List<Long> getNeighbors() { return neighbor_list; }
 
     @Override
     public Object clone() {
@@ -192,16 +179,13 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
         if (event instanceof Message) {
             switch (msg.getTag()) {
                 case "Heartbeat":
-                    //System.out.println("Heartbeat from " + node.getID());
                     if (msg.getIdSrc() == msg.getIdDest()) {
-                        //System.out.println("Stamp "+ timeStamp++);
                         EDSimulator.add(this.period, event, node, pid);
                         impl.emit(node, new Message(node.getID(), 0, "Heartbeat", "Heartbeat", this_pid));
                     }
                     else {
                         if(!neighbor_list.contains(msg.getIdSrc()))
                             neighbor_list.add(msg.getIdSrc());
-                        //System.out.println(neighbor_list);
                         break;
                     }
                     break;
@@ -217,11 +201,12 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 }
 ```
 
-## Q7.
+## Q7
 
 Oui.
 
-## Q8.
+## Q8
+
 Strategy3InitNext fait converger les points vers le milieu, et assure que tous
 les noeuds sont à portée les uns des autres, dans un rayon de `scope -
 marge`.
