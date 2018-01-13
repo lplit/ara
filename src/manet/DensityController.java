@@ -188,11 +188,32 @@ public class DensityController implements Control {
     }
 
     public void printState() {
+
+        String ddt = "[";
+        String det = "[";
+        String dedt = "[";
+
+        for (Double d : d_dt)
+            ddt += String.format(" %.2f\t", d);
+
+        for (Double d : d_et)
+            det += String.format(" %.2f\t", d);
+
+        for (Double d : d_edt)
+            dedt += String.format(" %.2f\t", d);
+
+        ddt += "]";
+        det += "]";
+        dedt += "]";
+
         String s = String.format("dit: %.2f\teit: %.2f\tdt: %.2f\tet: %.2f\tedt: %.2f\n" +
                 "d_dt:\t%s\n" +
                 "d_et:\t%s\n" +
                 "d_edt:\t%s\n",
-                dit, eit, dt, et, edt, d_dt, d_et, d_edt);
+                dit, eit, dt, et, edt, ddt, det, dedt);
+
+
+
         System.out.println(s);
     }
 
