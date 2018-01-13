@@ -11,8 +11,12 @@ public class DensityController implements Control {
 
 
     private static final String PAR_NEIGHBOR = "neighbours";
+    private static final String PAR_VERBOSE = "verbose";
 
     private final int this_pid;
+
+    private int verbose = 0; // Est-ce que l'on print les résultats sur stdout
+
     private double
             dit = 0.0,  // la moyenne du nombre de voisins par noeud à l'instant t (densite)
             eit = 0.0,  // l'écart-type de dit (donc a l'instant t)
@@ -29,6 +33,7 @@ public class DensityController implements Control {
 
     public DensityController(String prefix) {
         this.this_pid = Configuration.getPid(prefix+"."+PAR_NEIGHBOR);
+        this.verbose = Configuration.getInt(prefix + "." + PAR_VERBOSE);
     }
 
 
@@ -44,8 +49,8 @@ public class DensityController implements Control {
         dit = dit();
         eit = eit();
 
-//        System.err.println("Controler: dt " + dt + " et " + et + " edt " + edt + " dit " + dit + " eit " + eit);
-        System.out.println(col1() + " " + col2() + " " + col3());
+        if (this.verbose != 0)
+            System.out.println(col1() + " " + col2() + " " + col3());
 
         return false;
     }
