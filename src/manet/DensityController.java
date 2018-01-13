@@ -6,18 +6,26 @@ import peersim.core.Control;
 import peersim.core.Network;
 import peersim.core.Node;
 
+import java.util.ArrayList;
+
 public class DensityController implements Control {
 
 
-    private static final String PAR_NEIGHBOR = "latency";
+    private static final String PAR_NEIGHBOR = "neighbours";
 
     private final int this_pid;
     private double
-                dit = 0.0, // la moyenne du nombre de voisins par noeud à l'instant t
-                eit = 0.0, // l'écart-type de dit
-                dt  = 0.0, // densité moyenne sur le temps
-                et  = 0.0, // disparité moyenne de densité sur le temps
-                edt = 0.0; // variation de la densité au cours du temps
+            dit = 0.0, // la moyenne du nombre de voisins par noeud à l'instant t (densite)
+            eit = 0.0, // l'écart-type de dit
+            dt  = 0.0, // densité moyenne sur le temps
+            et  = 0.0, // disparité moyenne de densité sur le temps
+            edt = 0.0; // variation de la densité au cours du temps
+
+    // Arrays containing data for dt, et and edt calculations
+    private ArrayList<Double>
+            d_dt  = new ArrayList<Double>(), // Updated by dit()
+            d_et  = new ArrayList<Double>(), // Updated by eit()
+            d_edt = new ArrayList<Double>(); // Updates by evo_edt()
 
     public DensityController(String prefix) {
         this.this_pid = Configuration.getPid(prefix+"."+PAR_NEIGHBOR);
@@ -25,7 +33,14 @@ public class DensityController implements Control {
 
 
     @Override
+    // @return true if the simulation has to be stopped, false otherwise.
     public boolean execute() {
+        dt  = evo_dt();
+        et  = evo_et();
+        edt = evo_etd();
+
+        dit = dit();
+        eit = eit();
 
         return false;
     }
@@ -33,59 +48,82 @@ public class DensityController implements Control {
     /* A l'instant T */
 
     /**
-     * Calculates the standard deviation
-     * E_i(t) : L'ecart type de D_i(t) (avgNeighborsT())
-     *
-     * @return
-     */
-    public double standardDeviationT() {
-        double
-                avg = avgNeighborsT(),
-                stdDev = 0.0;
-        int n_size = Network.size();
-
-        for (int i = 0 ; i < n_size ; i++ ) {
-            double n_neigs = ((NeighborProtocolImpl) Network.get(i).getProtocol(this_pid)).getNeighbors().size();
-            stdDev += Math.pow(n_neigs - avg, 2);
-        }
-        return Math.sqrt(stdDev/n_size);
-    }
-
-
-    /**
-     * Calculates the average number of neighbors in the
-     * network when called
+     * Calculates the average number of neighbours in the
+     * network when called (works on 'live' data)
      * D_i(t) : Moyenne du nombre de voisins par noeud a l'instant t
+     *
+     * Updates dit and d_dt[]
      *
      * @return double average neighbors per node
      */
-    public double avgNeighborsT() {
+    private double dit() {
         double
                 sum = 0.0,
                 avg = 0.0;
 
         for (int i = 0 ; i < Network.size() ; i++) {
-            Node n = Network.get(i);
-            double n_neigs = ((NeighborProtocolImpl) n.getProtocol(this_pid)).getNeighbors().size();
+            double n_neigs = ((NeighborProtocolImpl) Network.get(i)
+                    .getProtocol(this_pid))
+                    .getNeighbors().size();
             sum += n_neigs;
         }
 
         avg = sum / Network.size();
+        dt = evo_dt(); // Update "up-to-now" avgs
+        d_dt.add(avg); // Add to history
+
         return avg;
     }
 
+    /**
+     * Calculates the standard deviation
+     * E_i(t) : L'ecart type de D_i(t) (dit())
+     * Works on 'live' data
+     * Updates eit and d_et[]
+     *
+     * @return l'écart-type de dit
+     */
+    public double eit() {
+        double stdDev = 0.0;
+        int n_size = Network.size();
 
-    /* Pour tout t' < t */
+        for (int i = 0 ; i < n_size ; i++ ) {
+            double n_neigs = ((NeighborProtocolImpl) Network.get(i)
+                    .getProtocol(this_pid))
+                    .getNeighbors().size();
+            stdDev += Math.pow(n_neigs - dit, 2);
+        }
+
+        stdDev = Math.sqrt(stdDev/n_size);
+        et = evo_et();      // Update "up-to-now" avgs
+        d_et.add(stdDev);   // Add to history
+
+        return stdDev;
+    }
+
+
+
+    /* Stats for all until current */
+
+    // TODO: Need to be implemented
 
     /**
      * La moyenne de l'ensemble des valeurs D_i(t') pour tout t' < t
      * donc densite moyenne sur le temps
      *
+     * Updates dt, works with history array
+     *
      * @return average density so far
      */
-    public double avgNeighbors() {
+    public double evo_dt() {
         double avg = 0.0;
-
+        if (!d_dt.isEmpty()) {
+            int size = d_dt.size();
+            for (Double d : d_dt) {
+                avg += d;
+            }
+            avg = avg / size;
+        }
         return avg;
     }
 
@@ -93,26 +131,34 @@ public class DensityController implements Control {
      * La moyenne de l'ensemble des valeurs E_i(t') pour tout t' < t
      * donc disparite moyenne de densite sur le temps
      *
+     * Updates et, works with history array
+     *
      * @return average density so far
      */
-    public double stdDeviation() {
-        double stdDev = 0.0;
-
-        return stdDev;
+    public double evo_et() {
+        double avg = 0.0;
+        if (!d_et.isEmpty()) {
+            int size = d_dt.size();
+            for (Double d : d_dt) {
+                avg += d;
+            }
+            avg = avg / size;
+        }
+        return avg;
     }
-
-    /* Evolution de la densite au cours du temps */
 
     /**
      * L'ecart type des valeurs D_i(t'), pour tout t' <= t, ce qui
      * permet de juger de la variation de la densite au cours du temps.
      * Plus le @return de cette fonction est elevee par rapport au resultat
-     * de stdDeviation(), plus le reseau a change de densite moyenne au cours
+     * de evo_et(), plus le reseau a change de densite moyenne au cours
      * du temps.
+     *
+     * Updates recalculates etd, works with history array
      *
      * @return
      */
-    public double stdDevEvolution() {
+    public double evo_etd() {
         double stdDev = 0.0;
 
         return stdDev;
