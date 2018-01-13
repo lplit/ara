@@ -120,7 +120,8 @@ sub bench {
     print "\n\n", $str_mov, " ", $str_pos, " ", $val_spi, " ", $val_sd, "\n-------\n";
 
     for ($i = 125; $i <= 1000; $i += 125) {
-	my $filename =  join "_", $file_base, $scope, $str_pos, $str_mov;
+
+	my $filename =  join "_", $file_base, $i, $str_pos, $str_mov;
 	push @scopes, $i;
 	$filename = join "/", $bench_dir, $filename;
 	open (my $bench_file, '>', $filename) or die "Could not open file ";
@@ -132,11 +133,10 @@ sub bench {
 			join("=", $key_cfg, $filename),,
 			join("=", $key_peersim, $val_peersim)
 	    );
-	print $run_cmd;
-	print "\n";
+	print $run_cmd, "\nExecuting:\n";
 	#    print $bench_file
 	close $filename;
-	print "\nOUAIS", `$run_cmd`;
+	system($run_cmd);
     }
 }
 
