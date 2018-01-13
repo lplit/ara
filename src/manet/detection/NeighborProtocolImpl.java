@@ -68,17 +68,19 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 
 
         if (event instanceof Message) {
+//            System.err.println("Node " + node.getID() + " msg src " + msg.getIdSrc() + " dest " + msg.getIdDest() + " " + msg.getTag() + " " + msg.getContent());
             /* on filtre déjà nos messages à nous
                 - "Heartbeat" (self-bootstrap)
                 - "Timer" pour déclencher les timers des gens
              */
-            if (msg.getIdDest() == 0) {
+            if (msg.getIdDest() == -1) {
                 switch (msg.getTag()) {
                     case "Heartbeat":
-                        EDSimulator.add(this.period, new Message(node.getID(), 0, "Heartbeat", "Heartbeat", this_pid), node, this_pid);
+                        EDSimulator.add(this.period, new Message(node.getID(), -1, "Heartbeat", "Heartbeat", this_pid), node, this_pid);
 //                        System.err.println(("recvd msg src" + msg.getIdSrc() + " dest " + msg.getIdDest()) + " " + msg.getTag() + neighbor_list);
                         // salut y'a-t-il des nouveaux potos dans mon scope
-                        impl.emit(node, new Message(msg.getIdSrc(), msg.getIdDest(), "Heartbeat", "Heartbeat", this_pid));
+//                        System.err.println("emitting from neighbor");
+                        impl.emit(node, new Message(msg.getIdSrc(), -1, "Heartbeat", "Heartbeat", this_pid));
 
 
                         break;
@@ -95,12 +97,14 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                             neighbor_list.add(msg.getIdSrc());
                             for (Long l : neighbor_list) {
                                 // pour tous les voisins dans la liste, on s'ajoute un timer
-                                EDSimulator.add(this.timer_delay, new Message(l, 0, "Timer", l, this_pid), node, this_pid);
+                                EDSimulator.add(this.timer_delay, new Message(l, -1, "Timer", l, this_pid), node, this_pid);
                             }
                         }
                         //System.out.println(neighbor_list);
                         break;
                     case "Timer":
+                        System.err.println("TIMER should not be here");
+                        System.err.println("TIMER Node " + node.getID() + " msg src " + msg.getIdSrc() + " dest " + msg.getIdDest() + " " + msg.getTag() + " " + msg.getContent());
                         if (neighbor_list.contains(msg.getContent())) {
                             neighbor_list.remove(msg.getContent());
                         }
