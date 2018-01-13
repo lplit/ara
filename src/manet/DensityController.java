@@ -50,7 +50,7 @@ public class DensityController implements Control {
         eit = eit();
 
         if (this.verbose != 0)
-            System.out.println(col1() + " " + col2() + " " + col3());
+            printState();
 
         return false;
     }
@@ -72,9 +72,7 @@ public class DensityController implements Control {
                 avg = 0.0;
 
         for (int i = 0 ; i < Network.size() ; i++) {
-            double n_neigs = ((NeighborProtocolImpl) Network.get(i)
-                    .getProtocol(this_pid))
-                    .getNeighbors().size();
+            double n_neigs = ((NeighborProtocolImpl) Network.get(i).getProtocol(this_pid)).getNeighbors().size();
             sum += n_neigs;
         }
 
@@ -93,14 +91,14 @@ public class DensityController implements Control {
      */
     public double eit() {
         double stdDev = 0.0;
-        for (int i = 0 ; i < Network.size() ; i++ ) {
-            double n_neigs = ((NeighborProtocolImpl) Network.get(i)
-                    .getProtocol(this_pid))
-                    .getNeighbors().size();
-            stdDev += Math.pow(n_neigs - dit, 2);
+        for (Double d : d_dt) {
+//            System.out.format("d: %.2f\n", d);
+            stdDev += Math.pow(d - dit, 2);
         }
-
-        stdDev = Math.sqrt(stdDev/Network.size());
+//        System.out.format("Stddev: %.2f ", stdDev);
+        double avg = stdDev/d_dt.size();
+        stdDev = Math.sqrt(avg);
+//        System.out.format("avg: %.2f stddev: %.2f\n", avg, stdDev);
         d_et.add(stdDev);   // Add to history
         return stdDev;
     }
@@ -169,25 +167,11 @@ public class DensityController implements Control {
 
 
     /* Getters */
-    public double getEdt() {
-        return edt;
-    }
-
-    public double getEt() {
-        return et;
-    }
-
-    public double getDt() {
-        return dt;
-    }
-
-    public double getEit() {
-        return eit;
-    }
-
-    public double getDit() {
-        return dit;
-    }
+    public double getEdt() { return edt; }
+    public double getEt() { return et; }
+    public double getDt() { return dt; }
+    public double getEit() { return eit; }
+    public double getDit() { return dit; }
 
     /** We're lazy so functions for q10
      * Col1 = D(t=end)
@@ -197,5 +181,19 @@ public class DensityController implements Control {
     public double col1() { return getDt(); }
     public double col2() { return (getEt() / getDt()); }
     public double col3() { return (getEdt() / getDt()); }
+
+    public void printCols() {
+        String s = String.format("%.2f\t%.2f\t%.2f", col1(), col2(), col3());
+        System.out.println(s);
+    }
+
+    public void printState() {
+        String s = String.format("dit: %.2f\teit: %.2f\tdt: %.2f\tet: %.2f\tedt: %.2f\n" +
+                "d_dt:\t%s\n" +
+                "d_et:\t%s\n" +
+                "d_edt:\t%s\n",
+                dit, eit, dt, et, edt, d_dt, d_et, d_edt);
+        System.out.println(s);
+    }
 
 }
