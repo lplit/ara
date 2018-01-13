@@ -51,13 +51,12 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
         NeighborProtocolImpl res = null;
         try {
             res = (NeighborProtocolImpl) super.clone();
-            neighbor_list = new ArrayList<>();
-            timeStamp = new Integer(0);
         } catch (CloneNotSupportedException e) {
 
         }
         return res;
     }
+
 
     @Override
     public void processEvent(Node node, int pid, Object event) {
