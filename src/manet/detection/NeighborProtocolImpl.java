@@ -77,7 +77,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                 switch (msg.getTag()) {
                     case "Heartbeat":
                         EDSimulator.add(this.period, new Message(node.getID(), 0, "Heartbeat", "Heartbeat", this_pid), node, this_pid);
-                        System.err.println(("recvd msg src" + msg.getIdSrc() + " dest " + msg.getIdDest()) + " " + msg.getTag() + neighbor_list);
+//                        System.err.println(("recvd msg src" + msg.getIdSrc() + " dest " + msg.getIdDest()) + " " + msg.getTag() + neighbor_list);
                         // salut y'a-t-il des nouveaux potos dans mon scope
                         impl.emit(node, new Message(msg.getIdSrc(), msg.getIdDest(), "Heartbeat", "Heartbeat", this_pid));
 
