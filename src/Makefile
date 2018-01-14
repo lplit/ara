@@ -26,4 +26,9 @@ clean :
 	@rm -fv  `find . -name "*~"`
 	@echo "Clean done!"
 
-.PHONY: all clean run
+bench_clean:
+	@rm -rf bench_*
+	@echo "Cleaned up benchmark directories"
+
+#`ls bench_*`
+.PHONY: all clean bench_clean run
