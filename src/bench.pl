@@ -3,11 +3,10 @@ use strict;
 use warnings;
 
 
-my $key_control_init =
+
 my $str_network_size = "network.size";
 my $str_random_seed = "random.seed";
 my $str_init = "Initialisation";
-my @scopes;
 my $scope;
 my $file_base;
 
@@ -85,8 +84,8 @@ sub date {
 #    return join("_",$dt->ymd, dt->hms);
 #    return localtime->strftime('%F-%X');
     my $ret = `/bin/env date +%F-%T\n`;
-    print "date(): date ", $ret, "nonewline";
-    return chomp($ret);
+    chomp $ret;
+    return $ret;
 }
 
 
@@ -135,38 +134,41 @@ sub bench {
     my $val_sd = shift;;
     my $results_file;
 
-    print "\nBenchmark directory", $bench_dir, "\n", $str_mov, " ", $str_pos, " ", $val_spi, " ", $val_sd, "\n-------\n";
+    print "\nBenchmark directory ", $bench_dir, "\n", $str_mov, " ", $str_pos, " ", $val_spi, " ", $val_sd, "\n-------\n";
 
     for ($i = 125; $i <= 1000; $i += 125) {
+	for (my $k = 0; $k < 10; $k++) {
+	    my $filename =  join "_", $file_base, $i, $str_pos, $str_mov;
+	    $filename = join "/", $bench_dir, $filename;
+	    open (my $bench_file, '>', $filename) or die "Could not open file ";
+	    print $bench_file $file_first, "\n", join(" ", $key_spi, $value_spi), "\n";
+	    print $bench_file join(" ", $key_sd, $value_sd), "\n";
+	    print $bench_file join(" ", $key_scope, $i), "\n";
+	    $run_cmd = join(" ",
+			    "make run",
+			    join("=", $key_cfg, $filename),
+			    join("=", $key_peersim, $val_peersim)
+		);
+	    print "Executing `", $run_cmd, "`\n";
 
-	my $filename =  join "_", $file_base, $i, $str_pos, $str_mov;
-	push @scopes, $i;
-	$filename = join "/", $bench_dir, $filename;
-	open (my $bench_file, '>', $filename) or die "Could not open file ";
-	print $bench_file $file_first, "\n", join(" ", $key_spi, $value_spi), "\n";
-	print $bench_file join(" ", $key_sd, $value_sd), "\n";
-	print $bench_file join(" ", $key_scope, $i), "\n";
-	$run_cmd = join(" ",
-			"make run",
-			join("=", $key_cfg, $filename),
-			join("=", $key_peersim, $val_peersim)
-	    );
-	print "Executing `", $run_cmd, "`\n";
-	#    print $bench_file
-	close $filename;
-	system($run_cmd);
+	    close $filename;
+	    system($run_cmd);
 
-	$results_file = join(".", $filename, "results");
-	open (my $bench_res, '<', $results_file) or die "Could not open ", $results_file, "\n";;
-	$results_file =~ s/^$//g;
-	print "Results file:\n";
-	print $results_file;
-	print "\n";
-	close($results_file);
-   } }
+	    $results_file = join(".", $filename, "results");
+	    print "Results file ", $results_file, "\n";
+	    open (my $bench_res, '<', $results_file) or die "Could not open ", $results_file, "\n";
+	    #	$results_file =~ s/^$//g;
+	    print "Results file:\n";
+	    print $results_file;
+	    print "\n";
+	    close($results_file);
+	}
+    }
+}
 
-#[
-#~pod
+
+    #[
+    #~pod
 
 
 #control.graph GraphicalMonitor
