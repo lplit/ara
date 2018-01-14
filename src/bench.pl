@@ -75,6 +75,15 @@ my $strat_move;
 my $i;
 
 
+
+my $run_cmd = "make CFG";
+my $key_cfg = "CFG";
+my $key_peersim = "DIR_PEERSIM";
+my $val_peersim = $ARGV[0];
+
+my $cmd_peersim = join("=", $key_peersim, $val_peersim);
+
+
 sub date {
 #    my $dt   = DateTime->now;   # Stores current date and time as datetime object
 #    my $date = $dt->ymd;   # Retrieves date as a string in 'yyyy-mm-dd' format
@@ -85,6 +94,7 @@ sub date {
 #    return localtime->strftime('%F-%X');
     my $ret = `/bin/env date +%F-%T\n`;
     chomp $ret;
+    print "date: ", $ret;
     return $ret;
 }
 
@@ -93,8 +103,12 @@ my $bench_dir;
 
 $bench_dir = join("_", "bench", date());
 
-system("mkdir $bench_dir");
 
+system("mkdir $bench_dir");
+if (system(join(" ", "make", $cmd_peersim)) != 0) {
+    print "make failed.\n";;
+    exit;
+}
 
 sub get_config_filename() {
     return join "/", $bench_dir, $filename;
@@ -103,11 +117,6 @@ sub get_config_filename() {
 
 
 
-
-my $run_cmd = "make CFG";
-my $key_cfg = "CFG";
-my $key_peersim = "DIR_PEERSIM";
-my $val_peersim = $ARGV[0];
 
 
 $strat_position = 1;
@@ -152,7 +161,10 @@ sub bench {
 	    print "Executing `", $run_cmd, "`\n";
 
 	    close $filename;
-	    system($run_cmd);
+	    if (system($run_cmd) != 0) {
+		print "run_cmd failed.\n";
+	    }
+
 
 	    $results_file = join(".", $filename, "results");
 	    print "Results file ", $results_file, "\n";
