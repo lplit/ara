@@ -68,13 +68,15 @@ my $value_sd;
 
 my $filename;
 
+srand(localtime);
+
 $file_base = "cfg_bench";
 
 my  $strat_position;
 my $strat_move;
 my $i;
 
-
+my $random_seed;
 
 my $run_cmd;
 my $key_cfg = "CFG";
@@ -148,12 +150,14 @@ sub bench {
 
     for ($i = 125; $i <= 1000; $i += 125) {
 	for (my $k = 0; $k < 10; $k++) {
+	    $random_seed = rand(100);
 	    my $filename =  join "_", $file_base, $i, $str_pos, $str_mov;
 	    $filename = join "/", $bench_dir, $filename;
 	    open (my $bench_file, '>', $filename) or die "Could not open file ";
 	    print $bench_file $file_first, "\n", join(" ", $key_spi, $value_spi), "\n";
 	    print $bench_file join(" ", $key_sd, $value_sd), "\n";
 	    print $bench_file join(" ", $key_scope, $i), "\n";
+	    print $bench_file join(" ", $str_random_seed, $random_seed, "\n");
 	    $run_cmd = join(" ",
 			    "make run",
 			    join("=", $key_cfg, $filename),
@@ -168,7 +172,7 @@ sub bench {
 
 
 	    $results_file = join(".", $filename, "results");
-	    print "Results file ", $results_file, "\n";
+	    print "Results file ", $results_file, "seed ", $random_seed, "\n";
 	    open (my $bench_res, '<', $results_file) or die "Could not open ", $results_file, "\n";
 	    #	$results_file =~ s/^$//g;
 	    print "Results file:\n";
