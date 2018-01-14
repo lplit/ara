@@ -76,11 +76,12 @@ my $i;
 
 
 
-my $run_cmd = "make CFG";
+my $run_cmd;
 my $key_cfg = "CFG";
+
+
 my $key_peersim = "DIR_PEERSIM";
 my $val_peersim = $ARGV[0];
-
 my $cmd_peersim = join("=", $key_peersim, $val_peersim);
 
 
@@ -92,9 +93,9 @@ sub date {
 #    my $wanted = "$date $time";   # creates 'yyyy-mm-dd hh:mm:ss' string
 #    return join("_",$dt->ymd, dt->hms);
 #    return localtime->strftime('%F-%X');
-    my $ret = `/bin/env date +%F-%T\n`;
+    my $ret = `date +%F-%T\n`;
     chomp $ret;
-    print "date: ", $ret;
+    print "date: ", $ret, "\n";
     return $ret;
 }
 
@@ -172,7 +173,7 @@ sub bench {
 	    #	$results_file =~ s/^$//g;
 	    print "Results file:\n";
 	    print $results_file;
-	    print "\n";
+	    print "\n\n";
 	    close($results_file);
 	}
     }
