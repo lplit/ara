@@ -13,7 +13,7 @@ all : $(BIN)
 	javac $(JFLAGS)
 
 run : $(BIN)
-	$(LINER) $(CFG) | tail -n 1 > "$(CFG).results"
+	$(LINER) $(CFG) | tail -n 1 >> "$(CFG).results"
 
 $(BIN) : $(SRC)
 	$(JCC) $(JFLAGS)
