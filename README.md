@@ -56,3 +56,8 @@ exemple output:
 ```
 
 `| 2.2740 +- 0.1165 | 0.4630 +- 0.0518 | 0.2320 +- 0.0325 |` se lit colonne1 moyenne `2.2740` et ecart type `0.1165`
+
+### todo (peut-être?)
+- bench.pl -> bench1q10.pl
+- bench2q1.pl
+- 2 ou 3 Makefile différents (Ex1, Ex2)
