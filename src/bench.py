@@ -13,7 +13,7 @@ for file in os.listdir(sys.argv[1]):
         c2 = []
         c3 = []
         for line in f.readlines():
-            col1, col2, col3 = line.split(',')
+            col1, col2, col3 = line.split(';')
             col3 = float(col3.strip())
             col2 = float(col2.strip())
             col1 = float(col1.strip())
