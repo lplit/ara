@@ -99,7 +99,7 @@ public class Strategy4Next implements NextDestinationStrategy {
 			return pos_proto_host.getCurrentPosition();//le mouvement de host entraine un split du reseau
 		}
 		currentMoving=host;
-		System.err.println("sup?");
+//		System.err.println("sup?");
 		return new_position;
 	}
 	
