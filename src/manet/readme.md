@@ -281,3 +281,12 @@ Averages and standard deviations over 100 iterations with random seeds.
 | 750 | 3 | 3 | 2.3350 +- 0.1005 | 0.4686 +- 0.0626 | 0.2413 +- 0.0490 |
 | 875 | 3 | 3 | 2.3451 +- 0.0853 | 0.4703 +- 0.0600 | 0.2500 +- 0.0516 |
 | 1000 | 3 | 3 | 2.3639 +- 0.0991 | 0.4614 +- 0.0698 | 0.2379 +- 0.0506 |
+
+
+# Ex2
+
+## Question 2
+
+> Expliquez votre démarche pour régler ce problème. Votre solution devra se faire de manière non intrusive, ni dans le code applicatif, ni dans le code qui vous a été fourni.
+
+Decorateur sur `Emitter`, ca se solve avec un `bool`, mais je sais pas trop commment.
