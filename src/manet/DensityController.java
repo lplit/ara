@@ -19,7 +19,7 @@ public class DensityController implements Control {
     private final int this_pid;
 
     private int verbose = 0; // Est-ce que l'on print les résultats sur stdout
-    private int step; // step du controlleur. hdxlk
+    private int step; // step du controlleur
 
     private double
             dit = 0.0,  // la moyenne du nombre de voisins par noeud à l'instant t (densite)
@@ -27,7 +27,7 @@ public class DensityController implements Control {
             dt  = 0.0,  // densité moyenne sur le temps (avg of d_dt)
             et  = 0.0,  // disparité moyenne de densité sur le temps (avg of d_et)
             edt = 0.0;  // variation de la densité au cours du temps (ecart type des valeurs d_dt,
-                        // donc de toute la sim jusqu'a mtn)
+    // donc de toute la sim jusqu'a mtn)
 
     // Arrays containing data for dt, et and edt calculations
     private ArrayList<Double>
@@ -39,7 +39,6 @@ public class DensityController implements Control {
         this.this_pid = Configuration.getPid(prefix+"."+PAR_NEIGHBOR);
         this.verbose = Configuration.getInt(prefix + "." + PAR_VERBOSE);
         this.step = Configuration.getInt(prefix + "." + PAR_STEP);
-//        System.err.println("verbose " + this.verbose + " step " + this.step);
     }
 
 
@@ -55,11 +54,9 @@ public class DensityController implements Control {
         dit = dit();
         eit = eit();
 
-        if (this.verbose != 0) {
-            if (CommonState.getTime() >= CommonState.getEndTime()-step) {
+        if (this.verbose != 0)
+            if (CommonState.getTime() >= CommonState.getEndTime()-step)
                 printCols();
-            }
-        }
 
         return false;
     }
@@ -101,13 +98,16 @@ public class DensityController implements Control {
     public double eit() {
         double stdDev = 0.0;
         for (Double d : d_dt) {
-//            System.out.format("d: %.2f\n", d);
+            if (this.verbose != 0)
+                System.out.format("d: %.2f\n", d);
             stdDev += Math.pow(d - dit, 2);
         }
-//        System.out.format("Stddev: %.2f ", stdDev);
+        if (this.verbose != 0)
+            System.out.format("Stddev: %.2f ", stdDev);
         double avg = stdDev/d_dt.size();
         stdDev = Math.sqrt(avg);
-//        System.out.format("avg: %.2f stddev: %.2f\n", avg, stdDev);
+        if (this.verbose != 0)
+            System.out.format("avg: %.2f stddev: %.2f\n", avg, stdDev);
         d_et.add(stdDev);   // Add to history
         return stdDev;
     }
@@ -197,30 +197,30 @@ public class DensityController implements Control {
     }
 
     public void printState() {
-            String ddt = "[";
-            String det = "[";
-            String dedt = "[";
+        String ddt = "[";
+        String det = "[";
+        String dedt = "[";
 
-            for (Double d : d_dt)
-                ddt += String.format(" %.2f\t", d);
+        for (Double d : d_dt)
+            ddt += String.format(" %.2f\t", d);
 
-            for (Double d : d_et)
-                det += String.format(" %.2f\t", d);
+        for (Double d : d_et)
+            det += String.format(" %.2f\t", d);
 
-            for (Double d : d_edt)
-                dedt += String.format(" %.2f\t", d);
+        for (Double d : d_edt)
+            dedt += String.format(" %.2f\t", d);
 
-            ddt += "]";
-            det += "]";
-            dedt += "]";
+        ddt += "]";
+        det += "]";
+        dedt += "]";
 
-            String s = String.format("dit: %.2f\teit: %.2f\tdt: %.2f\tet: %.2f\tedt: %.2f\n" +
-                            "d_dt:\t%s\n" +
-                            "d_et:\t%s\n" +
-                            "d_edt:\t%s\n",
-                    dit, eit, dt, et, edt, ddt, det, dedt);
+        String s = String.format("dit: %.2f\teit: %.2f\tdt: %.2f\tet: %.2f\tedt: %.2f\n" +
+                        "d_dt:\t%s\n" +
+                        "d_et:\t%s\n" +
+                        "d_edt:\t%s\n",
+                dit, eit, dt, et, edt, ddt, det, dedt);
 
 
-            System.out.println(s);
-        }
+        System.out.println(s);
+    }
 }
