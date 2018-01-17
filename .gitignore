@@ -23,4 +23,7 @@ hs_err_pid*
 
 # Emacs and temps
 *#
-.*~
+
+
+# IntelliJ
+.idea/
