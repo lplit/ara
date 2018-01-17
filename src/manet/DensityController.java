@@ -192,7 +192,7 @@ public class DensityController implements Control {
     public double col3() { return (getEdt() / getDt()); }
 
     public void printCols() {
-        String s = String.format("%.2f,%.2f,%.2f", col1(), col2(), col3());
+        String s = String.format("%.2f;%.2f;%.2f", col1(), col2(), col3());
         System.out.println(s);
     }
 

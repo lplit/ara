@@ -43,7 +43,7 @@ public class GossipProtocolImpl implements GossipProtocol {
     public void initiateGossip(Node host, int id, long id_initiator) {
 
         for (int i = 0 ; i < this.diffs ; i++) {
-
+// aight
         }
 
     }
