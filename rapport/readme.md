@@ -290,3 +290,8 @@ Averages and standard deviations over 100 iterations with random seeds.
 > Expliquez votre démarche pour régler ce problème. Votre solution devra se faire de manière non intrusive, ni dans le code applicatif, ni dans le code qui vous a été fourni.
 
 Decorateur sur `Emitter`, ca se solve avec un `bool`, mais je sais pas trop commment.
+
+On implémente une classe encapsulant la classe `EmitterImpl` avec le Design
+Pattern `Decorator`. Cette classe entretient une liste de voisins
+atteignables pendant un broadcast, et l'identifiant du noeud parent lui
+ayant envoyé le message.

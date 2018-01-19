@@ -19,6 +19,8 @@
 \usepackage{listings}
 \usepackage{appendix}
 
+\newcommand{\comment}[1]{}
+
 \title{Rapport ARA}
 \author{Mickael Rudek, Oskar Viljasaar}
 
@@ -229,57 +231,72 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 \subsection{Question 7}
 Oui.
 
-\subsection{Question 8}
+\subsection{Influence des stratégies sur la connexité du graphe (Questions 3, 4, 8)}
 
-Strategy3InitNext fait converger les points vers le milieu, et assure que tous
-les noeuds sont à portée les uns des autres, dans un rayon de $ \texttt{scope} -
-\texttt{marge} $.
+\begin{itemize}
+  \item Strategy1InitNext donne des positions initiales et destinations
+aléatoires dans le terrain pour chaque noeud.
+  \item Strategy3InitNext donne des positions initiales et
+    destinations vers le milieu du terrain, dans un rayon de $ \texttt{scope} -
+\texttt{marge} $, assurant un graphe
+    connexe.
+    \item Strategy2Next rend les noeuds immobiles, la connexité du
+      graphe dépend du placement initial des noeuds.
+  \item Strategy4Next assume que le graphe est connexe à
+    l'initiation. Elle va déplacer un nœud dans le graphe en
+    s'assurant qu'à la fin, le graphe soit toujours connexe. La
+    connexité du graphe dépend du placement initial des noeuds.
+    \item Strategy5Init place les noeuds en haut à droite du terrain,
+      chaque noeud est placé dans le scope d'un autre noeud.
+      Le graphe est initialement connexe.
+      \item Strategy6Init place les noeuds en étoile au milieu du
+        terrain, le graphe est donc initialement connexe.
+\end{itemize}
 
-\begin{minipage}[c]{\textwidth}
-\begin{tabularx}{\textwidth}{| l | l | l | X |}
+\begin{center}
+\begin{tabular}{| l | l | l |}
   \hline
-  \textbf{SPI} & \textbf{SD} & \textbf{Graphe} & \textbf{Commentaires}\\
+  \textsl{SPI} & \textsl{SD} & \textbf{Connexe}\\
   \hline
-  \texttt{Strategy1InitNext} & \texttt{Strategy1InitNext} & Connexe &\\
+  Strategy1InitNext & Strategy1InitNext & non\\
   \hline
-  \texttt{Strategy1InitNext} & \texttt{Strategy2Next} &  & bouge ap normal\\
+  Strategy1InitNext & Strategy2Next &  non\\
   \hline
-  \texttt{Strategy1InitNext} & \texttt{Strategy3InitNext} & Connexe & Converge vers le milieu\\
+  Strategy1InitNext & \textbf{Strategy3InitNext} & \textbf{oui}\\
   \hline
-  \texttt{Strategy1InitNext} & \texttt{Strategy4Next} & & bouge ap, ça
-  bouge seulement si on a
-  exactement deux noeuds dans le réseau\\
+  Strategy1InitNext & Strategy4Next & non \\
   \hline
-  \texttt{Strategy3InitNext} & \texttt{Strategy1InitNext} & Connexe & Connexe dès le début\\
+  Strategy3InitNext & Strategy1InitNext & non \\
   \hline
-  \texttt{Strategy3InitNext} & \texttt{Strategy2Next} & Connexe & spawn au milieu et ne bouge pas\\
+  \textbf{Strategy3InitNext} & Strategy2Next & \textbf{oui} \\
   \hline
-  \texttt{Strategy3InitNext} & \texttt{Strategy3InitNext} & Connexe\\
+  Strategy3InitNext & \textbf{Strategy3InitNext} & \textbf{oui}\\
   \hline
-  \texttt{Strategy3InitNext} & \texttt{Strategy4Next} & Connexe & Ça chill dans le scope\\
+  \textbf{Strategy3InitNext} & Strategy4Next & \textbf{oui}\\
   \hline
-  \texttt{Strategy5Init} & \texttt{Strategy1InitNext} & Connexe& Connexe dès le début car apparaissent au même endroit, après les nodes se barrent de ouf\\
+  Strategy5Init & Strategy1InitNext & non \\
   \hline
-  \texttt{Strategy5Init} & \texttt{Strategy2Next} & Connexe & Connexe et ne bouge pas\\
+  \textbf{Strategy5Init} & Strategy2Next & \textbf{oui}\\
   \hline
-  \texttt{Strategy5Init} & \texttt{Strategy3InitNext} & Connexe & cf Protocol3\\
+  Strategy5Init & \textbf{Strategy3InitNext} & \textbf{oui} \\
   \hline
-  \texttt{Strategy5Init} & \texttt{Strategy4Next} & Connexe & Trenquille dans le scope\\
+  \textbf{Strategy5Init} & Strategy4Next & \textbf{oui} \\
   \hline
-  \texttt{Strategy6Init} & \texttt{Strategy1InitNext} & Connexe& `protocol.emitter.latency 0`\\
+  Strategy6Init & Strategy1InitNext & non\\
   \hline
-  \texttt{Strategy6Init} & \texttt{Strategy2Next} & Connexe & `protocol.emitter.latency 0`\\
+  \textbf{Strategy6Init} & Strategy2Next & \textbf{oui} \\
   \hline
-  \texttt{Strategy6Init} & \texttt{Strategy3InitNext} & Connexe & `protocol.emitter.latency 0`\\
+  Strategy6Init & \textbf{Strategy3InitNext} & \textbf{oui}\\
   \hline
-  \texttt{Strategy6Init} & \texttt{Strategy4Next} & Connexe & `protocol.emitter.latency 0`\\
+  \textbf{Strategy6Init} & Strategy4Next & \textbf{oui}\\
   \hline
-\end{tabularx}
-\end{minipage}
+\end{tabular}
+\end{center}
 
 
 \pagebreak
 \subsection{Question 10}
+
 10 itérations
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
@@ -313,16 +330,16 @@ Portee & SPI & SD & D & E/D & ED/D \\\hline
 125 & 1 & 1 & 0.0953 +- 0.0155 & 1.9218 +- 0.2210 & 0.1943 +- 0.0241 \\\hline
 250 & 1 & 1 & 0.3441 +- 0.0302 & 0.9882 +- 0.0791 & 0.1949 +- 0.0296 \\\hline
 375 & 1 & 1 & 0.7277 +- 0.0490 & 0.6890 +- 0.0724 & 0.1982 +- 0.0409 \\\hline
-625 & 1 & 1 & 1.7340 +- 0.0904 & 0.4903 +- 0.0584 & 0.2188 +- 0.0418 \\\hline
 500 & 1 & 1 & 1.1966 +- 0.0595 & 0.5586 +- 0.0468 & 0.2049 +- 0.0278 \\\hline
+625 & 1 & 1 & 1.7340 +- 0.0904 & 0.4903 +- 0.0584 & 0.2188 +- 0.0418 \\\hline
 750 & 1 & 1 & 2.2763 +- 0.0774 & 0.4570 +- 0.0616 & 0.2306 +- 0.0435 \\\hline
 875 & 1 & 1 & 2.7883 +- 0.0979 & 0.4585 +- 0.0743 & 0.2551 +- 0.0641 \\\hline
-500 & 3 & 3 & 2.3528 +- 0.0868 & 0.4443 +- 0.0459 & 0.2220 +- 0.0379 \\\hline
 1000 & 1 & 1 & 3.2539 +- 0.0870 & 0.4583 +- 0.0753 & 0.2760 +- 0.0793 \\\hline
 125 & 3 & 3 & 2.8025 +- 0.1088 & 0.4299 +- 0.0680 & 0.2435 +- 0.0559 \\\hline
 250 & 3 & 3 & 2.4760 +- 0.0980 & 0.4381 +- 0.0446 & 0.2293 +- 0.0342 \\\hline
-625 & 3 & 3 & 2.3267 +- 0.1107 & 0.4584 +- 0.0600 & 0.2376 +- 0.0425 \\\hline
 375 & 3 & 3 & 2.3910 +- 0.1285 & 0.4527 +- 0.0567 & 0.2355 +- 0.0429 \\\hline
+500 & 3 & 3 & 2.3528 +- 0.0868 & 0.4443 +- 0.0459 & 0.2220 +- 0.0379 \\\hline
+625 & 3 & 3 & 2.3267 +- 0.1107 & 0.4584 +- 0.0600 & 0.2376 +- 0.0425 \\\hline
 750 & 3 & 3 & 2.3350 +- 0.1005 & 0.4686 +- 0.0626 & 0.2413 +- 0.0490 \\\hline
 875 & 3 & 3 & 2.3451 +- 0.0853 & 0.4703 +- 0.0600 & 0.2500 +- 0.0516 \\\hline
 1000 & 3 & 3 & 2.3639 +- 0.0991 & 0.4614 +- 0.0698 & 0.2379 +- 0.0506 \\\hline
