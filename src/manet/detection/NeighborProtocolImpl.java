@@ -3,6 +3,7 @@ package manet.detection;
 import manet.Message;
 import manet.communication.EmitterImpl;
 import peersim.config.Configuration;
+import peersim.core.CommonState;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 import peersim.edsim.EDSimulator;
@@ -18,6 +19,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
     private int period;
     private int timer_delay;
     private int listener_pid;
+    private int verbose = 0;
 
     private static final String PAR_PERIOD = "period";
     private static final String PAR_TIMERDELAY = "timer_delay";
@@ -67,6 +69,13 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
         Message msg = (Message) event;
 
         neighbor_timers.replaceAll((k, v) -> (int) v - this.period);
+
+
+        if (this.verbose != 0) {
+            if (CommonState.getIntTime() % 100000 * 60 * 60 == 0) {
+                System.err.println(CommonState.getIntTime());
+            }
+        }
 
 
         if (event instanceof Message) {
