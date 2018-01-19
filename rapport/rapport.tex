@@ -64,16 +64,9 @@ control.graph.time_slow 0.0002
 control.graph.step 1
 \end{verbatim}
 
-\subsection{Question 3}
-La stratégie 1 choisit aléatoirement la prochaine destination dans les intervalles
-$\left[ 0; \texttt{maxX} \right]$ et $\left[ 0; \texttt{maxY}
-  \right]$.
+\subsection{Questions 3 et 4}
+Voir la sous-section 1.6
 
-\subsection{Question 4}
-La stratégie 2 choisit comme destination l'endroit courant du noeud,
-celui-ci reste donc immobile.
-
-\pagebreak
 \subsection{Question 5}
 \begin{verbatim}
 package manet.communication;
@@ -228,9 +221,6 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 }
 \end{verbatim}
 
-\subsection{Question 7}
-Oui.
-
 \subsection{Influence des stratégies sur la connexité du graphe (Questions 3, 4, 8)}
 
 \begin{itemize}
@@ -297,6 +287,7 @@ aléatoires dans le terrain pour chaque noeud.
 \pagebreak
 \subsection{Question 10}
 
+\comment{
 10 itérations
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
@@ -320,8 +311,7 @@ Portee & SPI & SD & D & E/D & ED/D \\\hline
 1000 & 3 & 3 & 2.3450 +- 0.1551 & 0.4720 +- 0.0654 & 0.2480 +- 0.0531 \\\hline
 \end{tabular}
 \end{center}
-
-100 itérations
+}
 
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
@@ -347,6 +337,12 @@ Portee & SPI & SD & D & E/D & ED/D \\\hline
 \end{center}
 
 
+\begin{minipage}[c]{0.5\linewidth}
+\includegraphics[width=\textwidth]{images/q10-11.png}
+\begin{center}
+  Impact de la portée sur la connexité du graphe avec la stratégie 1.
+  \end{center}
+\end{minipage}
 \pagebreak
 \begin{appendix}
   \section{Compilation, lancement du code et jeux de test}
@@ -403,6 +399,7 @@ Les valeurs correspondent à des moyennes avec écarts-type, obtenus sur
 10 itérations sur chaque combinaison de SPI et SD.
 
 \end{appendix}
+
 
 
 \end{document}
