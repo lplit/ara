@@ -45,10 +45,9 @@ protocol.neighbor NeighborProtocolImpl
 protocol.neighbor.period 3000
 protocol.neighbor.timer_delay 3500
 
+    ";
 
-initial_position_strategy Strategy1InitNext
-next_destination_strategy Strategy1InitNext
-
+my $file_second = "
 initial_position_strategy.positionprotocol position
 initial_position_strategy.emitter emitter
 
@@ -57,7 +56,7 @@ next_destination_strategy.positionprotocol position
 next_destination_strategy.emitter emitter
 next_destination_strategy.distance_min 100
 next_destination_strategy.distance_max 500
-    ";
+";
 
 my $key_emitter_scope = "protocol.emitter.scope";
 my $key_spi = "initial_position_strategy";
@@ -65,6 +64,7 @@ my $key_sd = "next_destination_strategy";
 my $key_scope = "protocol.emitter.scope";
 my $value_spi;
 my $value_sd;
+
 
 my $filename;
 
@@ -149,7 +149,7 @@ sub bench {
     print "\nBenchmark directory ", $bench_dir, "\n", $str_mov, " ", $str_pos, " ", $val_spi, " ", $val_sd, "\n-------\n";
 
     for ($i = 125; $i <= 1000; $i += 125) {
-	for (my $k = 0; $k < 10; $k++) {
+	for (my $k = 0; $k < 5; $k++) {
 	    $random_seed = rand(100);
 	    my $filename =  join "_", $file_base, $i, $str_pos, $str_mov;
 	    $filename = join "/", $bench_dir, $filename;
@@ -158,12 +158,13 @@ sub bench {
 	    print $bench_file join(" ", $key_sd, $value_sd), "\n";
 	    print $bench_file join(" ", $key_scope, $i), "\n";
 	    print $bench_file join(" ", $str_random_seed, $random_seed, "\n");
+	    print $bench_file $file_second;
 	    $run_cmd = join(" ",
 			    "make run",
 			    join("=", $key_cfg, $filename),
 			    join("=", $key_peersim, $val_peersim)
 		);
-	    print "Executing `", $run_cmd, "`\n";
+	    print "Executing ", $run_cmd, ", iteration ", $k, "\n";
 
 	    close $filename;
 	    if (system($run_cmd) != 0) {
