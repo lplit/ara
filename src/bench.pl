@@ -10,16 +10,21 @@ my $str_init = "Initialisation";
 my $scope;
 my $file_base;
 
-my $file_first = "
-debug_config none
-simulation.endtime 28800000
-random.seed 4
-network.size 10
+
+my $file_first =
+    "debug_config none
+
+SECONDES 1000
+MINUTES 60*SECONDES
+HEURES 60*MINUTES
+
+network.size 50
+simulation.endtime 8*HEURES
 
 init.initialisation Initialisation
 
 control.graph.positionprotocol position
-control.graph.time_slow 0.0002
+control.graph.time_slow 0
 control.graph.step 1
 control.graph.emitter emitter
 control.graph.neighborprotocol neighbor
@@ -34,7 +39,7 @@ protocol.position.maxspeed 20
 protocol.position.minspeed 1
 protocol.position.width 1500
 protocol.position.height 1500
-protocol.position.pause 1200000
+protocol.position.pause 20*MINUTES
 
 protocol.emitter EmitterImpl
 protocol.emitter.latency 90
