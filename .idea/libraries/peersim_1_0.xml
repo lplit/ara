@@ -1,14 +1,14 @@
 <component name="libraryTable">
   <library name="peersim-1.0">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../peersim-1.0.5" />
+      <root url="file:///media/sf_Dropbox/UPMC/Mats/ARA/proj/peersim-1.0.5" />
     </CLASSES>
     <JAVADOC>
-      <root url="file://$PROJECT_DIR$/../peersim-1.0.5/doc" />
+      <root url="file:///media/sf_Dropbox/UPMC/Mats/ARA/proj/peersim-1.0.5/doc" />
     </JAVADOC>
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/../peersim-1.0.5/src" />
+      <root url="file:///media/sf_Dropbox/UPMC/Mats/ARA/proj/peersim-1.0.5/src" />
     </SOURCES>
-    <jarDirectory url="file://$PROJECT_DIR$/../peersim-1.0.5" recursive="false" />
+    <jarDirectory url="file:///media/sf_Dropbox/UPMC/Mats/ARA/proj/peersim-1.0.5" recursive="false" />
   </library>
 </component>
