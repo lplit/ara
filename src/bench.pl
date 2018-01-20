@@ -10,7 +10,6 @@ my $str_init = "Initialisation";
 my $scope;
 my $file_base;
 
-
 my $file_first =
     "debug_config none
 
@@ -20,6 +19,7 @@ HEURES 60*MINUTES
 
 network.size 50
 simulation.endtime 8*HEURES
+
 
 init.initialisation Initialisation
 
