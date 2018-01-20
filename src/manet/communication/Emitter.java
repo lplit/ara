@@ -6,7 +6,11 @@ import peersim.core.Protocol;
 
 
 public interface Emitter extends Protocol {
-	
+
+	public static final String PAR_LATENCY = "latency";
+	public static final String PAR_SCOPE = "scope";
+	public static final String PAR_POSITIONPROTOCOL = "positionprotocol";
+
 	/*désigne tous les voisins accessibles*/
 	public static final int ALL=-2;
 	

@@ -16,9 +16,6 @@ public class EmitterImpl implements Emitter {
     private int this_pid;
     private int position_protocol;
 
-    private static final String PAR_LATENCY = "latency";
-    private static final String PAR_SCOPE = "scope";
-    private static final String PAR_POSITIONPROTOCOL = "positionprotocol";
 
     public EmitterImpl(String prefix) {
         String tmp[]=prefix.split("\\.");
@@ -28,6 +25,12 @@ public class EmitterImpl implements Emitter {
         this.latency = Configuration.getInt(prefix + "." + PAR_LATENCY);
         this.scope = Configuration.getInt(prefix + "." + PAR_SCOPE);
         //System.out.println("WOAH");
+    }
+
+    public EmitterImpl(int latency, int scope, int position_protocol) {
+        this.latency = latency;
+        this.scope = scope;
+        this.position_protocol = position_protocol;
     }
 
     @Override
