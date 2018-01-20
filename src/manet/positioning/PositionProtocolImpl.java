@@ -44,7 +44,7 @@ public class PositionProtocolImpl implements PositionProtocol, EDProtocol {
 		this.maxx=Configuration.getInt(prefix+"."+PAR_MAXX);
 		this.maxy=Configuration.getInt(prefix+"."+PAR_MAXY);
 		this.pause=Configuration.getInt(prefix+"."+PAR_TIMEPAUSE);
-		
+		System.err.println("Positionprotocol pid " + my_pid);
 	}
 	
 	public Object clone(){

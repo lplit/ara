@@ -1,6 +1,7 @@
 package manet.detection;
 
 import manet.Message;
+import manet.communication.Emitter;
 import manet.communication.EmitterImpl;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
@@ -34,7 +35,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
         neighbor_timers = new HashMap<Node, Integer>();
 
         String tmp[]=prefix.split("\\.");
-        this_pid= Configuration.lookupPid(tmp[tmp.length-1]);
+            this_pid= Configuration.lookupPid(tmp[tmp.length-1]);
 
         this.period = Configuration.getInt(prefix+"."+PAR_PERIOD);
         this.timer_delay = Configuration.getInt(prefix + "." + PAR_TIMERDELAY);
@@ -65,7 +66,8 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
     @Override
     public void processEvent(Node node, int pid, Object event) {
         int emitter_pid = Configuration.lookupPid("emitter");
-        EmitterImpl impl = (EmitterImpl) node.getProtocol(emitter_pid);
+//        System.out.println("getting protocol " + emitter_pid);
+        Emitter impl = (Emitter) node.getProtocol(emitter_pid);
         Message msg = (Message) event;
 
         neighbor_timers.replaceAll((k, v) -> (int) v - this.period);

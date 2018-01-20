@@ -10,7 +10,7 @@ init.initialisation Initialisation
 
 control.graph GraphicalMonitor
 control.graph.positionprotocol position
-control.graph.time_slow 0
+control.graph.time_slow 0.0002
 control.graph.step 1
 control.graph.emitter emitter
 control.graph.neighborprotocol neighbor
@@ -28,18 +28,19 @@ protocol.position.width 2000
 protocol.position.height 2000
 protocol.position.pause 20*60*1000
 
-protocol.emitter EmitterImpl
+protocol.emitter DistanceEmitter
 protocol.emitter.latency 90
-protocol.emitter.scope 1000
+protocol.emitter.scope 350
 protocol.emitter.positionprotocol position
+protocol.emitter.probability 0.5
 
 protocol.neighbor NeighborProtocolImpl
-protocol.neighbor.period 800
-protocol.neighbor.timer_delay 1000
+protocol.neighbor.period 3000
+protocol.neighbor.timer_delay 3500
 
 
-initial_position_strategy Strategy3InitNext
-next_destination_strategy Strategy3InitNext
+initial_position_strategy Strategy1InitNext
+next_destination_strategy Strategy1InitNext
 
 initial_position_strategy.positionprotocol position
 initial_position_strategy.emitter emitter

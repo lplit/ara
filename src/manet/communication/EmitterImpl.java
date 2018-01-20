@@ -13,8 +13,10 @@ public class EmitterImpl implements Emitter {
 
     private int latency;
     private int scope;
-    private int this_pid;
+    protected int this_pid;
     private int position_protocol;
+
+    public static int messa;
 
 
     public EmitterImpl(String prefix) {
@@ -31,6 +33,7 @@ public class EmitterImpl implements Emitter {
         this.latency = latency;
         this.scope = scope;
         this.position_protocol = position_protocol;
+//        System.err.println("new EmitterImpl " + this.latency + " " + this.scope + " " + this.position_protocol);
     }
 
     @Override
