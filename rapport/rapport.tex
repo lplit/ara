@@ -21,15 +21,17 @@
 
 \newcommand{\comment}[1]{}
 
-\title{Rapport ARA}
+\title{Rapport projet ARA 2017-2018}
 \author{Mickael Rudek, Oskar Viljasaar}
 
 \begin{document}
 \maketitle
 
 
-\section{Exercice 1}
-\subsection{Question 1}
+\tableofcontents
+
+\section{Exercice 1 - Implémentation d'un MANET dans PeerSim}
+\subsection{Algorithme de déplacement d'un noeud (Question 1)}
 
 \begin{verbatim}
 Movement protocol:
@@ -48,10 +50,12 @@ L'algorithme utilise le protocole de déplacement suivant:
 Une valeur de la vitesse est aléatoirement choisie dans l'intervalle
 $ \left[ \texttt{speed\_min}; \texttt{speed\_max} \right] $.
 Vu qu'on est en temps discretisé, `distance\_to\_next` représente la distance parcourue au
- Une fois la destination atteinte, le noeud s'arrête pendant un tic.
+ Une fois la destination atteinte, le noeud s'arrête pendant un tic,
+ sinon il boucle en demandeant une nouvelle destination de la
+ stratégie de déplacement.
 
 
- \subsection{Question 2}
+ \subsection{Contenu du fichier de configuration pour la question 2}
 
 \begin{verbatim}
 simulation.endtime 50000
@@ -65,9 +69,9 @@ control.graph.step 1
 \end{verbatim}
 
 \subsection{Questions 3 et 4}
-Voir la sous-section 1.6
+Voir la sous-section 1.6.
 
-\subsection{Question 5}
+\subsection{Implémentation de l'interface \texttt{Emitter} (Question 5)}
 \begin{verbatim}
 package manet.communication;
 
@@ -131,9 +135,7 @@ public class EmitterImpl implements Emitter {
 }
 \end{verbatim}
 
-\pagebreak
-
-\subsection{Question 6}
+\subsection{Implémentation de l'interface \texttt{NeighborProtocol} (Question 6)}
 
 
 \begin{verbatim}
@@ -285,7 +287,8 @@ aléatoires dans le terrain pour chaque noeud.
 
 
 \pagebreak
-\subsection{Question 10}
+\subsection{Impact de la portée sur la densité du graphe (Questions 10
+  et 11)}
 
 \comment{
 10 itérations
