@@ -114,7 +114,7 @@ sub date {
 
 my $bench_dir;
 
-$bench_dir = join("_", "bench", date());
+$bench_dir = join("_", "bench_x2", date());
 
 
 system("mkdir $bench_dir");
@@ -151,7 +151,7 @@ print "\nBenchmark directory ", $bench_dir, "\n", "\n-------\n";
 # bench(size)
 my $it;
 
-for (my $number_of_exps = 0; $number_of_exps < 5; $number_of_exps++) {
+for (my $number_of_exps = 0; $number_of_exps < 100 ; $number_of_exps++) {
 
     for ($it = 20; $it < 100; $it += 10) {
 	bench($it);
