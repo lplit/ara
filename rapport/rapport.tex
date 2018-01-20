@@ -335,14 +335,57 @@ Portee & SPI & SD & D & E/D & ED/D \\\hline
 1000 & 3 & 3 & 2.3639 +- 0.0991 & 0.4614 +- 0.0698 & 0.2379 +- 0.0506 \\\hline
 \end{tabular}
 \end{center}
+Dans la stratégie 1, l'étendue de la portée a un impact sur la
+connexité du graphe, la stratégie de déplacement étant celle de
+choisir des destinations aléatoires dans le terrain. Il est plus
+facile donc de faire un graphe connexe en prenant une valeur assez
+grande pour la portée.
 
-
-\begin{minipage}[c]{0.5\linewidth}
-\includegraphics[width=\textwidth]{images/q10-11.png}
+La stratégie 3 donnant un graphe connexe dès
+le début, les noeuds disposent déjà d'un nombre de voisins important.
+Augmenter la portée pour la stratégie 3 a tendance à légèrement faire
+diminuer la densité du graphe. Cela peut être expliqué par la distance
+aléatoire pour la prochaine destination, tirée entre
+\texttt{NextDestinationStrategy.minimum\_distance} et $scope - marge$, sachant
+que $marge$ est plutôt petit (20) et reste constant, alors que la
+portée peut varier jusqu'à 1000. Le graphe, dans la stratégie 3, est beaucoup
+plus étendu, et les noeuds peuvent avoir moins d'arcs directs
+entre eux.
 \begin{center}
-  Impact de la portée sur la connexité du graphe avec la stratégie 1.
+\begin{minipage}[c]{\linewidth}
+\includegraphics[width=\textwidth]{images/q10-11-s1and2.png}
+\begin{center}
+  Impact de la portée sur la densité avec la stratégie 1
+  (orange) et la 3 (bleu).
   \end{center}
 \end{minipage}
+\end{center}
+
+\section{Exercice 2}
+\subsection{Question 1}
+\begin{center}
+\begin{tabular}{|l|r|r|}
+  \hline
+Taille & D-end & ED/D end \\ \hline
+10 & 4.7300 +- 0.0000 & 0.9000 +- 0.0000 \\ \hline
+20 & 3.8680 +- 0.9007 & 0.6580 +- 0.2134 \\ \hline
+30 & 3.9380 +- 0.5319 & 0.6940 +- 0.1995 \\ \hline
+40 & 3.6680 +- 0.7796 & 0.5200 +- 0.2904 \\ \hline
+50 & 4.5080 +- 1.1221 & 0.9380 +- 0.4756 \\ \hline
+60 & 4.0560 +- 1.0740 & 0.5080 +- 0.2393 \\ \hline
+70 & 3.9260 +- 0.5985 & 0.8520 +- 0.2531 \\ \hline
+80 & 3.8720 +- 0.7195 & 0.6260 +- 0.2407 \\ \hline
+90 & 4.5860 +- 0.6865 & 0.7240 +- 0.2003 \\ \hline
+100 & 4.1340 +- 0.2911 & 0.7020 +- 0.1132 \\ \hline
+120 & 4.1900 +- 0.5124 & 0.7740 +- 0.1500 \\ \hline
+140 & 4.4380 +- 1.0513 & 0.8580 +- 0.2485 \\ \hline
+160 & 3.9820 +- 0.6756 & 0.6860 +- 0.2604 \\ \hline
+180 & 4.2860 +- 0.5810 & 0.7640 +- 0.2772 \\ \hline
+200 & 3.4300 +- 0.5758 & 0.5040 +- 0.1252 \\ \hline
+\end{tabular}
+\end{center}
+
+
 \pagebreak
 \begin{appendix}
   \section{Compilation, lancement du code et jeux de test}

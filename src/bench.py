@@ -8,20 +8,20 @@ import math
 print "Parsing files in ", sys.argv[1]
 for file in os.listdir(sys.argv[1]):
     p = os.path.join(sys.argv[1], file)
-    with open(p) as f:   
+    with open(p) as f:
         c1 = []
         c2 = []
         c3 = []
         for line in f.readlines():
             col1, col2, col3 = line.split(';')
-            col3 = float(col3.strip())
-            col2 = float(col2.strip())
-            col1 = float(col1.strip())
-            
+            col3 = float(col3.strip().replace(',', '.'))
+            col2 = float(col2.strip().replace(',', '.'))
+            col1 = float(col1.strip().replace(',', '.'))
+
             c1.append(col1)
             c2.append(col2)
             c3.append(col3)
-        
+
         nc1 = numpy.array(c1)
         nc2 = numpy.array(c2)
         nc3 = numpy.array(c3)
