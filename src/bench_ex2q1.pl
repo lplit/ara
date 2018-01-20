@@ -11,8 +11,12 @@ my $scope;
 my $file_base;
 
 my $file_first = "
+SECONDES 1000
+MINUTES 60*SECONDES
+HEURES 60*MINUTES
+
 debug_config none
-simulation.endtime 12*60*60*1000
+simulation.endtime 12*HEURES
 random.seed 4
 network.size 50
 
@@ -26,8 +30,8 @@ control.graph.neighborprotocol neighbor
 
 control.density DensityController
 control.density.neighbours neighbor
-control.density.from 60*60*1000
-control.density.step 2000*60
+control.density.from 1*HEURE
+control.density.step 2*MINUTES
 control.density.verbose 1
 
 protocol.position PositionProtocolImpl
@@ -35,7 +39,7 @@ protocol.position.maxspeed 20
 protocol.position.minspeed 1
 protocol.position.width 1500
 protocol.position.height 1500
-protocol.position.pause 20*60*1000
+protocol.position.pause 20*MINUTES
 
 protocol.emitter EmitterImpl
 protocol.emitter.latency 90
