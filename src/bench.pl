@@ -24,15 +24,17 @@ simulation.endtime 8*HEURES
 init.initialisation Initialisation
 
 control.graph.positionprotocol position
-control.graph.time_slow 0
+control.graph.time_slow 0.0002
 control.graph.step 1
 control.graph.emitter emitter
 control.graph.neighborprotocol neighbor
 
 control.density DensityController
 control.density.neighbours neighbor
-control.density.step 1000
+control.density.from 1*HEURE
+control.density.step 2*MINUTES
 control.density.verbose 1
+
 
 protocol.position PositionProtocolImpl
 protocol.position.maxspeed 20
