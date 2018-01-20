@@ -156,7 +156,7 @@ sub bench {
     print "\nBenchmark directory ", $bench_dir, "\n", $str_mov, " ", $str_pos, " ", $val_spi, " ", $val_sd, "\n-------\n";
 
     for ($i = 125; $i <= 1000; $i += 125) {
-	for (my $k = 0; $k < 5; $k++) {
+	for (my $k = 0; $k < 50; $k++) {
 	    $random_seed = rand(100);
 	    my $filename =  join "_", $file_base, $i, $str_pos, $str_mov;
 	    $filename = join "/", $bench_dir, $filename;
