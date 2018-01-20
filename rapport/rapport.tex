@@ -21,6 +21,25 @@
 
 \newcommand{\comment}[1]{}
 
+\definecolor{javared}{rgb}{0.6,0,0} % for strings
+\definecolor{javagreen}{rgb}{0.25,0.5,0.35} % comments
+\definecolor{javapurple}{rgb}{0.5,0,0.35} % keywords
+\definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
+
+\lstset{language=Java,
+basicstyle=\ttfamily,
+keywordstyle=\color{javapurple}\bfseries,
+stringstyle=\color{javared},
+commentstyle=\color{javagreen},
+morecomment=[s][\color{javadocblue}]{/**}{*/},
+numbers=left,
+numberstyle=\tiny\color{black},
+%stepnumber=2,
+numbersep=10pt,
+tabsize=4,
+showspaces=false,
+showstringspaces=false}
+
 \title{Rapport projet ARA 2017-2018}
 \author{Mickael Rudek, Oskar Viljasaar}
 
@@ -49,8 +68,9 @@ Movement protocol:
 L'algorithme utilise le protocole de déplacement suivant:
 Une valeur de la vitesse est aléatoirement choisie dans l'intervalle
 $ \left[ \texttt{speed\_min}; \texttt{speed\_max} \right] $.
-Vu qu'on est en temps discretisé, `distance\_to\_next` représente la distance parcourue au
- Une fois la destination atteinte, le noeud s'arrête pendant un tic,
+Vu qu'on est en temps discretisé, $distance\_to\_next$ représente la
+distance parcourue en une unité de temps.
+Une fois la destination atteinte, le noeud s'arrête pendant un tic,
  sinon il boucle en demandeant une nouvelle destination de la
  stratégie de déplacement.
 
@@ -72,7 +92,7 @@ control.graph.step 1
 Voir la sous-section 1.6.
 
 \subsection{Implémentation de l'interface \texttt{Emitter} (Question 5)}
-\begin{verbatim}
+\begin{lstlisting}
 package manet.communication;
 
 import manet.Message;
@@ -112,7 +132,12 @@ public class EmitterImpl implements Emitter {
             PositionProtocol prot2 = (PositionProtocol) n.getProtocol(position_protocol);
             double dist =prot.getCurrentPosition().distance(prot2.getCurrentPosition());
             if (dist < scope && n.getID() != host.getID()) {
-                EDSimulator.add(latency, new Message(msg.getIdSrc(), n.getID(), msg.getTag(), msg.getContent(), msg.getPid()), n, msg.getPid());
+                EDSimulator.add(latency, new Message(msg.getIdSrc(),
+                                                     n.getID(),
+                                                     msg.getTag(),
+                                                     msg.getContent(),
+                                                     msg.getPid()),
+                                                     n, msg.getPid());
             }
         }
 
@@ -133,12 +158,12 @@ public class EmitterImpl implements Emitter {
         return res;
     }
 }
-\end{verbatim}
+\end{lstlisting}
 
 \subsection{Implémentation de l'interface \texttt{NeighborProtocol} (Question 6)}
 
 
-\begin{verbatim}
+\begin{lstlisting}
 package manet.detection;
 
 import manet.Message;
@@ -221,7 +246,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
         return;
     }
 }
-\end{verbatim}
+\end{lstlisting}
 
 \subsection{Influence des stratégies sur la connexité du graphe (Questions 3, 4, 8)}
 
@@ -245,8 +270,10 @@ aléatoires dans le terrain pour chaque noeud.
         terrain, le graphe est donc initialement connexe.
 \end{itemize}
 
+
+  \begin{table}[h]
 \begin{center}
-\begin{tabular}{| l | l | l |}
+    \begin{tabular}{| l | l | l |}
   \hline
   \textsl{SPI} & \textsl{SD} & \textbf{Connexe}\\
   \hline
@@ -283,61 +310,42 @@ aléatoires dans le terrain pour chaque noeud.
   \textbf{Strategy6Init} & Strategy4Next & \textbf{oui}\\
   \hline
 \end{tabular}
-\end{center}
+\caption{Impact des différentes SPI et SD sur la connexité du graphe}
+  \end{center}
+  \end{table}
 
-
-\pagebreak
-\subsection{Impact de la portée sur la densité du graphe (Questions 10
-  et 11)}
-
-\comment{
-10 itérations
+\subsection{Impact de la portée sur la densité du graphe (Questions 10 et 11)}
+  \begin{table}[h]
 \begin{center}
-\begin{tabular}{|c|c|c|c|c|c|}
-  \hline
-Portee & SPI & SD & D & E/D & ED/D \\\hline
-125 & 1 & 1 & 0.0900 +- 0.0148 & 2.0340 +- 0.2968 & 0.1940 +- 0.0220 \\\hline
-250 & 1 & 1 & 0.3430 +- 0.0344 & 0.9840 +- 0.0822 & 0.1850 +- 0.0242 \\\hline
-375 & 1 & 1 & 0.7130 +- 0.0447 & 0.6550 +- 0.0457 & 0.1790 +- 0.0230 \\\hline
-500 & 1 & 1 & 1.1980 +- 0.0473 & 0.5700 +- 0.0460 & 0.2040 +- 0.0265 \\\hline
-625 & 1 & 1 & 1.7760 +- 0.0967 & 0.4730 +- 0.0581 & 0.2120 +- 0.0366 \\\hline
-750 & 1 & 1 & 2.2740 +- 0.1165 & 0.4630 +- 0.0518 & 0.2320 +- 0.0325 \\\hline
-875 & 1 & 1 & 2.7320 +- 0.1012 & 0.4240 +- 0.0600 & 0.2270 +- 0.0514 \\\hline
-1000 & 1 & 1 & 3.2600 +- 0.0892 & 0.4600 +- 0.0632 & 0.2740 +- 0.0541 \\\hline
-125 & 3 & 3 & 2.7820 +- 0.1310 & 0.4280 +- 0.0787 & 0.2630 +- 0.0639 \\\hline
-250 & 3 & 3 & 2.5410 +- 0.0575 & 0.4630 +- 0.0520 & 0.2480 +- 0.0366 \\\hline
-375 & 3 & 3 & 2.3370 +- 0.1246 & 0.4380 +- 0.0371 & 0.2200 +- 0.0241 \\\hline
-500 & 3 & 3 & 2.3830 +- 0.0684 & 0.4320 +- 0.0426 & 0.2300 +- 0.0335 \\\hline
-625 & 3 & 3 & 2.3250 +- 0.0745 & 0.4730 +- 0.0473 & 0.2450 +- 0.0472 \\\hline
-750 & 3 & 3 & 2.3170 +- 0.0714 & 0.4590 +- 0.0532 & 0.2330 +- 0.0484 \\\hline
-875 & 3 & 3 & 2.3390 +- 0.1023 & 0.4400 +- 0.0369 & 0.2140 +- 0.0201 \\\hline
-1000 & 3 & 3 & 2.3450 +- 0.1551 & 0.4720 +- 0.0654 & 0.2480 +- 0.0531 \\\hline
-\end{tabular}
+    \begin{tabular}{|c|c|c|c|c|c|}
+      \hline
+Portee & SPI & SD & D & E/D & ED/D \\
+      \hline
+125 & 1 & 1 & 0.5058 +- 0.0261 & 0.3990 +- 0.0323 & 0.0428 +- 0.0063 \\
+250 & 1 & 1 & 1.8942 +- 0.0628 & 0.2376 +- 0.0196 & 0.0516 +- 0.0110 \\
+375 & 1 & 1 & 3.9176 +- 0.0967 & 0.2028 +- 0.0111 & 0.0718 +- 0.0105 \\
+500 & 1 & 1 & 6.4628 +- 0.1444 & 0.2012 +- 0.0149 & 0.1166 +- 0.0198 \\
+625 & 1 & 1 & 9.1208 +- 0.1883 & 0.2040 +- 0.0178 & 0.1654 +- 0.0386 \\
+750 & 1 & 1 & 11.8792 +- 0.2228 & 0.2180 +- 0.0126 & 0.2428 +- 0.0378 \\
+875 & 1 & 1 & 14.3908 +- 0.2073 & 0.2468 +- 0.0171 & 0.3892 +- 0.0585 \\
+1000& 1 & 1 & 16.4758 +- 0.3213 & 0.2810 +- 0.0193 & 0.6108 +- 0.0855 \\
+\hline
+125 & 3 & 3 & 14.5102 +- 0.2655 & 0.2202 +- 0.0198 & 0.3086 +- 0.0597 \\
+250 & 3 & 3 & 13.0276 +- 0.2380 & 0.2210 +- 0.0171 & 0.2756 +- 0.0480 \\
+375 & 3 & 3 & 12.5600 +- 0.2209 & 0.2216 +- 0.0171 & 0.2692 +- 0.0406 \\
+500 & 3 & 3 & 12.4170 +- 0.1680 & 0.2214 +- 0.0169 & 0.2688 +- 0.0412 \\
+625 & 3 & 3 & 12.3490 +- 0.2319 & 0.2242 +- 0.0186 & 0.2666 +- 0.0467 \\
+750 & 3 & 3 & 12.2988 +- 0.2397 & 0.2212 +- 0.0178 & 0.2550 +- 0.0443 \\
+875 & 3 & 3 & 12.2992 +- 0.2703 & 0.2174 +- 0.0171 & 0.2514 +- 0.0452 \\
+1000& 3 & 3 & 12.3032 +- 0.2481 & 0.2180 +- 0.0178 & 0.2492 +- 0.0420 \\
+\hline
+    \end{tabular}
+\caption{Valeurs obtenues pour la question 10, normalisées sur 100 itérations}
 \end{center}
-}
+\end{table}
 
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|c|}
-  \hline
-Portee & SPI & SD & D & E/D & ED/D \\\hline
-125 & 1 & 1 & 0.0953 +- 0.0155 & 1.9218 +- 0.2210 & 0.1943 +- 0.0241 \\\hline
-250 & 1 & 1 & 0.3441 +- 0.0302 & 0.9882 +- 0.0791 & 0.1949 +- 0.0296 \\\hline
-375 & 1 & 1 & 0.7277 +- 0.0490 & 0.6890 +- 0.0724 & 0.1982 +- 0.0409 \\\hline
-500 & 1 & 1 & 1.1966 +- 0.0595 & 0.5586 +- 0.0468 & 0.2049 +- 0.0278 \\\hline
-625 & 1 & 1 & 1.7340 +- 0.0904 & 0.4903 +- 0.0584 & 0.2188 +- 0.0418 \\\hline
-750 & 1 & 1 & 2.2763 +- 0.0774 & 0.4570 +- 0.0616 & 0.2306 +- 0.0435 \\\hline
-875 & 1 & 1 & 2.7883 +- 0.0979 & 0.4585 +- 0.0743 & 0.2551 +- 0.0641 \\\hline
-1000 & 1 & 1 & 3.2539 +- 0.0870 & 0.4583 +- 0.0753 & 0.2760 +- 0.0793 \\\hline
-125 & 3 & 3 & 2.8025 +- 0.1088 & 0.4299 +- 0.0680 & 0.2435 +- 0.0559 \\\hline
-250 & 3 & 3 & 2.4760 +- 0.0980 & 0.4381 +- 0.0446 & 0.2293 +- 0.0342 \\\hline
-375 & 3 & 3 & 2.3910 +- 0.1285 & 0.4527 +- 0.0567 & 0.2355 +- 0.0429 \\\hline
-500 & 3 & 3 & 2.3528 +- 0.0868 & 0.4443 +- 0.0459 & 0.2220 +- 0.0379 \\\hline
-625 & 3 & 3 & 2.3267 +- 0.1107 & 0.4584 +- 0.0600 & 0.2376 +- 0.0425 \\\hline
-750 & 3 & 3 & 2.3350 +- 0.1005 & 0.4686 +- 0.0626 & 0.2413 +- 0.0490 \\\hline
-875 & 3 & 3 & 2.3451 +- 0.0853 & 0.4703 +- 0.0600 & 0.2500 +- 0.0516 \\\hline
-1000 & 3 & 3 & 2.3639 +- 0.0991 & 0.4614 +- 0.0698 & 0.2379 +- 0.0506 \\\hline
-\end{tabular}
-\end{center}
+
+
 Dans la stratégie 1, l'étendue de la portée a un impact sur la
 connexité du graphe, la stratégie de déplacement étant celle de
 choisir des destinations aléatoires dans le terrain. Il est plus
@@ -354,18 +362,21 @@ que $marge$ est plutôt petit (20) et reste constant, alors que la
 portée peut varier jusqu'à 1000. Le graphe, dans la stratégie 3, est beaucoup
 plus étendu, et les noeuds peuvent avoir moins d'arcs directs
 entre eux.
-\begin{center}
-\begin{minipage}[c]{\linewidth}
-\includegraphics[width=\textwidth]{images/q10-11-s1and2.png}
-\begin{center}
-  Impact de la portée sur la densité avec la stratégie 1
-  (orange) et la 3 (bleu).
+\begin{figure}[h]
+  \begin{center}
+  \includegraphics[width=\textwidth]{images/q10-11-s1and2.png}
+  \caption{Impact de la portée sur la densité avec la stratégie 1 (orange) et la 3 (bleu).}
+  \label{fig:S1-S3-portee}
   \end{center}
-\end{minipage}
-\end{center}
+\end{figure}
 
-\section{Exercice 2}
-\subsection{Question 1}
+
+
+
+\section{Exercice 2 - Étude de protocoles de diffusion}
+\subsection{Impact du nombre de noeuds sur la densité du
+  graphe (Question 1)}
+\begin{table}[h]
 \begin{center}
 \begin{tabular}{|l|r|r|}
   \hline
@@ -387,16 +398,16 @@ Taille & D-end & ED/D end \\ \hline
 200 & 3.4300 +- 0.5758 & 0.5040 +- 0.1252 \\ \hline
 \end{tabular}
 \end{center}
+\end{table}
 
-\begin{center}
-\begin{minipage}[c]{\linewidth}
-\includegraphics[width=\textwidth]{images/ex2.png}
-\begin{center}
-  Impact de la portée sur la densité avec la stratégie 1
-  (orange) et la 3 (bleu).
-  \end{center}
-\end{minipage}
-\end{center}
+
+  \begin{figure}[h]
+    \begin{center}
+      \includegraphics[width=\textwidth]{images/ex2.png}
+      \caption{Impact du nombre de noeuds sur la densité et sa variation possible
+        pendant une simulation, avec les stratégies $SPI5$ et $SD4$.}
+    \end{center}
+    \end{figure}
 
 
 \pagebreak
