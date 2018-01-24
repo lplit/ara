@@ -5,6 +5,7 @@ import manet.communication.Emitter;
 import manet.communication.EmitterImpl;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
+import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 import peersim.edsim.EDSimulator;
@@ -55,6 +56,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
         try {
             res = (NeighborProtocolImpl) super.clone();
             res.neighbor_list= new ArrayList<>();
+            res.neighbor_timers = new HashMap<Node, Integer>();
         } catch (CloneNotSupportedException e) {
             System.err.println("Neighbor clone error");
         }
@@ -102,7 +104,8 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                                 neighbor_list.add(msg.getIdSrc());
                         //        for (Long l : neighbor_list) {
                                     // pour tous les voisins dans la liste, on s'ajoute un timer
-                                    EDSimulator.add(this.timer_delay, new Message(node.getID(), -1, "Timer", msg.getIdSrc(), this_pid), node, this_pid);
+                                    neighbor_timers.put(Network.get((int) msg.getIdSrc()), CommonState.getIntTime());
+                                    EDSimulator.add(this.timer_delay, new Message(node.getID(), -1, "Timer", new Long(msg.getIdSrc()), this_pid), node, this_pid);
                           //      }
     //                            System.out.println("Sup from node " + msg.getIdSrc() + ", list " + neighbor_list);
                             }
@@ -112,9 +115,15 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                         break;
                         case "Timer":
 //                           System.err.println("TIMER Node " + node.getID() + " msg src " + msg.getIdSrc() + " dest " + msg.getIdDest() + " " + msg.getTag() + " " + msg.getContent());
+
+                            System.err.println("Message " + msg.toString());
+
                             if (neighbor_list.contains(msg.getContent())) {
-                                neighbor_list.remove(msg.getContent());
+                                    System.err.println(neighbor_timers.get(msg.getContent()) + " " + this.period);
+                                if ((long) CommonState.getIntTime() - neighbor_timers.get(msg.getContent()) < this.period) {
+                                    neighbor_list.remove(msg.getContent());
 //                                System.out.println(node.getID() + ": list " + neighbor_list + "removed " + msg.getContent());
+                                }
                             }
                         break;
                         default:

@@ -1,10 +1,12 @@
+network.size 100
 
+SECONDES 1000
+MINUTES 60*SECONDES
+HEURES 60*MINUTES
 
-config.debug full
-
-simulation.endtime 12*60*60*1000
-random.seed 60
-network.size 20
+debug_config none
+simulation.endtime 12*HEURES
+random.seed 5
 
 init.initialisation Initialisation
 
@@ -17,39 +19,39 @@ control.graph.neighborprotocol neighbor
 
 control.density DensityController
 control.density.neighbours neighbor
-control.density.from 60*60*1000
-control.density.step 60*1000*2
+control.density.from 1*HEURE
+control.density.step 2*MINUTES
 control.density.verbose 1
 
 protocol.position PositionProtocolImpl
 protocol.position.maxspeed 20
 protocol.position.minspeed 1
-protocol.position.width 2000
-protocol.position.height 2000
-protocol.position.pause 20*60*1000
+protocol.position.width 1500
+protocol.position.height 1500
+protocol.position.pause 20*MINUTES
 
-protocol.emitter DistanceEmitter
+protocol.emitter EmitterImpl
 protocol.emitter.latency 90
-protocol.emitter.scope 350
+protocol.emitter.scope 300
+
 protocol.emitter.positionprotocol position
-protocol.emitter.probability 0.5
 
 protocol.neighbor NeighborProtocolImpl
 protocol.neighbor.period 3000
 protocol.neighbor.timer_delay 3500
 
 
-initial_position_strategy Strategy1InitNext
-next_destination_strategy Strategy1InitNext
+initial_position_strategy Strategy5Init
+next_destination_strategy Strategy4Next
 
 initial_position_strategy.positionprotocol position
 initial_position_strategy.emitter emitter
 initial_position_strategy.distance_init_min 200
-initial_position_strategy.distance_init_max 1000
+initial_position_strategy.distance_init_max 200
 
 
 next_destination_strategy.positionprotocol position
 next_destination_strategy.emitter emitter
 next_destination_strategy.distance_min 200
-next_destination_strategy.distance_max 400
+next_destination_strategy.distance_max 200
 

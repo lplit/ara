@@ -18,7 +18,6 @@ HEURES 60*MINUTES
 debug_config none
 simulation.endtime 12*HEURES
 random.seed 4
-network.size 50
 
 init.initialisation Initialisation
 
@@ -151,7 +150,7 @@ print "\nBenchmark directory ", $bench_dir, "\n", "\n-------\n";
 # bench(size)
 my $it;
 
-for (my $number_of_exps = 0; $number_of_exps < 100 ; $number_of_exps++) {
+for (my $number_of_exps = 0; $number_of_exps < 3 ; $number_of_exps++) {
 
     for ($it = 20; $it < 100; $it += 10) {
 	bench($it);
