@@ -31,5 +31,10 @@ public class Message {
 		this.pid=pid;
 		
 	}
-		
+
+	@Override
+	public String toString() {
+		return idsrc + " " + iddest + " " + tag + " " + content.toString();
+	}
+
 }

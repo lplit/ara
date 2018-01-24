@@ -1,4 +1,4 @@
-network.size 100
+network.size 10
 
 SECONDES 1000
 MINUTES 60*SECONDES
@@ -32,7 +32,7 @@ protocol.position.pause 20*MINUTES
 
 protocol.emitter EmitterImpl
 protocol.emitter.latency 90
-protocol.emitter.scope 300
+protocol.emitter.scope 50
 
 protocol.emitter.positionprotocol position
 
@@ -42,7 +42,7 @@ protocol.neighbor.timer_delay 3500
 
 
 initial_position_strategy Strategy5Init
-next_destination_strategy Strategy4Next
+next_destination_strategy Strategy1InitNext
 
 initial_position_strategy.positionprotocol position
 initial_position_strategy.emitter emitter

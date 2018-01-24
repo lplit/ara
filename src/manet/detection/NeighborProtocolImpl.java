@@ -26,14 +26,14 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
     private static final String PAR_PERIOD = "period";
     private static final String PAR_TIMERDELAY = "timer_delay";
     private static final String PAR_LISTENER_PID = "listenerpid";
-    Integer timeStamp = 0;
+    //Integer timeStamp = 0;
 
     private List<Long> neighbor_list;
-    private Map<Node, Integer> neighbor_timers;
+    private Map<Long, Long> neighbor_timers; // Map<NodeID, Timestamp>
 
     public NeighborProtocolImpl(String prefix) {
         neighbor_list = new ArrayList<>();
-        neighbor_timers = new HashMap<Node, Integer>();
+        neighbor_timers = new HashMap<Long, Long>();
 
         String tmp[]=prefix.split("\\.");
             this_pid= Configuration.lookupPid(tmp[tmp.length-1]);
@@ -56,7 +56,8 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
         try {
             res = (NeighborProtocolImpl) super.clone();
             res.neighbor_list= new ArrayList<>();
-            res.neighbor_timers = new HashMap<Node, Integer>();
+            res.neighbor_timers = new HashMap<Long, Long>();
+            res.period = this.period;
         } catch (CloneNotSupportedException e) {
             System.err.println("Neighbor clone error");
         }
@@ -72,7 +73,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
         Emitter impl = (Emitter) node.getProtocol(emitter_pid);
         Message msg = (Message) event;
 
-        neighbor_timers.replaceAll((k, v) -> (int) v - this.period);
+        //neighbor_timers.replaceAll((k, v) -> (int) v - this.period);
 
 
         if (this.verbose != 0) {
@@ -96,19 +97,27 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                             //                        System.err.println(("recvd msg src" + msg.getIdSrc() + " dest " + msg.getIdDest()) + " " + msg.getTag() + neighbor_list);
                             // salut y'a-t-il des nouveaux potos dans mon scope
                             //                        System.err.println("emitting from neighbor");
-                            impl.emit(node, new Message(msg.getIdSrc(), -1, "Heartbeat", "Heartbeat", this_pid));
+                            impl.emit(node, new Message(msg.getIdSrc(), -1, "Heartbeat", CommonState.getIntTime(), this_pid));
                         }
                         else { // du coup là on ne traite plus que les messages des autres
                             // salutations mon nouveau poto
-                            if (!neighbor_list.contains(msg.getIdSrc())) {
+                            //if (!neighbor_list.contains(msg.getIdSrc())) {
                                 neighbor_list.add(msg.getIdSrc());
                         //        for (Long l : neighbor_list) {
                                     // pour tous les voisins dans la liste, on s'ajoute un timer
-                                    neighbor_timers.put(Network.get((int) msg.getIdSrc()), CommonState.getIntTime());
-                                    EDSimulator.add(this.timer_delay, new Message(node.getID(), -1, "Timer", new Long(msg.getIdSrc()), this_pid), node, this_pid);
-                          //      }
+                                    long titi = CommonState.getTime();
+                                System.err.println(titi);
+
+                                    /* en vrai là on s'envoie un message. msg.getIdSrc contient la valeur du nouveau node
+                                       mais on se l'envoie à soi-même
+                                     */
+
+                                neighbor_timers.put(msg.getIdSrc(), titi);
+                                EDSimulator.add(this.timer_delay, new Message(msg.getIdSrc(), node.getID(), "Timer", titi, this_pid), node, this_pid);
+
+                                    //      }
     //                            System.out.println("Sup from node " + msg.getIdSrc() + ", list " + neighbor_list);
-                            }
+                            //}
                             //System.out.println(neighbor_list);
                         }
 
@@ -116,12 +125,11 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                         case "Timer":
 //                           System.err.println("TIMER Node " + node.getID() + " msg src " + msg.getIdSrc() + " dest " + msg.getIdDest() + " " + msg.getTag() + " " + msg.getContent());
 
-                            System.err.println("Message " + msg.toString());
-
-                            if (neighbor_list.contains(msg.getContent())) {
-                                    System.err.println(neighbor_timers.get(msg.getContent()) + " " + this.period);
-                                if ((long) CommonState.getIntTime() - neighbor_timers.get(msg.getContent()) < this.period) {
-                                    neighbor_list.remove(msg.getContent());
+                            //System.err.println("Message " + msg.toString());
+                            System.err.println(neighbor_timers.get(msg.getIdSrc()) + " == " + msg.getContent());
+                            if (neighbor_list.contains(msg.getIdSrc())) {
+                                if ( neighbor_timers.get(msg.getIdSrc()) == msg.getContent()) {
+                                    neighbor_list.remove(msg.getIdSrc());
 //                                System.out.println(node.getID() + ": list " + neighbor_list + "removed " + msg.getContent());
                                 }
                             }
