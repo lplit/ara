@@ -1,6 +1,6 @@
 package manet;
 
-import manet.detection.NeighborProtocolImpl;
+import manet.detection.NeighborProtocol;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Control;
@@ -78,7 +78,7 @@ public class DensityController implements Control {
                 avg = 0.0;
 
         for (int i = 0 ; i < Network.size() ; i++) {
-            double n_neigs = ((NeighborProtocolImpl) Network.get(i).getProtocol(this_pid)).getNeighbors().size();
+            double n_neigs = ((NeighborProtocol) Network.get(i).getProtocol(this_pid)).getNeighbors().size();
             sum += n_neigs;
         }
 

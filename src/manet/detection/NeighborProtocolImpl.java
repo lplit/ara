@@ -126,7 +126,8 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 //                           System.err.println("TIMER Node " + node.getID() + " msg src " + msg.getIdSrc() + " dest " + msg.getIdDest() + " " + msg.getTag() + " " + msg.getContent());
 
                             //System.err.println("Message " + msg.toString());
-                            System.err.println(neighbor_timers.get(msg.getIdSrc()) + " == " + msg.getContent());
+                            //System.err.println(neighbor_timers.get(msg.getIdSrc()) + " == " + msg.getContent());
+                            System.err.println("Node " + node.getID() + " " + neighbor_list)         ;
                             if (neighbor_list.contains(msg.getIdSrc())) {
                                 if ( neighbor_timers.get(msg.getIdSrc()) == msg.getContent()) {
                                     neighbor_list.remove(msg.getIdSrc());
