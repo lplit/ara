@@ -32,7 +32,7 @@ protocol.position.pause 20*MINUTES
 
 protocol.emitter EmitterImpl
 protocol.emitter.latency 90
-protocol.emitter.scope 50
+protocol.emitter.scope 150
 
 protocol.emitter.positionprotocol position
 
@@ -41,7 +41,7 @@ protocol.neighbor.period 3000
 protocol.neighbor.timer_delay 3500
 
 
-initial_position_strategy Strategy5Init
+initial_position_strategy Strategy1InitNext
 next_destination_strategy Strategy1InitNext
 
 initial_position_strategy.positionprotocol position
