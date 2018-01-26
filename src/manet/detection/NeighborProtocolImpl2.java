@@ -112,7 +112,8 @@ public class NeighborProtocolImpl2 implements NeighborProtocol, EDProtocol {
                         if (!neighbor_list.contains(msg.getIdSrc())) {
                             neighbor_list.add(msg.getIdSrc());
                         }
-                        System.err.println("Node " + node.getID() + ": received probe from " + msg.getIdSrc() + " with " + msg.getContent());
+                        if (verbose==1)
+                            System.err.println("Node " + node.getID() + ": received probe from " + msg.getIdSrc() + " with " + msg.getContent());
 
                         // rajout du voisin dans la liste des timers dans tous les cas
                         neighbor_timers.put(msg.getIdSrc(), (Long) msg.getContent());
@@ -125,7 +126,8 @@ public class NeighborProtocolImpl2 implements NeighborProtocol, EDProtocol {
 
                     break;
                 case tag_timer:
-                    System.err.println("Node " + node.getID() + " " + neighbor_list)         ;
+                    if (verbose==1)
+                        System.err.println("Node " + node.getID() + " " + neighbor_list)         ;
                     if (neighbor_list.contains(msg.getIdSrc())) {
                         if ( neighbor_timers.get(msg.getIdSrc()) == msg.getContent()) {
                             neighbor_list.remove(msg.getIdSrc());
