@@ -1,6 +1,7 @@
 package manet.algorithm.gossip;
 
 import manet.Message;
+import manet.communication.Emitter;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Network;
@@ -10,7 +11,14 @@ import peersim.edsim.EDSimulator;
 
 import java.util.ArrayList;
 
+
+
 public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
+
+    private class GossipData {
+        public int id;
+        public long id_initiator;
+    };
 
     private final int this_pid;
 
@@ -27,12 +35,22 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
      */
     @Override
     public void initiateGossip(Node host, int id, long id_initiator) {
-            Node n = Network.get(CommonState.r.nextInt()% Network.size());
+        GossipData data = new GossipData();
+        data.id = id;
+        data.id_initiator = id_initiator;
 
-            EDSimulator.add(0, new Message(n.getID(), 0, "Algorithm", "Zero", 0), n, 0);
+        int emitter_pid = Configuration.lookupPid("emitter");
+//        System.out.println("getting protocol " + emitter_pid);
+        Emitter emitter = (Emitter) host.getProtocol(emitter_pid);
 
+        Message msg = new Message(
+                host.getID(),
+                -1,
+                "Gossip",
+                data,
+                this_pid);
 
-
+        emitter.emit(host, msg);
     }
 
     @Override
@@ -47,6 +65,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
 
     @Override
     public void processEvent(Node node, int pid, Object event) {
-
+        if (event instanceof Message) { // blablabla un peu comme neighbors
+        }
     }
 }
