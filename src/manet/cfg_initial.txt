@@ -25,13 +25,17 @@ protocol.monitorable.gossipprotocol gossip
 #protocol.monitorable.neighborprotocol neighbor
 
 protocol.gossip GossipProtocolImpl
-protocol.gosspi.verbose 1
+protocol.gossip.verbose 0
 
 #control.density DensityController
 #control.density.neighbours neighbor
 #control.density.from 1*HEURES
 #control.density.step 2*MINUTES
 #control.density.verbose VERB
+
+control.gossipcontroller GossipController
+control.gossipcontroller.nb_diffusions 3
+control.gossipcontroller.at 0
 
 protocol.position PositionProtocolImpl
 protocol.position.maxspeed 20

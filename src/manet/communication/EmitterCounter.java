@@ -1,5 +1,6 @@
 package manet.communication;
 
+import manet.GossipController;
 import manet.Message;
 import manet.algorithm.gossip.GossipProtocol;
 import manet.positioning.PositionProtocol;
@@ -31,7 +32,16 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
     protected int position_protocol;
 
     protected int this_pid;
-    protected int verbose = 1;
+    protected int verbose = 0;
+    protected int pid_controller;
+
+    private void notify_finished() {
+        if (pid_controller != -1) {
+
+        }
+
+        return;
+    }
 
 
     public EmitterCounter(String prefix, Emitter emitter) {
@@ -42,7 +52,7 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
 
         this.position_protocol= Configuration.getPid(prefix+"."+PAR_POSITIONPROTOCOL);
         this.verbose = Configuration.getInt(prefix+".verbose");
-
+        this.pid_controller = Configuration.getPid(prefix + "." + "controller", -1);
 
     }
 
@@ -74,13 +84,6 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                     System.err.println(this_pid + "Incrementing number of received messages to " + number_of_received);
                 }
 
-                if (number_of_transits == 0) {
-                    has_finished = true;
-                    if (verbose != 0)
-                        System.err.println("Message transit finished");
-                } else {
-                    has_finished = false;
-                }
 
             //    if (verbose != 0)
             //        System.err.println("EmitterCounter node " + node.getID() + " delivering " + inner_msg.toString() + " time " + CommonState.getTime());
@@ -95,6 +98,16 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                                 inner_msg.getPid()),
                         node,
                         inner_msg.getPid());
+
+
+                if (number_of_transits == 0) {
+                    has_finished = true;
+                    notify_finished();
+                    if (verbose != 0)
+                        System.err.println("Message transit finished");
+                } else {
+                    has_finished = false;
+                }
             }
             // We're not in reach any more
             else {
