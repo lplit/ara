@@ -1,6 +1,7 @@
 package manet.communication;
 
 import manet.Message;
+import manet.algorithm.gossip.GossipProtocol;
 import manet.positioning.PositionProtocol;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
@@ -53,6 +54,8 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
         // If we're still in reach of the sender
         info();
         if (pid == this_pid && event instanceof Message) {
+
+            //System.out.println("INSTANCE OF MESSAGE");
             Message msg = (Message) event;
 
             if (msg.getTag() != "EMITTER") {
@@ -81,6 +84,7 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                 if (verbose != 0)
                     System.err.println("EmitterCounter node " + node.getID() + " delivering " + inner_msg.toString() + " time " + CommonState.getTime());
 
+                // Deliver message
                 EDSimulator.add(
                         0,
                         new Message(inner_msg.getIdSrc(),
@@ -94,6 +98,13 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
             }
             // We're not in reach any more
             else {
+                System.out.println("Node" + node.getID() + " too far from ");
+
+                int gpro = Configuration.lookupPid("gossip");
+                GossipProtocol gossip = (GossipProtocol) node.getProtocol(gpro);
+//                gossip.initiateGossip(node,((Message) msg.getContent()));
+
+
                 number_of_transits--;
                 if (verbose != 0)
                     System.err.println(this_pid + " decrementing, left: " + number_of_transits);

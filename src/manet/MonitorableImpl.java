@@ -36,7 +36,7 @@ public class MonitorableImpl implements Monitorable {
         GossipProtocolImpl gossip = (GossipProtocolImpl) host.getProtocol(gossip_pid);
         if (gossip_pid != 0) {
             res.add("Gossip ");
-            res.add(gossip.show_map());
+            res.add(gossip.show_list());
         }
 
         //System.err.println(res.toString());
