@@ -3,6 +3,8 @@ network.size 10
 SECONDES 1000
 MINUTES 60*SECONDES
 HEURES 60*MINUTES
+VERB 1
+
 
 debug_config none
 simulation.endtime 12*HEURES
@@ -21,7 +23,7 @@ control.density DensityController
 control.density.neighbours neighbor
 control.density.from 1*HEURES
 control.density.step 2*MINUTES
-control.density.verbose 1
+control.density.verbose VERB
 
 protocol.position PositionProtocolImpl
 protocol.position.maxspeed 20
@@ -33,12 +35,14 @@ protocol.position.pause 20*MINUTES
 protocol.emitter FloodingEmitter
 protocol.emitter.latency 90
 protocol.emitter.scope 150
+protocol.emitter.verbose VERB
 
 protocol.emitter.positionprotocol position
 
 protocol.neighbor NeighborProtocolImpl2
 protocol.neighbor.period 3000
 protocol.neighbor.timer_delay 3500
+protocol.neighbor.verbose VERB
 
 
 initial_position_strategy Strategy1InitNext

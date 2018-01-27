@@ -24,6 +24,7 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
 
     protected int position_protocol;
     protected int this_pid;
+    private int verbose = 0;
 
 
     public EmitterCounter(String prefix, Emitter emitter) {
@@ -33,6 +34,8 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
         emitter_impl = emitter;
 
         this.position_protocol= Configuration.getPid(prefix+"."+PAR_POSITIONPROTOCOL);
+        this.verbose = Configuration.getInt(prefix+".verbose");
+
 
     }
 
@@ -40,6 +43,7 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
     public void processEvent(Node node, int pid, Object event) {
         if (pid == this_pid) {
             number_of_transits--;
+            System.err.println(this_pid + " decrementing, left: " + number_of_transits);
         }
     }
 

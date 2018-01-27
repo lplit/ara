@@ -47,6 +47,7 @@ public class NeighborProtocolImpl2 implements NeighborProtocol, EDProtocol {
         this.period = Configuration.getInt(prefix+"."+PAR_PERIOD);
         this.timer_delay = Configuration.getInt(prefix + "." + PAR_TIMERDELAY);
         this.listener_pid = Configuration.getPid(prefix + "." + PAR_LISTENER_PID,-1);
+        this.verbose = Configuration.getInt(prefix+".verbose");
 
 
     }
