@@ -30,7 +30,7 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
     protected int position_protocol;
 
     protected int this_pid;
-    protected int verbose = 0;
+    protected int verbose = 1;
 
 
     public EmitterCounter(String prefix, Emitter emitter) {
@@ -47,6 +47,10 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
 
     @Override
     public void processEvent(Node node, int pid, Object event) {
+        if (verbose != 0)
+            System.err.println("Node " + node.getID() + " EmitterCounter recvd event " + event.toString());
+
+
         // Message for me
         Message msg = (Message) event;
         long sender = msg.getIdSrc();
@@ -56,7 +60,6 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
         if (pid == this_pid) {
 //            System.err.println("Neighs " + get_neighbors_in_scope(node));
             if (get_neighbors_in_scope(node).contains(Network.get((int) sender))) {
-                number_of_transits--;
                 number_of_received++;
                 if (verbose != 0) {
                     System.err.println(this_pid + "Decrementing transits to " + number_of_transits);
@@ -70,7 +73,10 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                 } else {
                     has_finished = false;
                 }
-                System.err.println("EmitterCounter node " + node.getID() + " delivering " + event.toString() + " time " + CommonState.getTime());
+
+                if (verbose != 0)
+                    System.err.println("EmitterCounter node " + node.getID() + " delivering " + event.toString() + " time " + CommonState.getTime());
+
                 EDSimulator.add(
                         0,
                         new Message(inner_msg.getIdSrc(),
@@ -80,6 +86,7 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                                 inner_msg.getPid()),
                         node,
                         inner_msg.getPid());
+                number_of_transits--;
             }
             // We're not in reach any more
             else {

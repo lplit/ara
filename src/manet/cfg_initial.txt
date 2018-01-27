@@ -3,7 +3,7 @@ network.size 10
 SECONDES 1000
 MINUTES 60*SECONDES
 HEURES 60*MINUTES
-VERB 1
+VERB 0
 
 
 debug_config none
@@ -18,6 +18,12 @@ control.graph.time_slow 0.0002
 control.graph.step 1
 control.graph.emitter emitter
 control.graph.neighborprotocol neighbor
+control.graph.monitorableprotocol monitorable
+
+protocol.monitorable MonitorableImpl
+protocol.monitorable.gossipprotocol gossip
+
+protocol.gossip GossipProtocolImpl
 
 control.density DensityController
 control.density.neighbours neighbor
@@ -35,8 +41,8 @@ protocol.position.pause 20*MINUTES
 protocol.emitter FloodingEmitter
 protocol.emitter.latency 90
 protocol.emitter.scope 150
-protocol.emitter.probability 0.5
-protocol.emitter.verbose VERB
+protocol.emitter.probability 0.4
+protocol.emitter.verbose 1
 
 protocol.emitter.positionprotocol position
 
@@ -46,8 +52,8 @@ protocol.neighbor.timer_delay 3500
 protocol.neighbor.verbose VERB
 
 
-initial_position_strategy Strategy1InitNext
-next_destination_strategy Strategy1InitNext
+initial_position_strategy Strategy5Init
+next_destination_strategy Strategy4Next
 
 initial_position_strategy.positionprotocol position
 initial_position_strategy.emitter emitter

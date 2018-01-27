@@ -79,7 +79,7 @@ public class NeighborProtocolImpl2 implements NeighborProtocol, EDProtocol {
         Emitter impl = (Emitter) node.getProtocol(emitter_pid);
 
         if (verbose != 0) {
-            System.err.println("NeighbotImpl2 node " + node.getID() + " received event " + event.toString());
+            System.err.println("NeighborImpl2 node " + node.getID() + " received event " + event.toString());
         }
 
         Message msg = (Message) event;

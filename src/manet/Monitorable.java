@@ -3,12 +3,17 @@ package manet;
 import java.util.ArrayList;
 import java.util.List;
 
+import manet.algorithm.gossip.GossipProtocol;
+import manet.algorithm.gossip.GossipProtocolImpl;
+import manet.positioning.PositionProtocol;
+import peersim.config.Configuration;
 import peersim.core.Node;
 import peersim.core.Protocol;
 
 public interface Monitorable extends Protocol{
-	
-	
+
+
+
 	/*permet d'obtenir le nombre d'état applicatif du noeud*/
 	public default int nbState() {return 1;}
 	
@@ -19,6 +24,7 @@ public interface Monitorable extends Protocol{
 	public default List<String> infos(Node host){ 
 		List<String> res = new ArrayList<String>();
 		res.add("Node"+host.getID());
+
 		return res;
 	}
 }
