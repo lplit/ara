@@ -26,8 +26,9 @@ public class Initialisation implements Control {
             PositionProtocolImpl pos = (PositionProtocolImpl) n.getProtocol(pid);
             pos.initialiseCurrentPosition(n); // chelou un peu mais bon
             EDSimulator.add(0, PositionProtocolImpl.loop_event, n, pid);
-            int pid2 = Configuration.lookupPid("neighbor");
-            EDSimulator.add(0, new Message(n.getID(), -1, "Heartbeat", "Heartbeat", pid2), n, pid2);
+            int pid2 = Configuration.getPid("neighbor", -1);
+            if (pid2 != -1)
+                EDSimulator.add(0, new Message(n.getID(), -1, "Heartbeat", "Heartbeat", pid2), n, pid2);
 
 //            System.err.println("new tick");
         }

@@ -67,7 +67,8 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
 
 //            System.err.println("Neighs " + get_neighbors_in_scope(node));
             if (get_neighbors_in_scope(node).contains(Network.get((int) sender))) {
-                number_of_received++;
+                number_of_transits--;
+
                 if (verbose != 0) {
                     System.err.println(this_pid + "Decrementing transits to " + number_of_transits);
                     System.err.println(this_pid + "Incrementing number of received messages to " + number_of_received);
@@ -81,8 +82,8 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                     has_finished = false;
                 }
 
-                if (verbose != 0)
-                    System.err.println("EmitterCounter node " + node.getID() + " delivering " + inner_msg.toString() + " time " + CommonState.getTime());
+            //    if (verbose != 0)
+            //        System.err.println("EmitterCounter node " + node.getID() + " delivering " + inner_msg.toString() + " time " + CommonState.getTime());
 
                 // Deliver message
                 EDSimulator.add(
@@ -94,7 +95,6 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                                 inner_msg.getPid()),
                         node,
                         inner_msg.getPid());
-                number_of_transits--;
             }
             // We're not in reach any more
             else {
@@ -104,8 +104,6 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                 GossipProtocol gossip = (GossipProtocol) node.getProtocol(gpro);
 //                gossip.initiateGossip(node,((Message) msg.getContent()));
 
-
-                number_of_transits--;
                 if (verbose != 0)
                     System.err.println(this_pid + " decrementing, left: " + number_of_transits);
             }

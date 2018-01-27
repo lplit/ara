@@ -14,8 +14,9 @@ import java.util.List;
 
 
 public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
+    private static int number_recvd = 0;
 
-    private int verbose = 1;
+    private int verbose = 0;
     private final static String tag_gossip = "Gossip";
 
   private final int this_pid;
@@ -70,9 +71,12 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
             emitter.emit(host, msg);
             if (verbose != 0)
                 System.err.println("Node " + host.getID() + "Gossip: Done re-emitting");
+
+
         }
         else {
-            System.err.println("Node " + host.getID() + " Gossip not re-emitting existing message " + msg);
+            if (verbose != 0)
+                System.err.println("Node " + host.getID() + " Gossip not re-emitting existing message " + msg);
         }
     }
 

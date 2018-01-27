@@ -19,8 +19,8 @@ public class MonitorableImpl implements Monitorable {
 
     public MonitorableImpl(String prefix) {
         this.gossip_pid= Configuration.getPid(prefix+"."+ GossipProtocol.PAR_GOSSIPPROTOCOL);
-        this.neighbor_pid = Configuration.getPid(prefix+"."+ PAR_NEIGHBORPID);
-        System.err.println("MonitorableImpl up with gossip " + gossip_pid);
+        this.neighbor_pid = Configuration.getPid(prefix + "." + "neighbor", -1);
+        System.err.println("MonitorableImpl up with gossip " + gossip_pid + " neighbor " + neighbor_pid);
     }
 
     @Override
@@ -28,8 +28,8 @@ public class MonitorableImpl implements Monitorable {
         List<String> res = new ArrayList<String>();
         res.add("Node "+host.getID());
 
-        NeighborProtocol impl = (NeighborProtocol) host.getProtocol(neighbor_pid);
-        if (neighbor_pid != 0) {
+        if (neighbor_pid != -1) {
+            NeighborProtocol impl = (NeighborProtocol) host.getProtocol(neighbor_pid);
             res.add("Neighbors " + impl.getNeighbors());
         }
 

@@ -33,6 +33,8 @@ public class FloodingEmitter extends EmitterCounter {
                                 msg.getContent(),
                                 msg.getPid()),
                         this_pid));
+
+        number_of_transits += get_neighbors_in_scope(host).size();
 //        System.err.println("Node " + host.getID() + "Sup, FloodingEmitter emitting");
         // "Pour tous les noeuds dans le scope", ..
 
