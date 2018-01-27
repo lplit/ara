@@ -1,6 +1,7 @@
 package manet.communication;
 
 import manet.Message;
+import manet.algorithm.gossip.GossipProtocol;
 import manet.positioning.PositionProtocol;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
@@ -30,7 +31,7 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
     protected int position_protocol;
 
     protected int this_pid;
-    protected int verbose = 0;
+    protected int verbose = 1;
 
 
     public EmitterCounter(String prefix, Emitter emitter) {
@@ -47,17 +48,27 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
 
     @Override
     public void processEvent(Node node, int pid, Object event) {
+        if (verbose != 0)
+            System.err.println("Node " + node.getID() + " EmitterCounter pid " + this_pid + " recvd event " + event.toString() + " pid " + pid);
         // Message for me
-        Message msg = (Message) event;
-        long sender = msg.getIdSrc();
-        Message inner_msg = (Message) msg.getContent();
         // If we're still in reach of the sender
         info();
-        if (pid == this_pid) {
+        if (pid == this_pid && event instanceof Message) {
+
+            //System.out.println("INSTANCE OF MESSAGE");
+            Message msg = (Message) event;
+
+            if (msg.getTag() != "EMITTER") {
+                System.err.println("Should not show this event " + event);
+            }
+
+            long sender = msg.getIdSrc();
+            Message inner_msg = (Message) msg.getContent();
+
 //            System.err.println("Neighs " + get_neighbors_in_scope(node));
             if (get_neighbors_in_scope(node).contains(Network.get((int) sender))) {
                 number_of_transits--;
-                number_of_received++;
+
                 if (verbose != 0) {
                     System.err.println(this_pid + "Decrementing transits to " + number_of_transits);
                     System.err.println(this_pid + "Incrementing number of received messages to " + number_of_received);
@@ -70,7 +81,11 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                 } else {
                     has_finished = false;
                 }
-                System.err.println("EmitterCounter node " + node.getID() + " delivering " + event.toString() + " time " + CommonState.getTime());
+
+            //    if (verbose != 0)
+            //        System.err.println("EmitterCounter node " + node.getID() + " delivering " + inner_msg.toString() + " time " + CommonState.getTime());
+
+                // Deliver message
                 EDSimulator.add(
                         0,
                         new Message(inner_msg.getIdSrc(),
@@ -83,7 +98,12 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
             }
             // We're not in reach any more
             else {
-                number_of_transits--;
+                System.out.println("Node" + node.getID() + " too far from ");
+
+                int gpro = Configuration.lookupPid("gossip");
+                GossipProtocol gossip = (GossipProtocol) node.getProtocol(gpro);
+//                gossip.initiateGossip(node,((Message) msg.getContent()));
+
                 if (verbose != 0)
                     System.err.println(this_pid + " decrementing, left: " + number_of_transits);
             }
