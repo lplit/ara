@@ -194,6 +194,10 @@ public class DensityController implements Control {
     public void printCols() {
         String s = String.format("%.2f;%.2f;%.2f", col1(), col2(), col3());
         System.out.println(s);
+        System.out.flush();
+
+        if (verbose != 0)
+            System.err.println("Should have flushed");
     }
 
     public void printState() {
