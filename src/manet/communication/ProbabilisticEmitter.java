@@ -1,58 +1,13 @@
 package manet.communication;
 
-import manet.MANETGraph;
 import manet.Message;
-import manet.detection.NeighborProtocolImpl;
-import manet.positioning.Position;
-import manet.positioning.PositionProtocol;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
-import peersim.core.Network;
 import peersim.core.Node;
-import peersim.edsim.EDProtocol;
-import peersim.graph.Graph;
-import peersim.graph.GraphAlgorithms;
+import peersim.edsim.EDSimulator;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+/** Émitteur probabiliste aléatoire dans le scope. Exercice 5 question 5. */
 public class ProbabilisticEmitter extends EmitterCounter {
-    // clé = msgid, valeur == initiateur du message
-    public Map<Integer, Integer> messages_received;
-
-
-    private Map<Long, Position> getPositions(){
-
-        Map<Long, Position> res = new HashMap<>();
-        for(int i = 0; i< Network.size(); i++) {
-            Node n = Network.get(i);
-            PositionProtocol pos_proto_n = (PositionProtocol) n.getProtocol(position_protocol);
-            Position cur = pos_proto_n.getCurrentPosition();
-            res.put(n.getID(),cur);
-        }
-        return res;
-    }
-
-    public Boolean has_received(int msg_id) {
-        Map<Long, Position> positions = getPositions();
-        Graph g = new MANETGraph(positions, super.getScope());
-        final GraphAlgorithms ga = new GraphAlgorithms();
-        Map<Integer,Integer> m =ga.weaklyConnectedClusters(g);
-
-        NeighborProtocolImpl impl;
-        Node originateur;
-
-        if (messages_received.containsKey(msg_id)) {
-            originateur = Network.get(messages_received.get(msg_id));
-//            impl = originateur.getProtocol();
-        }
-
-        return false;
-    }
-
-    private int next_waiting = 0;
-
     private static String PAR_PROBABILITY = "probability";
 
     private double probability = 0;
@@ -69,6 +24,14 @@ public class ProbabilisticEmitter extends EmitterCounter {
         double _prob = CommonState.r.nextDouble();
         if (_prob < this.probability) {
             emitter_impl.emit(host, msg);
+
+            for (Node n : get_neighbors_in_scope(host)) {
+                EDSimulator.add(getLatency(), null, n, this_pid);
+                number_of_transits++;
+            }
+
+            if (verbose != 0)
+                System.err.println("Node " + host.getID() + " ProbabilisticEmitter emitting " + _prob + " < " + probability);
         }
     }
 
