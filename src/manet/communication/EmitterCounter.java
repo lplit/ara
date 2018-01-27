@@ -48,22 +48,30 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
     @Override
     public void processEvent(Node node, int pid, Object event) {
         if (verbose != 0)
-            System.err.println("Node " + node.getID() + " EmitterCounter recvd event " + event.toString());
+            System.err.println("Node " + node.getID()
+                    + " EmitterCounter recvd event "
+                    + event.toString());
 
 
         // Message for me
-        Message msg = (Message) event;
-        long sender = msg.getIdSrc();
-        Message inner_msg = (Message) msg.getContent();
-        // If we're still in reach of the sender
-        info();
         if (pid == this_pid) {
-//            System.err.println("Neighs " + get_neighbors_in_scope(node));
+            Message msg = (Message) event;
+            long sender = msg.getIdSrc();
+            Message inner_msg = (Message) msg.getContent();
+
+            // If we're still in reach of the sender
             if (get_neighbors_in_scope(node).contains(Network.get((int) sender))) {
+
+                // Message received
                 number_of_received++;
+
                 if (verbose != 0) {
-                    System.err.println(this_pid + "Decrementing transits to " + number_of_transits);
-                    System.err.println(this_pid + "Incrementing number of received messages to " + number_of_received);
+                    System.err.println(this_pid
+                            + "Decrementing transits to "
+                            + number_of_transits);
+                    System.err.println(this_pid
+                            + "Incrementing number of received messages to "
+                            + number_of_received);
                 }
 
                 if (number_of_transits == 0) {
@@ -75,7 +83,10 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                 }
 
                 if (verbose != 0)
-                    System.err.println("EmitterCounter node " + node.getID() + " delivering " + event.toString() + " time " + CommonState.getTime());
+                    System.err.println("EmitterCounter node "
+                            + node.getID() + " delivering "
+                            + event.toString() + " time "
+                            + CommonState.getTime());
 
                 EDSimulator.add(
                         0,
@@ -86,10 +97,14 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                                 inner_msg.getPid()),
                         node,
                         inner_msg.getPid());
+
+                // Sent out to everyone, finished, decrement
                 number_of_transits--;
             }
             // We're not in reach any more
             else {
+                // Decrement transits, cause message treated, but not delivered because
+                // we're not in range any more
                 number_of_transits--;
                 if (verbose != 0)
                     System.err.println(this_pid + " decrementing, left: " + number_of_transits);
