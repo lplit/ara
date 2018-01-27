@@ -19,7 +19,7 @@ control.graph.neighborprotocol neighbor
 
 control.density DensityController
 control.density.neighbours neighbor
-control.density.from 1*HEURE
+control.density.from 1*HEURES
 control.density.step 2*MINUTES
 control.density.verbose 1
 
