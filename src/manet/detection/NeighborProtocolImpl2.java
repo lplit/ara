@@ -103,7 +103,7 @@ public class NeighborProtocolImpl2 implements NeighborProtocol, EDProtocol {
                         //                        System.err.println("emitting from neighbor");
 
                         // Envoi d'un probe dans le scope pour les voisins, avec un timestamp
-                        impl.emit(node, new Message(msg.getIdSrc(), -1, tag_probe, CommonState.getTime(), this_pid));
+                        impl.emit(node, new Message(node.getID(), -1, tag_probe, CommonState.getTime(), this_pid));
                         break;
 
 
