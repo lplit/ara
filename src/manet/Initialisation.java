@@ -36,7 +36,7 @@ public class Initialisation implements Control {
 
 
         int pid_gossip = Configuration.lookupPid("gossip");
-        System.err.println("Node " + n.getID() + " initiating gossip with 0 0");
+        System.err.println("Node " + n.getID() + " initiating gossip with 0 " + n.getID());
         GossipProtocolImpl gos = (GossipProtocolImpl) n.getProtocol(pid_gossip);
         System.err.println("Gossip impl: " + pid_gossip  + " " + gos);
         gos.initiateGossip(n, 0, n.getID());

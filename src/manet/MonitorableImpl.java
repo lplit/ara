@@ -2,6 +2,8 @@ package manet;
 
 import manet.algorithm.gossip.GossipProtocol;
 import manet.algorithm.gossip.GossipProtocolImpl;
+import manet.detection.NeighborProtocol;
+import manet.detection.NeighborProtocolImpl;
 import peersim.config.Configuration;
 import peersim.core.Node;
 
@@ -10,9 +12,14 @@ import java.util.List;
 
 public class MonitorableImpl implements Monitorable {
     private int gossip_pid;
+    private int neighbor_pid;
+
+    private static final String PAR_NEIGHBORPID = "neighborprotocol";
+
 
     public MonitorableImpl(String prefix) {
         this.gossip_pid= Configuration.getPid(prefix+"."+ GossipProtocol.PAR_GOSSIPPROTOCOL);
+        this.neighbor_pid = Configuration.getPid(prefix+"."+ PAR_NEIGHBORPID);
         System.err.println("MonitorableImpl up with gossip " + gossip_pid);
     }
 
@@ -21,8 +28,14 @@ public class MonitorableImpl implements Monitorable {
         List<String> res = new ArrayList<String>();
         res.add("Node "+host.getID());
 
+        NeighborProtocol impl = (NeighborProtocol) host.getProtocol(neighbor_pid);
+        if (neighbor_pid != 0) {
+            res.add("Neighbors " + impl.getNeighbors());
+        }
+
         GossipProtocolImpl gossip = (GossipProtocolImpl) host.getProtocol(gossip_pid);
         if (gossip_pid != 0) {
+            res.add("Gossip ");
             res.add(gossip.show_map());
         }
 

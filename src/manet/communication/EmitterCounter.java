@@ -48,16 +48,20 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
     @Override
     public void processEvent(Node node, int pid, Object event) {
         if (verbose != 0)
-            System.err.println("Node " + node.getID() + " EmitterCounter recvd event " + event.toString());
-
-
+            System.err.println("Node " + node.getID() + " EmitterCounter pid " + this_pid + " recvd event " + event.toString() + " pid " + pid);
         // Message for me
-        Message msg = (Message) event;
-        long sender = msg.getIdSrc();
-        Message inner_msg = (Message) msg.getContent();
         // If we're still in reach of the sender
         info();
-        if (pid == this_pid) {
+        if (pid == this_pid && event instanceof Message) {
+            Message msg = (Message) event;
+
+            if (msg.getTag() != "EMITTER") {
+                System.err.println("Should not show this event " + event);
+            }
+
+            long sender = msg.getIdSrc();
+            Message inner_msg = (Message) msg.getContent();
+
 //            System.err.println("Neighs " + get_neighbors_in_scope(node));
             if (get_neighbors_in_scope(node).contains(Network.get((int) sender))) {
                 number_of_received++;
@@ -75,7 +79,7 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                 }
 
                 if (verbose != 0)
-                    System.err.println("EmitterCounter node " + node.getID() + " delivering " + event.toString() + " time " + CommonState.getTime());
+                    System.err.println("EmitterCounter node " + node.getID() + " delivering " + inner_msg.toString() + " time " + CommonState.getTime());
 
                 EDSimulator.add(
                         0,

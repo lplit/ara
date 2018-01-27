@@ -20,7 +20,19 @@ public class FloodingEmitter extends EmitterCounter {
     public void emit(Node host, Message msg) {
 
         // Diffusion à tous les noeuds dans le scope classique
-        emitter_impl.emit(host, new Message(msg.getIdSrc(), msg.getIdDest(), msg.getTag(), msg, this_pid));
+        emitter_impl.emit(
+                host,
+                new Message(
+                        msg.getIdSrc(),
+                        msg.getIdDest(),
+                        "EMITTER",
+                        new Message(
+                                msg.getIdSrc(),
+                                msg.getIdDest(),
+                                msg.getTag(),
+                                msg.getContent(),
+                                msg.getPid()),
+                        this_pid));
 //        System.err.println("Node " + host.getID() + "Sup, FloodingEmitter emitting");
         // "Pour tous les noeuds dans le scope", ..
 
