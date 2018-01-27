@@ -1,18 +1,14 @@
 package manet.communication;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import manet.Message;
 import manet.positioning.PositionProtocol;
 import peersim.config.Configuration;
 import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
-import peersim.edsim.EDSimulator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /** Décorateur sur Emitter qui simplifie la vie et qui compte le nombre de messages en transit.
