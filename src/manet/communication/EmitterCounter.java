@@ -8,10 +8,11 @@ import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 import peersim.edsim.EDSimulator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
-/** Décorateur sur Emitter qui compte le nombre de messages en transit.
+/** Décorateur sur Emitter qui simplifie la vie et qui compte le nombre de messages en transit.
  *  La classe concrète s'occupe d'envoyer les messages, celle-ci s'occupe de la réception.
  */
 
@@ -65,6 +66,21 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
 
     public static int get_number_of_transits() {
         return number_of_transits;
+    }
+
+    protected List<Node> get_neighbors_in_scope(Node host) {
+        ArrayList<Node> list = new ArrayList<>();
+        PositionProtocol prot = (PositionProtocol) host.getProtocol(position_protocol);
+
+        for (int i = 0; i < Network.size(); i++) {
+            Node n = Network.get(i);
+            PositionProtocol prot2 = (PositionProtocol) n.getProtocol(position_protocol);
+            double dist = prot.getCurrentPosition().distance(prot2.getCurrentPosition());
+            if (dist < getScope() && n.getID() != host.getID()) {
+                list.add(n);
+            }
+        }
+        return list;
     }
 
 
