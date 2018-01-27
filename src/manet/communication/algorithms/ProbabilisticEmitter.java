@@ -26,7 +26,7 @@ public class ProbabilisticEmitter extends EmitterCounter {
             emitter_impl.emit(host, msg);
 
             for (Node n : get_neighbors_in_scope(host)) {
-                EDSimulator.add(getLatency(), null, n, this_pid);
+                EDSimulator.add(getLatency(), msg.getIdSrc(), n, this_pid);
                 number_of_transits++;
             }
 

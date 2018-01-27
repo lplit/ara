@@ -23,9 +23,9 @@ public class FloodingEmitter extends EmitterCounter {
 //        System.err.println("Node " + host.getID() + "Sup, FloodingEmitter emitting");
         // "Pour tous les noeuds dans le scope", ..
 
-                // On rajoute l'évènement faisant décrémenter le compteur
+                // On rajoute l'évènement faisant inc le compteur
                 for (Node n : get_neighbors_in_scope(host)) {
-                    EDSimulator.add(getLatency(), null, n, this_pid);
+                    EDSimulator.add(getLatency(), msg.getIdSrc(), n, this_pid);
                     number_of_transits++;
                     if (verbose != 0)
                         System.err.println(host.getID() + " FloodingEmitter incrementing, left: " + number_of_transits);

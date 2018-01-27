@@ -19,12 +19,14 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
 
     // Nombre de messages en transit.
     protected static int number_of_transits = 0;
+    protected static int number_of_received = 0;
     protected static Boolean has_finished = false;
 
     protected Emitter emitter_impl;
 
 
     protected int position_protocol;
+
     protected int this_pid;
     protected int verbose = 0;
 
@@ -43,19 +45,32 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
 
     @Override
     public void processEvent(Node node, int pid, Object event) {
+        // Message for me
+        long sender = (long) event;
+        // If we're still in reach of the sender
+        info();
         if (pid == this_pid) {
-            number_of_transits--;
-            System.err.println(this_pid + " decrementing, left: " + number_of_transits);
-
-            if (number_of_transits == 0) {
-                has_finished = true;
+//            System.err.println("Neighs " + get_neighbors_in_scope(node));
+            if (get_neighbors_in_scope(node).contains(sender)) {
+                number_of_transits--;
+                number_of_received++;
                 if (verbose != 0)
-                    System.err.println("Message transit finished");
-            }
-            else {
-                has_finished = false;
-            }
+                    System.err.println(this_pid + " decrementing, left: " + number_of_transits);
 
+                if (number_of_transits == 0) {
+                    has_finished = true;
+                    if (verbose != 0)
+                        System.err.println("Message transit finished");
+                } else {
+                    has_finished = false;
+                }
+            }
+            // We're not in reach any more
+            else {
+                number_of_transits--;
+                if (verbose != 0)
+                    System.err.println(this_pid + " decrementing, left: " + number_of_transits);
+            }
         }
     }
 
@@ -111,4 +126,10 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
     }
 //    public Node getParentNode();
 
+
+
+    public void info() {
+        if (verbose != 0)
+            System.err.println("Transits: " + number_of_transits + " received " + number_of_received);
+    }
 }
