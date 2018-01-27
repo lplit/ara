@@ -151,16 +151,16 @@ print "\nBenchmark directory ", $bench_dir, "\n", "\n-------\n";
 
 # bench(size)
 my $it;
-my $total = 5
-for (my $number_of_exps = 0; $number_of_exps < total ; $number_of_exps++) {
+my $runs = 5;
+for (my $number_of_exps = 0; $number_of_exps < $runs ; $number_of_exps++) {
 
     for ($it = 20; $it < 100; $it += 10) {
-    print "Running", $number_of_exps, "/", $total
+    print "Run ", $number_of_exps, "/", $runs, "\n";
 	bench($it);
     }
 
     for ($it=100; $it < 220; $it += 20) {
-    print "Running", $number_of_exps, "/", $total
+    print "Run ", $number_of_exps, "/", $runs, "\n";
 	bench($it);
     }
 }
