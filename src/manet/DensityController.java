@@ -54,7 +54,7 @@ public class DensityController implements Control {
         dit = dit();
         eit = eit();
 
-        if (this.verbose != 0)
+//        if (this.verbose != 0)
             if (CommonState.getTime() >= CommonState.getEndTime()-step)
                 printCols();
 
