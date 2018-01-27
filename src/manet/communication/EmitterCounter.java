@@ -51,11 +51,13 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
         info();
         if (pid == this_pid) {
 //            System.err.println("Neighs " + get_neighbors_in_scope(node));
-            if (get_neighbors_in_scope(node).contains(sender)) {
+            if (get_neighbors_in_scope(node).contains(Network.get((int) sender))) {
                 number_of_transits--;
                 number_of_received++;
-                if (verbose != 0)
-                    System.err.println(this_pid + " decrementing, left: " + number_of_transits);
+                if (verbose != 0) {
+                    System.err.println(this_pid + " Decrementing transits to " + number_of_transits);
+                    System.err.println(this_pid + "Incrementing number of received messages to " + number_of_received);
+                }
 
                 if (number_of_transits == 0) {
                     has_finished = true;
