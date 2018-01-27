@@ -59,7 +59,7 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                 number_of_transits--;
                 number_of_received++;
                 if (verbose != 0) {
-                    System.err.println(this_pid + " Decrementing transits to " + number_of_transits);
+                    System.err.println(this_pid + "Decrementing transits to " + number_of_transits);
                     System.err.println(this_pid + "Incrementing number of received messages to " + number_of_received);
                 }
 
