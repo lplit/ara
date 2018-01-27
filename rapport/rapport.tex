@@ -644,6 +644,18 @@ Portee & SPI & SD & D & E/D & ED/D \\
 \end{minipage}
 \end{figure}
 
+\subsection{Question 2}
+On a défini une classe abstraite \texttt{EmitterCounter} utilisant le
+design pattern \textsl{Strategy}, en rendant la méthode \texttt{emit}
+abstraite. Celle-ci se charge de la délivrance d'un message à un noeud
+en assurant la propriété qu'à l'instant  $t_{reception}=t_{emission}+period$, le noeud émetteur se trouve toujours à portée du noeud
+récepteur.
+
+La sous-classe concrète se charge d'implémenter la méthode
+\texttt{emit} en encapsulant le message du protocole de manière à ce
+que \texttt{EmitterCounter} puisse bien s'assurer de la
+(non-)délivrance du message.
+
 
 
 \begin{appendix}
