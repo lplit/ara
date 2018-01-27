@@ -23,7 +23,7 @@ public class FloodingEmitter extends EmitterCounter {
 //        System.err.println("Node " + host.getID() + "Sup, FloodingEmitter emitting");
         // "Pour tous les noeuds dans le scope", ..
 
-                // On rajoute l'évènement faisant inc le compteur
+                // On rajoute l'évènement faisant décrémenter le compteur chez ceux qui reçoivent
                 for (Node n : get_neighbors_in_scope(host)) {
                     EDSimulator.add(getLatency(), msg.getIdSrc(), n, this_pid);
                     number_of_transits++;
