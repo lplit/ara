@@ -6,6 +6,7 @@ import peersim.config.Configuration;
 import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
+import peersim.edsim.EDSimulator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,8 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
     @Override
     public void processEvent(Node node, int pid, Object event) {
         // Message for me
-        long sender = (long) event;
+        Message msg = (Message) event;
+        long sender = msg.getIdSrc();
         // If we're still in reach of the sender
         info();
         if (pid == this_pid) {
@@ -66,6 +68,8 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                 } else {
                     has_finished = false;
                 }
+
+                EDSimulator.add(0, msg, node, msg.getPid());
             }
             // We're not in reach any more
             else {
