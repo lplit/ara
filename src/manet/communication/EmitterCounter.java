@@ -1,5 +1,6 @@
 package manet.communication;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import manet.Message;
 import manet.positioning.PositionProtocol;
 import peersim.config.Configuration;
@@ -9,7 +10,9 @@ import peersim.edsim.EDProtocol;
 import peersim.edsim.EDSimulator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /** Décorateur sur Emitter qui simplifie la vie et qui compte le nombre de messages en transit.
@@ -20,6 +23,8 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
 
     // Nombre de messages en transit.
     protected static int number_of_transits = 0;
+    protected static Boolean has_finished = false;
+
     protected Emitter emitter_impl;
 
 
@@ -45,6 +50,16 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
         if (pid == this_pid) {
             number_of_transits--;
             System.err.println(this_pid + " decrementing, left: " + number_of_transits);
+
+            if (number_of_transits == 0) {
+                has_finished = true;
+                if (verbose != 0)
+                    System.err.println("Message transit finished");
+            }
+            else {
+                has_finished = false;
+            }
+
         }
     }
 
@@ -64,8 +79,12 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
         return emitter_impl.getScope();
     }
 
-    public static int get_number_of_transits() {
+    public static int get_number_of_transits(Message msg) {
         return number_of_transits;
+    }
+
+    public static Boolean get_has_finished() {
+        return has_finished;
     }
 
     protected List<Node> get_neighbors_in_scope(Node host) {
