@@ -8,7 +8,7 @@ VERB 0
 
 debug_config none
 simulation.endtime 12*HEURES
-random.seed 5
+random.seed 8
 
 init.initialisation Initialisation
 
@@ -17,53 +17,54 @@ control.graph.positionprotocol position
 control.graph.time_slow 0.0002
 control.graph.step 1
 control.graph.emitter emitter
-control.graph.neighborprotocol neighbor
+#control.graph.neighborprotocol neighbor
 control.graph.monitorableprotocol monitorable
 
 protocol.monitorable MonitorableImpl
 protocol.monitorable.gossipprotocol gossip
-protocol.monitorable.neighborprotocol neighbor
+#protocol.monitorable.neighborprotocol neighbor
 
 protocol.gossip GossipProtocolImpl
+protocol.gosspi.verbose 1
 
-control.density DensityController
-control.density.neighbours neighbor
-control.density.from 1*HEURES
-control.density.step 2*MINUTES
-control.density.verbose VERB
+#control.density DensityController
+#control.density.neighbours neighbor
+#control.density.from 1*HEURES
+#control.density.step 2*MINUTES
+#control.density.verbose VERB
 
 protocol.position PositionProtocolImpl
 protocol.position.maxspeed 20
 protocol.position.minspeed 1
-protocol.position.width 1500
-protocol.position.height 1500
+protocol.position.width 1000
+protocol.position.height 1000
 protocol.position.pause 20*MINUTES
 
 protocol.emitter FloodingEmitter
 protocol.emitter.latency 90
-protocol.emitter.scope 150
+protocol.emitter.scope 100
 protocol.emitter.probability 0.4
 protocol.emitter.verbose 1
 
 protocol.emitter.positionprotocol position
 
-protocol.neighbor NeighborProtocolImpl2
-protocol.neighbor.period 3000
-protocol.neighbor.timer_delay 3500
-protocol.neighbor.verbose VERB
+#protocol.neighbor NeighborProtocolImpl2
+#protocol.neighbor.period 3000
+#protocol.neighbor.timer_delay 3500
+#protocol.neighbor.verbose VERB
 
 
 initial_position_strategy Strategy1InitNext
-next_destination_strategy Strategy1InitNext
+next_destination_strategy Strategy4Next
 
 initial_position_strategy.positionprotocol position
 initial_position_strategy.emitter emitter
-initial_position_strategy.distance_init_min 200
-initial_position_strategy.distance_init_max 200
+initial_position_strategy.distance_init_min 500
+initial_position_strategy.distance_init_max 1000
 
 
 next_destination_strategy.positionprotocol position
 next_destination_strategy.emitter emitter
-next_destination_strategy.distance_min 200
-next_destination_strategy.distance_max 200
+next_destination_strategy.distance_min 500
+next_destination_strategy.distance_max 1000
 
