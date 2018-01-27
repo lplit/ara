@@ -31,7 +31,7 @@ control.graph.neighborprotocol neighbor
 
 control.density DensityController
 control.density.neighbours neighbor
-control.density.from 1*HEURE
+control.density.from 1*HEURES
 control.density.step 2*MINUTES
 control.density.verbose 1
 
@@ -48,7 +48,7 @@ protocol.emitter.latency 90
 
 protocol.emitter.positionprotocol position
 
-protocol.neighbor NeighborProtocolImpl
+protocol.neighbor NeighborProtocolImpl2
 protocol.neighbor.period 3000
 protocol.neighbor.timer_delay 3500
 
@@ -156,7 +156,7 @@ sub bench {
     print "\nBenchmark directory ", $bench_dir, "\n", $str_mov, " ", $str_pos, " ", $val_spi, " ", $val_sd, "\n-------\n";
 
     for ($i = 125; $i <= 1000; $i += 125) {
-	for (my $k = 0; $k < 50; $k++) {
+	for (my $k = 0; $k < 5; $k++) {
 	    $random_seed = rand(100);
 	    my $filename =  join "_", $file_base, $i, $str_pos, $str_mov;
 	    $filename = join "/", $bench_dir, $filename;

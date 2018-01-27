@@ -125,13 +125,13 @@ public class DensityController implements Control {
      * @return average density so far
      */
     public double dt() {
-        double avg = 0.0;
+        double sum = 0.0, ret = 0.;
         if (!d_dt.isEmpty()) {
             for (Double d : d_dt)
-                avg += d;
-            avg = avg / d_dt.size();
+                sum += d;
+            ret = sum / d_dt.size();
         }
-        return avg;
+        return ret;
     }
 
     /**
@@ -143,13 +143,13 @@ public class DensityController implements Control {
      * @return average density so far
      */
     public double et() {
-        double avg = 0.0;
+        double sum = 0.0, ret = 0.;
         if (!d_et.isEmpty()) {
             for (Double d : d_et)
-                avg += d;
-            avg = avg / d_et.size();
+                sum += d;
+            ret = sum / d_et.size();
         }
-        return avg;
+        return ret;
     }
 
     /**
