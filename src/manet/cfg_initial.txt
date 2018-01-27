@@ -30,7 +30,7 @@ protocol.position.width 1500
 protocol.position.height 1500
 protocol.position.pause 20*MINUTES
 
-protocol.emitter EmitterImpl
+protocol.emitter FloodingEmitter
 protocol.emitter.latency 90
 protocol.emitter.scope 150
 

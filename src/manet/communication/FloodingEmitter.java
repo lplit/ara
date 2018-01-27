@@ -11,7 +11,7 @@ public class FloodingEmitter extends EmitterCounter {
     public FloodingEmitter(String prefix) {
         super(prefix, new EmitterImpl(prefix));
 
-//        System.err.println("Sup, FloodingEmitter here");
+        System.err.println("Sup, FloodingEmitter here");
 
     }
 
@@ -26,11 +26,22 @@ public class FloodingEmitter extends EmitterCounter {
         for (int i = 0; i < Network.size(); i++) {
             Node n = Network.get(i);
             PositionProtocol prot2 = (PositionProtocol) n.getProtocol(position_protocol);
-            double dist =prot.getCurrentPosition().distance(prot2.getCurrentPosition());
+            double dist = prot.getCurrentPosition().distance(prot2.getCurrentPosition());
             if (dist < getScope() && n.getID() != host.getID()) {
+                number_of_transits++;
+
                 // On rajoute l'évènement faisant décrémenter le compteur
                 EDSimulator.add(getLatency(), null, n, this_pid);
             }
         }
+    }
+
+    @Override
+    public Object clone() {
+        FloodingEmitter res = null;
+
+        res = (FloodingEmitter) super.clone();
+
+        return res;
     }
 }

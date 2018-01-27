@@ -18,7 +18,7 @@ import java.util.List;
 public abstract class EmitterCounter implements Emitter, EDProtocol {
 
     // Nombre de messages en transit.
-    private static int number_of_transits = 0;
+    protected static int number_of_transits = 0;
     protected Emitter emitter_impl;
 
 
