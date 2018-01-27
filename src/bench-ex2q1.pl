@@ -14,6 +14,7 @@ my $file_first = "
 SECONDES 1000
 MINUTES 60*SECONDES
 HEURES 60*MINUTES
+VERB 0
 
 debug_config none
 simulation.endtime 12*HEURES
@@ -29,9 +30,9 @@ control.graph.neighborprotocol neighbor
 
 control.density DensityController
 control.density.neighbours neighbor
-control.density.from 1*HEURE
+control.density.from 1*HEURES
 control.density.step 2*MINUTES
-control.density.verbose 1
+control.density.verbose VERB
 
 protocol.position PositionProtocolImpl
 protocol.position.maxspeed 20
@@ -46,9 +47,10 @@ protocol.emitter.scope 300
 
 protocol.emitter.positionprotocol position
 
-protocol.neighbor NeighborProtocolImpl
+protocol.neighbor NeighborProtocolImpl2
 protocol.neighbor.period 3000
 protocol.neighbor.timer_delay 3500
+protocol.neighbor.verbose VERB
 
 
 initial_position_strategy Strategy5Init
