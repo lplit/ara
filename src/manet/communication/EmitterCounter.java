@@ -68,8 +68,16 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                 } else {
                     has_finished = false;
                 }
-
-                EDSimulator.add(0, msg.getContent(), node, msg.getPid());
+                System.err.println("EmitterImpl node " + node.getID() + " delivering " + event.toString());
+                EDSimulator.add(
+                        0,
+                        new Message(msg.getIdSrc(),
+                                msg.getIdDest(),
+                                msg.getTag(),
+                                msg.getContent(),
+                                msg.getPid()),
+                        node,
+                        msg.getPid());
             }
             // We're not in reach any more
             else {

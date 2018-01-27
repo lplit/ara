@@ -15,6 +15,8 @@ import java.util.ArrayList;
 
 public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
 
+    private final static String tag_gossip = "Gossip";
+
     private class GossipData {
         public int id;
         public long id_initiator;

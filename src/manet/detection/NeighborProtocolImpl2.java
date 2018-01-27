@@ -1,21 +1,17 @@
 package manet.detection;
 
 import manet.Message;
-        import manet.communication.Emitter;
-        import manet.communication.EmitterImpl;
-        import manet.detection.NeighborProtocol;
-        import peersim.config.Configuration;
-        import peersim.core.CommonState;
-        import peersim.core.Network;
-        import peersim.core.Node;
-        import peersim.edsim.EDProtocol;
-        import peersim.edsim.EDSimulator;
+import manet.communication.Emitter;
+import peersim.config.Configuration;
+import peersim.core.CommonState;
+import peersim.core.Node;
+import peersim.edsim.EDProtocol;
+import peersim.edsim.EDSimulator;
 
-        import java.util.ArrayList;
-        import java.util.Map;
-        import java.util.HashMap;
-        import java.util.Iterator;
-        import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class NeighborProtocolImpl2 implements NeighborProtocol, EDProtocol {
     private int this_pid;
@@ -43,6 +39,9 @@ public class NeighborProtocolImpl2 implements NeighborProtocol, EDProtocol {
 
         String tmp[]=prefix.split("\\.");
         this_pid= Configuration.lookupPid(tmp[tmp.length-1]);
+
+        if (verbose != 0)
+            System.err.println("NeighborImpl2 pid " + this_pid);
 
         this.period = Configuration.getInt(prefix+"."+PAR_PERIOD);
         this.timer_delay = Configuration.getInt(prefix + "." + PAR_TIMERDELAY);
@@ -78,6 +77,11 @@ public class NeighborProtocolImpl2 implements NeighborProtocol, EDProtocol {
         int emitter_pid = Configuration.lookupPid("emitter");
 //        System.out.println("getting protocol " + emitter_pid);
         Emitter impl = (Emitter) node.getProtocol(emitter_pid);
+
+        if (verbose != 0) {
+            System.err.println("NeighbotImpl2 node " + node.getID() + " received event " + event.toString());
+        }
+
         Message msg = (Message) event;
 
         //neighbor_timers.replaceAll((k, v) -> (int) v - this.period);
@@ -103,8 +107,10 @@ public class NeighborProtocolImpl2 implements NeighborProtocol, EDProtocol {
                         //                        System.err.println("emitting from neighbor");
 
                         // Envoi d'un probe dans le scope pour les voisins, avec un timestamp
-                        impl.emit(node, new Message(node.getID(), -1, tag_probe, CommonState.getTime(), this_pid));
-                        break;
+                    if (verbose != 0)
+                        System.err.println("NeighborImpl2 node " + node.getID() + " emitting w/pid " + this_pid);
+                    impl.emit(node, new Message(node.getID(), -1, tag_probe, CommonState.getTime(), this_pid));
+                    break;
 
 
                 case tag_probe: // Réception d'un probe de quelqu'un d'autre
