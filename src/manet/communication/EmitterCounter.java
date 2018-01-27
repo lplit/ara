@@ -3,6 +3,7 @@ package manet.communication;
 import manet.Message;
 import manet.positioning.PositionProtocol;
 import peersim.config.Configuration;
+import peersim.core.CommonState;
 import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
@@ -49,6 +50,7 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
         // Message for me
         Message msg = (Message) event;
         long sender = msg.getIdSrc();
+        Message inner_msg = (Message) msg.getContent();
         // If we're still in reach of the sender
         info();
         if (pid == this_pid) {
@@ -68,16 +70,16 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
                 } else {
                     has_finished = false;
                 }
-                System.err.println("EmitterImpl node " + node.getID() + " delivering " + event.toString());
+                System.err.println("EmitterCounter node " + node.getID() + " delivering " + event.toString() + " time " + CommonState.getTime());
                 EDSimulator.add(
                         0,
-                        new Message(msg.getIdSrc(),
-                                msg.getIdDest(),
-                                msg.getTag(),
-                                msg.getContent(),
-                                msg.getPid()),
+                        new Message(inner_msg.getIdSrc(),
+                                inner_msg.getIdDest(),
+                                inner_msg.getTag(),
+                                inner_msg.getContent(),
+                                inner_msg.getPid()),
                         node,
-                        msg.getPid());
+                        inner_msg.getPid());
             }
             // We're not in reach any more
             else {
