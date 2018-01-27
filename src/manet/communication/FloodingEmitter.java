@@ -30,6 +30,8 @@ public class FloodingEmitter extends EmitterCounter {
             if (dist < getScope() && n.getID() != host.getID()) {
                 number_of_transits++;
 
+                if (this.verbose == 1)
+                    System.err.println(this_pid + " incrementing, left: " + number_of_transits);
                 // On rajoute l'évènement faisant décrémenter le compteur
                 EDSimulator.add(getLatency(), null, n, this_pid);
             }

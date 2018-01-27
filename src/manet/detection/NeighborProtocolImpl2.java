@@ -85,7 +85,7 @@ public class NeighborProtocolImpl2 implements NeighborProtocol, EDProtocol {
 
         if (this.verbose != 0) {
             if (CommonState.getIntTime() % 100000 * 60 * 60 == 0) {
-                System.err.println(CommonState.getIntTime());
+                System.err.println("Time " + CommonState.getIntTime());
             }
         }
 

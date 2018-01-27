@@ -24,7 +24,7 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
 
     protected int position_protocol;
     protected int this_pid;
-    private int verbose = 0;
+    protected int verbose = 0;
 
 
     public EmitterCounter(String prefix, Emitter emitter) {
