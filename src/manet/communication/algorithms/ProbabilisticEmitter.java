@@ -24,7 +24,7 @@ public class ProbabilisticEmitter extends EmitterCounter {
     public void emit(Node host, Message msg) {
         double _prob = CommonState.r.nextDouble();
         if (_prob < this.probability) {
-            emitter_impl.emit(host, msg);
+            emitter_impl.emit(host, new Message(msg.getIdSrc(), msg.getIdDest(), msg.getTag(), msg, this_pid));
 
             for (Node n : get_neighbors_in_scope(host)) {
 //                EDSimulator.add(getLatency(), msg.getIdSrc(), n, this_pid);

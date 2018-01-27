@@ -41,8 +41,8 @@ public class DistanceEmitter extends EmitterCounter {
                             new Message(msg.getIdSrc(),
                                     n.getID(),
                                     msg.getTag(),
-                                    msg.getContent(),
-                                    msg.getPid()),
+                                    msg,
+                                    this_pid),
                             n,
                             this_pid);
 
