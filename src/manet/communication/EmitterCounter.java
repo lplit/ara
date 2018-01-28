@@ -57,72 +57,67 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                     + " recvd event " + event.toString()
                     + " pid " + pid);
 
-        // Message for me
-        // If we're still in reach of the sender
-
         number_of_received++;
         number_of_transits--;
 
-
+        // This message is for me
         if (pid == this_pid && event instanceof Message) {
 
             Message msg = (Message) event;
             long sender = msg.getIdSrc();
             Message inner_msg = (Message) msg.getContent();
 
+            // The sender is still within scope
             if (get_neighbors_in_scope(node).contains(Network.get((int) sender))) {
 
-                //    if (verbose != 0)
-                //        System.err.println("EmitterCounter node " + node.getID() + " delivering " + inner_msg.toString() + " time " + CommonState.getTime());
+                deliverMessage(inner_msg, node);
 
-                // Deliver message
-                EDSimulator.add(
-                        0,
-                        new Message(inner_msg.getIdSrc(),
-                                inner_msg.getIdDest(),
-                                inner_msg.getTag(),
-                                inner_msg.getContent(),
-                                inner_msg.getPid()),
-                        node,
-                        inner_msg.getPid());
-
-                // Message traite & delivre
-                //number_of_transits--;
-                number_of_delivered++;
-//                info();
-
-                // Last message
+                // If last message
                 if (number_of_transits == 0 && has_finished == false) {
                     if (verbose != 0)
                         System.err.println("Message transit finished");
 
-                    int[] EndResults = {
-                            number_of_transits,
-                            number_of_received,
-                            number_of_sent,
-                            number_of_delivered
-                    };
-
-                    has_finished = true;
-                    setChanged();
-                    notifyObservers(EndResults);
+                    notifyGossip();
                 }
-                else {
+                // This wasn't the last message
+                else
                     info();
-                }
-
             }
-            // We're not in reach any more, do not deliver message
+            // We're not within reach any more, do not deliver message
             else {
-
                 if (verbose != 0)
                     System.err.println(this_pid + " out of scope. Message " + msg.getPid() + "not delivered.");
-//                    info();
-
             }
         }
-
         info();
+    }
+
+    public void notifyGossip() {
+        int[] EndResults = {
+                number_of_transits,
+                number_of_received,
+                number_of_sent,
+                number_of_delivered
+        };
+        has_finished = true;
+        setChanged();
+        notifyObservers(EndResults);
+    }
+
+    public void deliverMessage(Message m, Node n) {
+        // Deliver message
+        EDSimulator.add(
+                0,
+                new Message(m.getIdSrc(),
+                        m.getIdDest(),
+                        m.getTag(),
+                        m.getContent(),
+                        m.getPid()),
+                n,
+                m.getPid());
+
+        // Message delivre
+        this.number_of_delivered++;
     }
 
     @Override
