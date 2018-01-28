@@ -17,7 +17,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
     private final static String tag_gossip = "Gossip";
 
   private final int this_pid;
-    private Set<String> received_messages;
+    private static Set<String> received_messages;
 
 
 

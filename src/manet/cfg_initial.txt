@@ -35,7 +35,7 @@ protocol.gossip.verbose 1
 #control.density.verbose VERB
 
 control.gossipcontroller GossipController
-control.gossipcontroller.nb_diffusions 3
+control.gossipcontroller.nb_diffusions 5
 control.gossipcontroller.at 0
 control.gossipcontroller.emitter emitter
 
