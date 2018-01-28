@@ -15,16 +15,15 @@ import java.util.Observer;
 
 public class GossipController implements Control, Observer {
 
-    private int diffs;  // Nombre de diffusions
     private static final String PAR_NB_DIFFUSIONS = "nb_diffusions";
     private static final String PAR_EMITTER = "emitter";
 
-    private int emitter_pid;
-
-    private int verbose = 1;
-
-    private int id_diffusion = 0;
-    private int id_originator = -1;
+    private int
+            diffs = -1,  // Nombre de diffusions
+            emitter_pid = -1,
+            verbose = 0, // Par default a zero, se change globalement dans le fichier de config
+            id_diffusion = 0, // First
+            id_originator = -1;
 
     private Boolean first_execute = true;
 
@@ -94,23 +93,16 @@ public class GossipController implements Control, Observer {
                     nouvelle_diffusion();
                     return false;
                 }
-
-
             }
-
         }
-        else {
+        else
             System.err.println("Not supposed to be here");
-        }
-
 
         if (first_execute) {
             nouvelle_diffusion();
             first_execute = false;
             return false;
         }
-
-
         return false;
     }
 
@@ -131,7 +123,7 @@ public class GossipController implements Control, Observer {
      * @return % of reachable nodes
      */
     private double att() {
-
+        // TODO: Implement att method
         return 0.0;
     }
 
@@ -144,7 +136,7 @@ public class GossipController implements Control, Observer {
      * @return % of reachable nodes that did not rebroadcast
      */
     private double er() {
-
+        // TODO: Implement er method
         return 0.0;
     }
 
@@ -163,6 +155,8 @@ public class GossipController implements Control, Observer {
         //if (verbose != 0)
         // donc quand une diffusion est termine
         // on doit chopper l'Att et ER ici
+        // Object contient les info de fin de diffusion:
+        //  - number_of_transi
         System.err.println("Controller notified of end");
 
         notified_finished();

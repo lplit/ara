@@ -20,19 +20,22 @@ import java.util.Observable;
 
 public abstract class EmitterCounter extends Observable implements Emitter, EDProtocol {
 
-    // Nombre de messages en transit.
-    protected static int number_of_transits = 0;
-    protected static int number_of_received = 0;
+    // # of messages
+    protected static int
+            number_of_transits = 0,
+            number_of_received = 0,
+            number_of_sent = 0;
+
+    protected int
+            position_protocol = -1,
+            this_pid = -1,
+            verbose = 0,
+            pid_controller = -1;
+
     protected static Boolean has_finished = false;
 
     protected Emitter emitter_impl;
 
-
-    protected int position_protocol;
-
-    protected int this_pid;
-    protected int verbose = 0;
-    protected int pid_controller;
 
     public EmitterCounter(String prefix, Emitter emitter) {
         String tmp[]=prefix.split("\\.");
@@ -55,28 +58,14 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
         info();
         if (pid == this_pid && event instanceof Message) {
 
-            //System.out.println("INSTANCE OF MESSAGE");
             Message msg = (Message) event;
-
-            if (msg.getTag() != "EMITTER") {
-                System.err.println("Should not show this event " + event);
-            }
-
             long sender = msg.getIdSrc();
             Message inner_msg = (Message) msg.getContent();
 
-//            System.err.println("Neighs " + get_neighbors_in_scope(node));
             if (get_neighbors_in_scope(node).contains(Network.get((int) sender))) {
-                number_of_transits--;
 
-                if (verbose != 0) {
-                    System.err.println(this_pid + "Decrementing transits to " + number_of_transits);
-                    System.err.println(this_pid + "Incrementing number of received messages to " + number_of_received);
-                }
-
-
-            //    if (verbose != 0)
-            //        System.err.println("EmitterCounter node " + node.getID() + " delivering " + inner_msg.toString() + " time " + CommonState.getTime());
+                //    if (verbose != 0)
+                //        System.err.println("EmitterCounter node " + node.getID() + " delivering " + inner_msg.toString() + " time " + CommonState.getTime());
 
                 // Deliver message
                 EDSimulator.add(
@@ -89,32 +78,28 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                         node,
                         inner_msg.getPid());
 
-                // Message delivre, on increment
+                // Message traite & delivre
+                number_of_transits--;
                 number_of_received++;
+                info();
 
                 if (number_of_transits == 0) {
-                    has_finished = true;
-                    setChanged();
                     if (verbose != 0)
                         System.err.println("Message transit finished");
+                    has_finished = true;
+                    setChanged();
                     notifyObservers();
-                } else {
+                } else
                     has_finished = false;
-                }
+
             }
-            // We're not in reach any more
+            // We're not in reach any more, do not deliver message
             else {
-                System.out.println("Node" + node.getID() + " too far from ");
-
-                int gpro = Configuration.lookupPid("gossip");
-                GossipProtocol gossip = (GossipProtocol) node.getProtocol(gpro);
-//                gossip.initiateGossip(node,((Message) msg.getContent()));
-
-                // Message traite, mais pas a delivrer, faut decrement donc
                 number_of_transits--;
-
                 if (verbose != 0)
-                    System.err.println(this_pid + " decrementing, left: " + number_of_transits);
+                    System.err.println(this_pid + " out of scope. Message " + msg.getPid() + "not delivered.");
+                info();
+
             }
         }
     }
