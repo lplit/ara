@@ -52,7 +52,7 @@ public class GossipController implements Control, Observer {
         this.diffs = Configuration.getInt(prefix + "." + PAR_NB_DIFFUSIONS);
         this.emitter_pid = Configuration.getPid(prefix + "." + PAR_EMITTER);
         id_diffusion = 0;
-
+        round_number = 0;
         last_size = -1;
 /*
         for (int i = 0; i < Network.size(); i++) {
@@ -82,9 +82,11 @@ public class GossipController implements Control, Observer {
     private void nouvelle_diffusion() {
         int rand_id = CommonState.r.nextInt(Network.size());
         id_originator = rand_id;
+        round_number = 0;
 
-        System.err.println("New broadcast");
         System.err.println("\n\n\n\n\n");
+        System.err.println("New broadcast, round " + round_number);
+
         // On choisit un noeud random dans le réseau
         Node n = Network.get(rand_id);
 
@@ -96,7 +98,7 @@ public class GossipController implements Control, Observer {
 
 
         if(verbose !=0)
-            System.err.println("Node " + n.getID() + " initiating gossip with " + n.getID() + " gossip_id " + id_diffusion);
+            System.err.println("Node " + n.getID() + " initiating gossip " + id_diffusion);
 
         GossipProtocolImpl gos = (GossipProtocolImpl) n.getProtocol(pid_gossip);
 
@@ -137,14 +139,6 @@ public class GossipController implements Control, Observer {
         }
         return false;
     }
-
-
-
-
-
-
-
-
 
     /**
      * Calcule l' atteignabilité: le pourcentage de noeuds atteignables ayant
@@ -208,6 +202,7 @@ public class GossipController implements Control, Observer {
             notified_finished();
         }
         else { // une vague s'est terminée mais pas le broadcast. on a de nouveaux voisins quoi
+            System.err.println("\n\nNew round: " + ++round_number);
             last_size = results[4];
         }
 
