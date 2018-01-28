@@ -10,8 +10,10 @@ import peersim.core.Network;
 import peersim.core.Node;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
-public class GossipController implements Control {
+public class GossipController implements Control, Observer {
 
     private int diffs;  // Nombre de diffusions
     private static final String PAR_NB_DIFFUSIONS = "nb_diffusions";
@@ -144,4 +146,10 @@ public class GossipController implements Control {
         return d_er;
     }
 
+    @Override
+    public void update(Observable observable, Object o) {
+        // Fait des bails ici quand le boolean dans EmitterCouter passe a true
+        // notified_finished
+        notified_finished();
+    }
 }

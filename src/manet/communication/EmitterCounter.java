@@ -13,13 +13,14 @@ import peersim.edsim.EDSimulator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
 
 /** Décorateur sur Emitter qui simplifie la vie et qui compte le nombre de messages en transit.
  *  La classe concrète s'occupe d'envoyer les messages, celle-ci s'occupe de la réception.
  */
 
-public abstract class EmitterCounter implements Emitter, EDProtocol {
+public abstract class EmitterCounter extends Observable implements Emitter, EDProtocol {
 
     // Nombre de messages en transit.
     protected static int number_of_transits = 0;
@@ -34,15 +35,6 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
     protected int this_pid;
     protected int verbose = 0;
     protected int pid_controller;
-
-    private void notify_finished() {
-        if (pid_controller != -1) {
-
-        }
-
-        return;
-    }
-
 
     public EmitterCounter(String prefix, Emitter emitter) {
         String tmp[]=prefix.split("\\.");
@@ -102,7 +94,7 @@ public abstract class EmitterCounter implements Emitter, EDProtocol {
 
                 if (number_of_transits == 0) {
                     has_finished = true;
-                    notify_finished();
+                    setChanged();
                     if (verbose != 0)
                         System.err.println("Message transit finished");
                 } else {
