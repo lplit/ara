@@ -6,6 +6,7 @@ import manet.communication.EmitterImpl;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Node;
+import peersim.edsim.EDSimulator;
 
 /** Émitteur probabiliste aléatoire dans le scope. Exercice 5 question 5. */
 public class ProbabilisticEmitter extends EmitterCounter {
@@ -29,8 +30,9 @@ public class ProbabilisticEmitter extends EmitterCounter {
             emitter_impl.emit(host, new Message(msg.getIdSrc(), msg.getIdDest(), msg.getTag(), msg, this_pid));
 
             for (Node n : get_neighbors_in_scope(host)) {
-//                EDSimulator.add(getLatency(), msg.getIdSrc(), n, this_pid);
+                EDSimulator.add(getLatency(), msg.getIdSrc(), n, this_pid);
                 number_of_transits++;
+                number_of_sent++;
             }
 
             if (verbose != 0)

@@ -42,6 +42,10 @@ public class FloodingEmitter extends EmitterCounter {
 
                 // On rajoute l'évènement faisant décrémenter le compteur chez ceux qui reçoivent
                 for (Node n : get_neighbors_in_scope(host)) {
+                    number_of_transits++;
+                    number_of_sent++;
+                    has_finished = false;
+
                     EDSimulator.add(getLatency(), new Message(
                             msg.getIdSrc(),
                             n.getID(),
@@ -53,9 +57,7 @@ public class FloodingEmitter extends EmitterCounter {
                                     msg.getContent(),
                                     msg.getPid()),
                             this_pid), n, this_pid);
-                    has_finished = false;
-                    number_of_transits++;
-                    number_of_sent++;
+
                     if (verbose != 0)
                         System.err.println(host.getID() + " FloodingEmitter incrementing, left: " + number_of_transits);
                 }

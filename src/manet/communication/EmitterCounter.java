@@ -60,6 +60,11 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
         // Message for me
         // If we're still in reach of the sender
         info();
+
+        number_of_received++;
+        number_of_transits--;
+
+
         if (pid == this_pid && event instanceof Message) {
 
             Message msg = (Message) event;
@@ -84,7 +89,6 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
 
                 // Message traite & delivre
                 //number_of_transits--;
-                number_of_received++;
                 number_of_delivered++;
                 info();
 
@@ -98,8 +102,7 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                 }
                 // We're not in reach any more, do not deliver message
                 else {
-                    number_of_received++;
-                  //  number_of_transits--;
+
                     if (verbose != 0)
                         System.err.println(this_pid + " out of scope. Message " + msg.getPid() + "not delivered.");
                     info();
@@ -165,6 +168,6 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
 
     public void info() {
         if (verbose != 0)
-            System.err.println("Transits: " + number_of_transits + " received " + number_of_received + " delivered " + number_of_delivered);
+            System.err.println("Transits: " + number_of_transits + " sent " + number_of_sent + " received " + number_of_received + " delivered " + number_of_delivered);
     }
 }
