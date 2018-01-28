@@ -58,7 +58,7 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                     + " pid " + pid);
 
         number_of_received++;
-        number_of_transits--;
+        //number_of_transits--;
 
         // This message is for me
         if (pid == this_pid && event instanceof Message) {
@@ -117,7 +117,7 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                 m.getPid());
 
         // Message delivre
-        this.number_of_delivered++;
+        number_of_delivered++;
     }
 
     @Override
@@ -159,6 +159,9 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
         return list;
     }
 
+    public void decrement_transits() {
+        number_of_transits--;
+    }
 
     @Override
     public Object clone(){

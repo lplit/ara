@@ -7,10 +7,7 @@ import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-;
 
 
 public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
@@ -38,10 +35,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
     }
 
     public Boolean received(GossipData data) {
-        if (received_messages.contains(data.toString())) {
-            return true;
-        } else
-            return false;
+        return received_messages.contains(data.toString());
     }
 
 
@@ -78,6 +72,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
             if (verbose != 0)
                 System.err.println("Node " + host.getID() + " Gossip not re-emitting existing message " + msg);
         }
+        emitter.decrement_transits();
     }
 
     @Override
