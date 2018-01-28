@@ -20,6 +20,7 @@ public class FloodingEmitter extends EmitterCounter {
     public void emit(Node host, Message msg) {
 
         // Diffusion à tous les noeuds dans le scope classique
+        /*
         emitter_impl.emit(
                 host,
                 new Message(
@@ -35,6 +36,7 @@ public class FloodingEmitter extends EmitterCounter {
                         this_pid));
 
         number_of_transits += get_neighbors_in_scope(host).size();
+        */
 //        System.err.println("Node " + host.getID() + "Sup, FloodingEmitter emitting");
         // "Pour tous les noeuds dans le scope", ..
 

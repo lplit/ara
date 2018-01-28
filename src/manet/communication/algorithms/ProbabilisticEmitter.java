@@ -17,7 +17,7 @@ public class ProbabilisticEmitter extends EmitterCounter {
     public ProbabilisticEmitter(String prefix) {
         super(prefix, new EmitterImpl(prefix));
 
-        probability = Configuration.getDouble(prefix+"." + PAR_PROBABILITY);
+        this.probability = Configuration.getDouble(prefix+"." + PAR_PROBABILITY);
     }
 
     @Override
