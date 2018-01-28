@@ -44,11 +44,10 @@ public class EmitterImpl implements Emitter {
             PositionProtocol prot2 = (PositionProtocol) n.getProtocol(position_protocol);
             double dist = prot.getCurrentPosition().distance(prot2.getCurrentPosition());
             if (dist < scope && n.getID() != host.getID()) {
-                if (msg.getIdDest() == -1) {
-                    EDSimulator.add(latency, new Message(msg.getIdSrc(), n.getID(), msg.getTag(), msg.getContent(), msg.getPid()), n, msg.getPid());
-                }
-                //
-                //                EDSimulator.add(0, msg, n, );
+                if (msg.getIdDest() == -1)
+                    EDSimulator.add(latency,
+                            new Message(msg.getIdSrc(), n.getID(), msg.getTag(), msg.getContent(), msg.getPid()),
+                            n, msg.getPid());
             }
         }
 
