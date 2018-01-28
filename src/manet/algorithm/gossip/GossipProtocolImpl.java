@@ -72,7 +72,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
             if (verbose != 0)
                 System.err.println("Node " + host.getID() + " Gossip not re-emitting existing message " + msg);
         }
-        emitter.decrement_transits();
+//        emitter.decrement_transits();
     }
 
     @Override

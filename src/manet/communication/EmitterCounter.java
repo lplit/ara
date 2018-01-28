@@ -3,6 +3,7 @@ package manet.communication;
 import manet.Message;
 import manet.positioning.PositionProtocol;
 import peersim.config.Configuration;
+import peersim.core.CommonState;
 import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
@@ -24,7 +25,8 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
             number_of_transits = 0,
             number_of_received = 0,
             number_of_sent = 0,
-            number_of_delivered = 0;
+            number_of_delivered = 0,
+            number_not_delivered = 0;
 
     protected int
             position_protocol = -1,
@@ -57,11 +59,21 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                     + " recvd event " + event.toString()
                     + " pid " + pid);
 
-        number_of_received++;
-        //number_of_transits--;
+
+        info();
 
         // This message is for me
         if (pid == this_pid && event instanceof Message) {
+
+            // check if transfers done
+            if (((Message) event).getTag() == "Check") {
+                check_for_end();
+                return;
+            }
+            else {
+                number_of_received++;
+                number_of_transits--;
+            }
 
             Message msg = (Message) event;
             long sender = msg.getIdSrc();
@@ -72,24 +84,16 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
 
                 deliverMessage(inner_msg, node);
 
-                // If last message
-                if (number_of_transits == 0 && has_finished == false) {
-                    if (verbose != 0)
-                        System.err.println("Message transit finished");
+                EDSimulator.add(1, new Message(node.getID(), node.getID(), "Check", "Check", this_pid), node, this_pid);
 
-                    notifyGossip();
-                }
-                // This wasn't the last message
-                else
-                    info();
             }
             // We're not within reach any more, do not deliver message
             else {
+                number_not_delivered++;
                 if (verbose != 0)
                     System.err.println(this_pid + " out of scope. Message " + msg.getPid() + "not delivered.");
             }
         }
-        info();
     }
 
     public void notifyGossip() {
@@ -179,6 +183,20 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
 
     public void info() {
         if (verbose != 0)
-            System.err.println("Transits: " + number_of_transits + " sent " + number_of_sent + " received " + number_of_received + " delivered " + number_of_delivered);
+            System.err.println("transits " + number_of_transits + "; sent " + number_of_sent
+                    + "; rcvd " + number_of_received + " dlvd " + number_of_delivered
+            + "; not dlvd " + number_not_delivered);
+    }
+
+    private void check_for_end() {
+        if (number_of_transits == 0 && has_finished == false) {
+            if (verbose != 0)
+                System.err.println(CommonState.getTime() + ": message transit finished");
+
+            notifyGossip();
+        }
+        // This wasn't the last message
+        else
+            info();
     }
 }
