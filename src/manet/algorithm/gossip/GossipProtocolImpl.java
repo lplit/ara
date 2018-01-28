@@ -6,24 +6,28 @@ import peersim.config.Configuration;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
     private static int number_recvd = 0;
 
-    private int verbose = 0;
+    private int verbose = 1;
     private final static String tag_gossip = "Gossip";
 
   private final int this_pid;
-    private List<String> received_messages;
+    private Set<String> received_messages;
+
+
+
+
 
     public GossipProtocolImpl(String prefix) {
         String tmp[] = prefix.split("\\.");
         this_pid = Configuration.lookupPid(tmp[tmp.length - 1]);
 
-        received_messages = new ArrayList<String>();
+        received_messages = new HashSet<>();
 
         if (verbose != 0) {
             System.err.println("Gossip up with pid " + this_pid);
@@ -61,6 +65,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
                 data,
                 this_pid);
         if (!received_messages.contains(data.toString())) {
+            System.err.println("putting " + data.toString());
             received_messages.add(data.toString());
             emitter.emit(host, msg);
             if (verbose != 0)
@@ -69,6 +74,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
 
         }
         else {
+            received_messages.add(data.toString());
             if (verbose != 0)
                 System.err.println("Node " + host.getID() + " Gossip not re-emitting existing message " + msg);
         }
@@ -80,7 +86,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
         GossipProtocolImpl gpi = null;
         try {
             gpi = (GossipProtocolImpl) super.clone();
-            gpi.received_messages = new ArrayList<String>();
+            gpi.received_messages = new HashSet<>();
         } catch (CloneNotSupportedException e) {
         }
         return gpi;

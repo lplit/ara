@@ -18,6 +18,22 @@ public class GossipController implements Control, Observer {
     private static final String PAR_NB_DIFFUSIONS = "nb_diffusions";
     private static final String PAR_EMITTER = "emitter";
 
+    private static int last_size;
+    private int round_number;
+    //private static Set<Long> nodes_received;
+
+    /* Système de rounds rondes genre. Tuple <id_séquence, size du set>
+        Le set == tous les noeuds qui ont reçu le message <id> (Set<NodeId>)
+
+        On stocke la valeur courante du set à la première itération (== 1 comme y'a déjà l'initiateur)
+        - à chaque round, le receveur s'ajoute au set (incrémente la taille du set)
+        - on compare la taille du set de l'itération courante avec la valeur stockée. Si ça a cbangé, ça veut dire qu'on
+          est dans le même broadcast mais qu'on a atteint des nouveaux voisins entre-temps, donc c'est le même reund.
+          - SINON si size(t-1) == size(t) c'est qu'on a plus rien et là notifyAll
+     */
+
+
+
     // Used to calculate the average and stdev
     private ArrayList<Double>
             d_att   = new ArrayList<>(), // Historic data for `att`
@@ -26,7 +42,7 @@ public class GossipController implements Control, Observer {
     private int
             diffs = 0,  // Nombre de diffusions
             emitter_pid = -1,
-            verbose = 0, // Par default a zero, se change globalement dans le fichier de config
+            verbose = 1, // Par default a zero, se change globalement dans le fichier de config
             id_diffusion = 0, // First
             id_originator = -1;
 
@@ -36,6 +52,8 @@ public class GossipController implements Control, Observer {
         this.diffs = Configuration.getInt(prefix + "." + PAR_NB_DIFFUSIONS);
         this.emitter_pid = Configuration.getPid(prefix + "." + PAR_EMITTER);
         id_diffusion = 0;
+
+        last_size = -1;
 /*
         for (int i = 0; i < Network.size(); i++) {
             Node n = Network.get(i);
@@ -50,6 +68,7 @@ public class GossipController implements Control, Observer {
      */
     public void notified_finished() {
         id_diffusion++;
+        last_size = 0;
 
         if (id_diffusion < diffs) {
 
@@ -64,10 +83,17 @@ public class GossipController implements Control, Observer {
         int rand_id = CommonState.r.nextInt(Network.size());
         id_originator = rand_id;
 
+        System.err.println("New broadcast");
+        System.err.println("\n\n\n\n\n");
         // On choisit un noeud random dans le réseau
         Node n = Network.get(rand_id);
 
+        last_size = 1;
         int pid_gossip = Configuration.lookupPid("gossip");
+
+        EmitterCounter emitter = (EmitterCounter) n.getProtocol(emitter_pid);
+        emitter.clear_set();
+
 
         if(verbose !=0)
             System.err.println("Node " + n.getID() + " initiating gossip with " + n.getID() + " gossip_id " + id_diffusion);
@@ -76,6 +102,8 @@ public class GossipController implements Control, Observer {
 
         if(verbose !=0)
             System.err.println("Gossip impl: " + pid_gossip + " " + gos);
+
+
 
         gos.initiateGossip(n, id_diffusion, n.getID());
         Observable finisher = (EmitterCounter) n.getProtocol(emitter_pid);
@@ -163,15 +191,26 @@ public class GossipController implements Control, Observer {
         //  - [1] number_of_received
         //  - [2] number_of_sent
         //  - [3] number_of_delivered
+        //  - [4] number_of_nodes
 
+        int[] results = (int[]) o;
         System.err.println("Controller notified of end, diff " + id_diffusion);
-/*
-        int[] Results = (int[]) o;
-        System.err.println("Got results " + Results);
+        System.err.println("last size " + last_size + " new size " + results[4]);
+
+
+/*        System.err.println("Got results " + results);
         for (int i : Results)
             System.err.print(i+" ");
-*/
-        notified_finished();
+ */
+        if (last_size == results[4]) { // le broadcast est terminé
+
+            System.err.println("Going to initiate new broadcast from update()");
+            notified_finished();
+        }
+        else { // une vague s'est terminée mais pas le broadcast. on a de nouveaux voisins quoi
+            last_size = results[4];
+        }
+
 
     }
 }

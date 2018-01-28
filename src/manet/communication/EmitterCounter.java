@@ -9,9 +9,7 @@ import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 import peersim.edsim.EDSimulator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
+import java.util.*;
 
 
 /** Décorateur sur Emitter qui simplifie la vie et qui compte le nombre de messages en transit.
@@ -38,12 +36,18 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
 
     protected Emitter emitter_impl;
 
+    private static Set<Long> nodes_received;
+
+    public void clear_set() {
+        nodes_received.clear();
+    }
 
     public EmitterCounter(String prefix, Emitter emitter) {
         String tmp[]=prefix.split("\\.");
         this_pid=Configuration.lookupPid(tmp[tmp.length-1]);
 
         emitter_impl = emitter;
+        nodes_received = new HashSet<>();
 
         this.position_protocol= Configuration.getPid(prefix+"."+PAR_POSITIONPROTOCOL);
         this.verbose = Configuration.getInt(prefix+".verbose");
@@ -65,27 +69,14 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
         // This message is for me
         if (pid == this_pid && event instanceof Message) {
 
-            // check if transfers done
-            if (((Message) event).getTag() == "Check") {
-                check_for_end();
-                return;
-            }
-            else {
-                number_of_received++;
-                number_of_transits--;
-            }
-
+            number_of_transits--;
             Message msg = (Message) event;
             long sender = msg.getIdSrc();
             Message inner_msg = (Message) msg.getContent();
 
             // The sender is still within scope
             if (get_neighbors_in_scope(node).contains(Network.get((int) sender))) {
-
                 deliverMessage(inner_msg, node);
-
-                EDSimulator.add(1, new Message(node.getID(), node.getID(), "Check", "Check", this_pid), node, this_pid);
-
             }
             // We're not within reach any more, do not deliver message
             else {
@@ -94,6 +85,7 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                     System.err.println(this_pid + " out of scope. Message " + msg.getPid() + "not delivered.");
             }
         }
+        check_for_end();
     }
 
     public void notifyGossip() {
@@ -101,7 +93,8 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                 number_of_transits,
                 number_of_received,
                 number_of_sent,
-                number_of_delivered
+                number_of_delivered,
+                nodes_received.size()
         };
         has_finished = true;
         setChanged();
@@ -119,6 +112,11 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                         m.getPid()),
                 n,
                 m.getPid());
+//        int protocol_pid = m.getPid();
+//        Protocol prot = n.getProtocol(protocol_pid);
+
+        nodes_received.add(n.getID());
+//        notifyObservers(m);
 
         // Message delivre
         number_of_delivered++;
@@ -172,6 +170,7 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
         EmitterCounter res=null;
         try {
             res=(EmitterCounter) super.clone();
+            nodes_received = new HashSet<>();
         } catch (CloneNotSupportedException e) {}
 
         res.emitter_impl.clone();
