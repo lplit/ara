@@ -1,7 +1,6 @@
 package manet.communication;
 
 import manet.Message;
-import manet.algorithm.gossip.GossipProtocol;
 import manet.positioning.PositionProtocol;
 import peersim.config.Configuration;
 import peersim.core.Network;
@@ -24,7 +23,8 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
     protected static int
             number_of_transits = 0,
             number_of_received = 0,
-            number_of_sent = 0;
+            number_of_sent = 0,
+            number_of_delivered = 0;
 
     protected int
             position_protocol = -1,
@@ -83,28 +83,28 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                         inner_msg.getPid());
 
                 // Message traite & delivre
-                number_of_transits--;
+                //number_of_transits--;
                 number_of_received++;
+                number_of_delivered++;
                 info();
 
                 // Last message
-                if (number_of_transits == 0) {
+                if (number_of_transits == 0 && has_finished == false) {
                     if (verbose != 0)
                         System.err.println("Message transit finished");
                     has_finished = true;
                     setChanged();
                     notifyObservers();
-                } else
-                    has_finished = false;
+                }
+                // We're not in reach any more, do not deliver message
+                else {
+                    number_of_received++;
+                  //  number_of_transits--;
+                    if (verbose != 0)
+                        System.err.println(this_pid + " out of scope. Message " + msg.getPid() + "not delivered.");
+                    info();
 
-            }
-            // We're not in reach any more, do not deliver message
-            else {
-                number_of_transits--;
-                if (verbose != 0)
-                    System.err.println(this_pid + " out of scope. Message " + msg.getPid() + "not delivered.");
-                info();
-
+                }
             }
         }
     }
@@ -165,6 +165,6 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
 
     public void info() {
         if (verbose != 0)
-            System.err.println("Transits: " + number_of_transits + " received " + number_of_received);
+            System.err.println("Transits: " + number_of_transits + " received " + number_of_received + " delivered " + number_of_delivered);
     }
 }

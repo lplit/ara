@@ -53,7 +53,9 @@ public class FloodingEmitter extends EmitterCounter {
                                     msg.getContent(),
                                     msg.getPid()),
                             this_pid), n, this_pid);
+                    has_finished = false;
                     number_of_transits++;
+                    number_of_sent++;
                     if (verbose != 0)
                         System.err.println(host.getID() + " FloodingEmitter incrementing, left: " + number_of_transits);
                 }
