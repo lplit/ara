@@ -89,6 +89,8 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                         node,
                         inner_msg.getPid());
 
+                // Message delivre, on increment
+                number_of_received++;
 
                 if (number_of_transits == 0) {
                     has_finished = true;
@@ -107,6 +109,9 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                 int gpro = Configuration.lookupPid("gossip");
                 GossipProtocol gossip = (GossipProtocol) node.getProtocol(gpro);
 //                gossip.initiateGossip(node,((Message) msg.getContent()));
+
+                // Message traite, mais pas a delivrer, faut decrement donc
+                number_of_transits--;
 
                 if (verbose != 0)
                     System.err.println(this_pid + " decrementing, left: " + number_of_transits);

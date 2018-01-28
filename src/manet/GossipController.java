@@ -63,23 +63,17 @@ public class GossipController implements Control, Observer {
         // On choisit un noeud random dans le réseau
         Node n = Network.get(rand_id);
 
-
         int pid_gossip = Configuration.lookupPid("gossip");
 
-                if(verbose !=0)
-
-        {
+        if(verbose !=0)
             System.err.println("Node " + n.getID() + " initiating gossip with " + n.getID() + " gossip_id " + id_diffusion);
-        }
 
         GossipProtocolImpl gos = (GossipProtocolImpl) n.getProtocol(pid_gossip);
 
-                if(verbose !=0)
-
-        {
+        if(verbose !=0)
             System.err.println("Gossip impl: " + pid_gossip + " " + gos);
-        }
-                gos.initiateGossip(n, id_diffusion, n.getID());
+
+        gos.initiateGossip(n, id_diffusion, n.getID());
         Observable finisher = (EmitterCounter) n.getProtocol(emitter_pid);
         finisher.addObserver(this::update);
 
@@ -167,6 +161,8 @@ public class GossipController implements Control, Observer {
         // Fait des bails ici quand le boolean dans EmitterCouter passe a true
         // notified_finished
         //if (verbose != 0)
+        // donc quand une diffusion est termine
+        // on doit chopper l'Att et ER ici
         System.err.println("Controller notified of end");
 
         notified_finished();
