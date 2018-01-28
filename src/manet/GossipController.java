@@ -32,13 +32,13 @@ public class GossipController implements Control, Observer {
         this.diffs = Configuration.getInt(prefix + "." + PAR_NB_DIFFUSIONS);
         this.emitter_pid = Configuration.getPid(prefix + "." + PAR_EMITTER);
         id_diffusion = 0;
-
+/*
         for (int i = 0; i < Network.size(); i++) {
             Node n = Network.get(i);
             Observable finisher = (EmitterCounter) n.getProtocol(emitter_pid);
             finisher.addObserver(this::update);
         }
-
+*/
     }
 
     /**
@@ -47,11 +47,11 @@ public class GossipController implements Control, Observer {
     public void notified_finished() {
         id_diffusion++;
 
-        if (verbose != 0) {
-            System.err.println("notified; next gossip is " + id_diffusion);
-        }
-
         if (id_diffusion < diffs) {
+
+            if (verbose != 0) {
+                System.err.println("notified; next gossip is " + id_diffusion);
+            }
             nouvelle_diffusion();
         }
     }
@@ -80,6 +80,8 @@ public class GossipController implements Control, Observer {
             System.err.println("Gossip impl: " + pid_gossip + " " + gos);
         }
                 gos.initiateGossip(n, id_diffusion, n.getID());
+        Observable finisher = (EmitterCounter) n.getProtocol(emitter_pid);
+        finisher.addObserver(this::update);
 
     }
 
@@ -100,7 +102,7 @@ public class GossipController implements Control, Observer {
 
             emitter = (Emitter) n.getProtocol(delivering_emitter_pid);
             if (emitter instanceof EmitterCounter) {
-                if (((EmitterCounter) emitter).get_has_finished() == true) {
+                if (EmitterCounter.get_has_finished() == true) {
                     nouvelle_diffusion();
                 }
 
