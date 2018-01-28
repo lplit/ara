@@ -17,6 +17,10 @@ public class GossipController implements Control, Observer {
 
     private int diffs;  // Nombre de diffusions
     private static final String PAR_NB_DIFFUSIONS = "nb_diffusions";
+    private static final String PAR_EMITTER = "emitter";
+
+    private int emitter_pid;
+
     private int verbose = 1;
 
     private int id_diffusion = 0;
@@ -26,7 +30,14 @@ public class GossipController implements Control, Observer {
 
     public GossipController(String prefix) {
         this.diffs = Configuration.getInt(prefix + "." + PAR_NB_DIFFUSIONS);
+        this.emitter_pid = Configuration.getPid(prefix + "." + PAR_EMITTER);
         id_diffusion = 0;
+
+        for (int i = 0; i < Network.size(); i++) {
+            Node n = Network.get(i);
+            Observable finisher = (EmitterCounter) n.getProtocol(emitter_pid);
+            finisher.addObserver(this::update);
+        }
 
     }
 
@@ -150,6 +161,9 @@ public class GossipController implements Control, Observer {
     public void update(Observable observable, Object o) {
         // Fait des bails ici quand le boolean dans EmitterCouter passe a true
         // notified_finished
+        //if (verbose != 0)
+        System.err.println("Controller notified of end");
+
         notified_finished();
     }
 }

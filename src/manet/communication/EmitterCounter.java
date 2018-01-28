@@ -14,6 +14,7 @@ import peersim.edsim.EDSimulator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+import java.util.Observer;
 
 
 /** Décorateur sur Emitter qui simplifie la vie et qui compte le nombre de messages en transit.
@@ -95,6 +96,7 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                 if (number_of_transits == 0) {
                     has_finished = true;
                     setChanged();
+                    notifyObservers();
                     if (verbose != 0)
                         System.err.println("Message transit finished");
                 } else {
