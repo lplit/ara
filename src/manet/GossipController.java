@@ -98,13 +98,9 @@ public class GossipController implements Control, Observer {
 
 
         if(verbose !=0)
-            System.err.println("Node " + n.getID() + " initiating gossip " + id_diffusion);
+            System.err.println("Node " + n.getID() + " initiating gossip #" + id_diffusion + " pid " + pid_gossip);
 
         GossipProtocolImpl gos = (GossipProtocolImpl) n.getProtocol(pid_gossip);
-
-        if(verbose !=0)
-            System.err.println("Gossip impl: " + pid_gossip + " " + gos);
-
 
 
         gos.initiateGossip(n, id_diffusion, n.getID());
@@ -202,7 +198,7 @@ public class GossipController implements Control, Observer {
             notified_finished();
         }
         else { // une vague s'est terminée mais pas le broadcast. on a de nouveaux voisins quoi
-            System.err.println("\n\nNew round: " + ++round_number);
+            System.err.println("\nBroadcast " + id_diffusion + " round: " + ++round_number);
             last_size = results[4];
         }
 

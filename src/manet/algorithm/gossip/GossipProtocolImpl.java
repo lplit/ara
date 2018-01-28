@@ -16,8 +16,8 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
     private int verbose = 1;
     private final static String tag_gossip = "Gossip";
 
-  private final int this_pid;
-    private static Set<String> received_messages;
+    private final int this_pid;
+    private Set<String> received_messages = new HashSet<>();
 
 
 
@@ -26,8 +26,6 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
     public GossipProtocolImpl(String prefix) {
         String tmp[] = prefix.split("\\.");
         this_pid = Configuration.lookupPid(tmp[tmp.length - 1]);
-
-        received_messages = new HashSet<>();
 
         if (verbose != 0) {
             System.err.println("Gossip up with pid " + this_pid);
@@ -65,18 +63,16 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
                 data,
                 this_pid);
         if (!received_messages.contains(data.toString())) {
-            System.err.println("putting " + data.toString());
             received_messages.add(data.toString());
             emitter.emit(host, msg);
             if (verbose != 0)
-                System.err.println("Node " + host.getID() + "Gossip: Done re-emitting");
+                System.err.println("Node " + host.getID() + " added message " + data.toString());
 
 
         }
         else {
-            received_messages.add(data.toString());
             if (verbose != 0)
-                System.err.println("Node " + host.getID() + " Gossip not re-emitting existing message " + msg);
+                System.err.println("Node " + host.getID() + " message " + msg + " already treated");
         }
 //        emitter.decrement_transits();
     }
