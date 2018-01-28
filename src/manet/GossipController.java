@@ -19,7 +19,7 @@ public class GossipController implements Control, Observer {
     private static final String PAR_EMITTER = "emitter";
 
     private int
-            diffs = -1,  // Nombre de diffusions
+            diffs = 0,  // Nombre de diffusions
             emitter_pid = -1,
             verbose = 0, // Par default a zero, se change globalement dans le fichier de config
             id_diffusion = 0, // First
@@ -157,7 +157,7 @@ public class GossipController implements Control, Observer {
         // on doit chopper l'Att et ER ici
         // Object contient les info de fin de diffusion:
         //  - number_of_transi
-        System.err.println("Controller notified of end");
+        System.err.println("Controller notified of end, diff " + id_diffusion);
 
         notified_finished();
     }

@@ -52,7 +52,11 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
     @Override
     public void processEvent(Node node, int pid, Object event) {
         if (verbose != 0)
-            System.err.println("Node " + node.getID() + " EmitterCounter pid " + this_pid + " recvd event " + event.toString() + " pid " + pid);
+            System.err.println("Node " + node.getID()
+                    + " EmitterCounter pid " + this_pid
+                    + " recvd event " + event.toString()
+                    + " pid " + pid);
+
         // Message for me
         // If we're still in reach of the sender
         info();
@@ -83,6 +87,7 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                 number_of_received++;
                 info();
 
+                // Last message
                 if (number_of_transits == 0) {
                     if (verbose != 0)
                         System.err.println("Message transit finished");
