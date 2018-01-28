@@ -91,12 +91,6 @@ public class GossipController implements Control, Observer {
 
         Emitter emitter;
 
-        if (first_execute) {
-            nouvelle_diffusion();
-            first_execute = false;
-            return false;
-        }
-
         if (id_originator != -1 && delivering_emitter_pid != -1) {
             Node n = Network.get(id_originator);
 
@@ -104,6 +98,7 @@ public class GossipController implements Control, Observer {
             if (emitter instanceof EmitterCounter) {
                 if (EmitterCounter.get_has_finished() == true) {
                     nouvelle_diffusion();
+                    return false;
                 }
 
 
@@ -113,6 +108,14 @@ public class GossipController implements Control, Observer {
         else {
             System.err.println("Not supposed to be here");
         }
+
+
+        if (first_execute) {
+            nouvelle_diffusion();
+            first_execute = false;
+            return false;
+        }
+
 
         return false;
     }
