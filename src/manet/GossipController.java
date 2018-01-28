@@ -18,6 +18,11 @@ public class GossipController implements Control, Observer {
     private static final String PAR_NB_DIFFUSIONS = "nb_diffusions";
     private static final String PAR_EMITTER = "emitter";
 
+    // Used to calculate the average and stdev
+    private ArrayList<Double>
+            d_att   = new ArrayList<>(), // Historic data for `att`
+            d_er    = new ArrayList<>(); // Historic data for `er`
+
     private int
             diffs = 0,  // Nombre de diffusions
             emitter_pid = -1,
@@ -75,7 +80,6 @@ public class GossipController implements Control, Observer {
         gos.initiateGossip(n, id_diffusion, n.getID());
         Observable finisher = (EmitterCounter) n.getProtocol(emitter_pid);
         finisher.addObserver(this::update);
-
     }
 
     @Override
@@ -108,10 +112,7 @@ public class GossipController implements Control, Observer {
 
 
 
-    // Used to calculate the average and stdev
-    private ArrayList<Double>
-            d_att   = new ArrayList<>(), // Historic data for `att`
-            d_er    = new ArrayList<>(); // Historic data for `er`
+
 
 
 
@@ -119,18 +120,20 @@ public class GossipController implements Control, Observer {
 
     /**
      * Calcule l' atteignabilité: le pourcentage de noeuds atteignables ayant
-     * reçu le message, soit ( #acks / network.size()).
+     * reçu le message
+     * nd recu / nombre d'sent
      * @return % of reachable nodes
      */
-    private double att() {
-        // TODO: Implement att method
-        return 0.0;
+    private double att(int sent, int rcvd) {
+        double att = (rcvd*1.0)/sent;
+        d_att.add(att);
+        return att;
     }
 
     /**
      * l'economie de rediffusion qui est le pourcentage de noeuds qui ont recu
      * le message et qui n'ont pas rediffuser le message.
-     * Cette metrique peut se calculer par la formule suivante (r - t)
+     * Cette metrique peut se calculer par la formule suivante (r - t)/r
      * ou `r` est le nombre de noeuds ayant recu le message
      * `r` et `t` le nombre de noeuds qui ont retransmis le messages
      * @return % of reachable nodes that did not rebroadcast
@@ -155,9 +158,18 @@ public class GossipController implements Control, Observer {
         //if (verbose != 0)
         // donc quand une diffusion est termine
         // on doit chopper l'Att et ER ici
-        // Object contient les info de fin de diffusion:
-        //  - number_of_transi
+        // Object is an int[4]
+        //  - [0] number_of_transits - usually 0
+        //  - [1] number_of_received
+        //  - [2] number_of_sent
+        //  - [3] number_of_delivered
+
         System.err.println("Controller notified of end, diff " + id_diffusion);
+
+        int[] Results = (int[]) o;
+        System.err.println("Got results " + Results);
+        for (int i : Results)
+            System.err.print(i+" ");
 
         notified_finished();
     }

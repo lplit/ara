@@ -95,9 +95,17 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                 if (number_of_transits == 0 && has_finished == false) {
                     if (verbose != 0)
                         System.err.println("Message transit finished");
+
+                    int[] EndResults = {
+                            number_of_transits,
+                            number_of_received,
+                            number_of_sent,
+                            number_of_delivered
+                    };
+
                     has_finished = true;
                     setChanged();
-                    notifyObservers();
+                    notifyObservers(EndResults);
                 }
                 else {
                     info();
