@@ -2,19 +2,26 @@ package manet;
 
 import manet.algorithm.gossip.GossipData;
 import manet.algorithm.gossip.GossipProtocolImpl;
+import manet.communication.Emitter;
 import manet.communication.EmitterCounter;
+import manet.positioning.Position;
+import manet.positioning.PositionProtocol;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Control;
 import peersim.core.Network;
 import peersim.core.Node;
+import peersim.graph.Graph;
+import peersim.graph.GraphAlgorithms;
 
 import java.util.*;
 
 public class GossipController implements Control, Observer {
 
+    private int position_pid;
     private Observable last_observable = null;
     private static final String PAR_NB_DIFFUSIONS = "nb_diffusions";
+    private static final String PAR_POSITION = "position";
     private static final String PAR_EMITTER = "emitter";
 
     private static Set<Integer> received;
@@ -52,6 +59,8 @@ public class GossipController implements Control, Observer {
     public GossipController(String prefix) {
         diffs = Configuration.getInt(prefix + "." + PAR_NB_DIFFUSIONS);
         this.emitter_pid = Configuration.getPid(prefix + "." + PAR_EMITTER);
+        this.position_pid = Configuration.getPid(prefix + "." + PAR_POSITION);
+
         id_diffusion = 0;
 
         received = new HashSet<>();
@@ -110,6 +119,20 @@ public class GossipController implements Control, Observer {
         obs.addObserver(this::update);
 
         broadcasts.put(id_diffusion, new GossipData(id_diffusion, n.getID()));
+
+        Graph g = new MANETGraph(getPositions(), ((Emitter) n.getProtocol(emitter_pid)).getScope());
+        final GraphAlgorithms ga = new GraphAlgorithms();
+        Hashtable<Integer, Integer> connexes = (Hashtable) ga.weaklyConnectedClusters(g);
+
+        int sum_theorique = 0;
+        for (Integer i: connexes.keySet()) {
+            sum_theorique += connexes.get(i);
+        }
+
+
+
+
+
 
         gos.initiateGossip(n, id_diffusion, n.getID());
 /*
@@ -194,11 +217,18 @@ public class GossipController implements Control, Observer {
             if (verbose != 0) {
                 System.err.println("Controller notified of end, diff " + id_diffusion);
             }
+
+            GossipData bcast_data = broadcasts.get(results[4]);
+
+
+
             System.err.println(
                     "Controller: transits " + results[0] + " rcvd " + results[1] + " sent " + results[2]
                             + " delivered " + results[3] + " id " + results[4] + " retransmits " + results[5]);
-            notified_finished(results[4]);
             received.add(results[4]);
+
+            notified_finished(results[4]);
+
         }
         observable.deleteObserver(this::update);
     }
@@ -215,5 +245,14 @@ public class GossipController implements Control, Observer {
         return d_er;
     }
 
-
+    private Map<Long, Position> getPositions(){
+        Map<Long, Position> res = new HashMap<>();
+        for(int i=0; i< Network.size();i++) {
+            Node n = Network.get(i);
+            PositionProtocol pos_proto_n = (PositionProtocol) n.getProtocol(position_pid);
+            Position cur = pos_proto_n.getCurrentPosition();
+            res.put(n.getID(),cur);
+        }
+        return res;
+    }
 }
