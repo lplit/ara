@@ -4,12 +4,12 @@ SECONDES 1000
 MINUTES 60*SECONDES
 HEURES 60*MINUTES
 VERB 0
-SIZE 200
+SIZE 20
 
 network.size SIZE
 debug_config none
 simulation.endtime 12*HEURES
-random.seed 7
+random.seed 42
 
 init.initialisation Initialisation
 

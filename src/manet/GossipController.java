@@ -47,7 +47,8 @@ public class GossipController implements Control, Observer {
     private int
             emitter_pid = -1,
             verbose = 0, // Par default a zero, se change globalement dans le fichier de config
-            id_originator = -1;
+            id_originator = -1,
+            att_th = -1; // Theoretic reach at start of bcast
 
     private static int id_diffusion = 0;
 
@@ -120,17 +121,9 @@ public class GossipController implements Control, Observer {
 
         broadcasts.put(id_diffusion, new GossipData(id_diffusion, n.getID()));
 
-        Graph g = new MANETGraph(getPositions(), ((Emitter) n.getProtocol(emitter_pid)).getScope());
-        final GraphAlgorithms ga = new GraphAlgorithms();
-        Hashtable<Integer, Integer> connexes = (Hashtable) ga.weaklyConnectedClusters(g);
-
-        int sum_theorique = 0;
-        for (Integer i: connexes.keySet()) {
-            sum_theorique += connexes.get(i);
-        }
 
 
-
+        this.att_th = attTheo(n);
 
 
 
@@ -143,9 +136,19 @@ public class GossipController implements Control, Observer {
         }
 
         */
+    }
 
 
-
+    private int attTheo(Node n) {
+        Graph g = new MANETGraph(getPositions(), ((Emitter) n.getProtocol(emitter_pid)).getScope());
+        final GraphAlgorithms ga = new GraphAlgorithms();
+        Hashtable<Integer, Integer> connexes = (Hashtable) ga.weaklyConnectedClusters(g);
+        int sum_theorique = 0; // Pcq source node
+        for (Integer i: connexes.keySet()) {
+            sum_theorique += connexes.get(i);
+            System.err.println("Adding " + connexes.get(i));
+        }
+        return sum_theorique;
     }
 
     private Node get_node_by_id(long id) {
@@ -175,9 +178,12 @@ public class GossipController implements Control, Observer {
      * nd recu / nombre d'sent
      * @return % of reachable nodes
      */
-    private double att(int sent, int rcvd) {
-        double att = (rcvd*1.0)/sent;
+    private double att(int retransmits) {
+
+        double att = (this.att_th*1.0/retransmits);
         d_att.add(att);
+        if (verbose != 0)
+            System.err.println("Reach : " + att);
         return att;
     }
 
@@ -220,15 +226,14 @@ public class GossipController implements Control, Observer {
 
             GossipData bcast_data = broadcasts.get(results[4]);
 
-
+            received.add(results[4]);
+            double reached = att(results[5]+1); // retransmits + root
+            notified_finished(results[4]);
 
             System.err.println(
                     "Controller: transits " + results[0] + " rcvd " + results[1] + " sent " + results[2]
-                            + " delivered " + results[3] + " id " + results[4] + " retransmits " + results[5]);
-            received.add(results[4]);
-
-            notified_finished(results[4]);
-
+                            + " delivered " + results[3] + " id " + results[4] + " retransmits " + results[5]
+                            + " att " + reached);
         }
         observable.deleteObserver(this::update);
     }
