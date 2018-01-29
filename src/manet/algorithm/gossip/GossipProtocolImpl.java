@@ -17,6 +17,7 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
             number_of_sent = 0,
             number_of_received = 0,
             number_of_delivered = 0,
+            number_of_retransmits = 0,
             last_id = -1;
     private static long last_initiator = -1;
 
@@ -58,7 +59,7 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
         number_of_sent = 0;
         number_of_transits = 0;
         number_of_received = 0;
-
+        number_of_retransmits = 0;
 
 
         GossipData data = new GossipData(id, id_initiator);
@@ -88,7 +89,8 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
                 number_of_received,
                 number_of_sent,
                 number_of_delivered,
-                last_id
+                last_id,
+                number_of_retransmits
         };
         setChanged();
         notifyObservers(EndResults);
@@ -125,11 +127,13 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
             local_sent = emitter.get_number_of_sent();
             number_of_transits += local_sent;
             number_of_sent += local_sent;
-
+            if (node.getID() != data.id_initiator)
+                number_of_retransmits++;
 
 
             if (verbose != 0)
-                System.err.println("Node " + node.getID() + " emitted " + data.toString() + " " + local_sent + " times");
+                System.err.println("Node " + node.getID() + " emitted " + data.toString() + " "
+                        + local_sent + " times " + number_of_retransmits + " retransmits");
         }
         else {
             if (verbose != 0)

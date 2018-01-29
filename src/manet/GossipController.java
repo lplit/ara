@@ -164,6 +164,7 @@ public class GossipController implements Control, Observer {
      *  - [2] number_of_sent
      *  - [3] number_of_delivered
      *  - [4] identifier of gossip bcast
+     *  - [5] number_of_retransmits
      * @param observable The calling instance
      * @param o int[] containing data from EmitterCounter
      */
@@ -179,7 +180,8 @@ public class GossipController implements Control, Observer {
         //  - [1] number_of_received
         //  - [2] number_of_sent
         //  - [3] number_of_delivered
-        //  - [4] number_of_nodes
+        //  - [4] id of bcast
+        //  - [5] number_of_retransmits
 
         int[] results = (int[]) o;
 
@@ -187,7 +189,7 @@ public class GossipController implements Control, Observer {
             System.err.println("Controller notified of end, diff " + id_diffusion);
             System.err.println(
                     "Controller: transits " + results[0] + " rcvd " + results[1] + " sent " + results[2]
-                            + " delivered " + results[3] + " id " + results[4]);
+                            + " delivered " + results[3] + " id " + results[4] + " retransmits " + results[5]);
             notified_finished(results[4]);
             received.add(results[4]);
         }
