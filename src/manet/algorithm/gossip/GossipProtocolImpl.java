@@ -64,7 +64,6 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
         GossipData data = new GossipData(id, id_initiator);
         data.id = id;
         data.id_initiator = id_initiator;
-        int local_sent = 0;
         last_id = id;
         int emitter_pid = Configuration.lookupPid("emitter");
         EmitterCounter emitter = (EmitterCounter) host.getProtocol(emitter_pid);
@@ -72,7 +71,6 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
 
 
         emit_if_needed(host, data);
-
         if (number_of_sent == 0) { // émission nulle, broadcast terminé, le noeud est seultout :(
             System.err.println("Node " + host.getID() + " terminated broadcast alone");
             notifyGossip();
@@ -87,8 +85,8 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
     public void notifyGossip() {
         int[] EndResults = {
                 number_of_transits,
-                number_of_sent,
                 number_of_received,
+                number_of_sent,
                 number_of_delivered,
                 last_id
         };
@@ -128,6 +126,8 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
             number_of_transits += local_sent;
             number_of_sent += local_sent;
 
+
+
             if (verbose != 0)
                 System.err.println("Node " + node.getID() + " emitted " + data.toString() + " " + local_sent + " times");
         }
@@ -143,12 +143,11 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
     public void processEvent(Node node, int pid, Object event) {
         int emitter_pid = Configuration.lookupPid("emitter");
         EmitterCounter emitter = (EmitterCounter) node.getProtocol(emitter_pid);
-        int local_sent = 0;
         if (verbose != 0) {
-            System.err.println("Node " + node.getID() + " GossipProtocol xfers " + number_of_transits);
+            System.err.println("Node " + node.getID() + " GossipProtocol xfers " + number_of_transits + " sent " + number_of_sent);
 
         }
-
+        number_of_received++;
         number_of_transits--;
 
         if (event instanceof Message) {
