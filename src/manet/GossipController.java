@@ -72,8 +72,6 @@ public class GossipController implements Control, Observer {
      * Callback utilisé pour signaler à la classe qu'une diffusion s'est terminée.
      */
     public void notified_finished(int last_broadcast_id) {
-        if (received.contains(last_broadcast_id))
-            return;
 
         id_diffusion++;
 
@@ -219,6 +217,7 @@ public class GossipController implements Control, Observer {
     public void update(Observable observable, Object o) {
 
         int[] results = (int[]) o;
+        observable.deleteObserver(this::update);
 
         if (!received.contains(results[4])) {
             if (verbose != 0) {
@@ -229,14 +228,15 @@ public class GossipController implements Control, Observer {
 
             received.add(results[4]);
             double reached = att(results[5]+1); // retransmits + root
-            notified_finished(results[4]);
+
 
             System.err.println(
                     "Controller: transits " + results[0] + " rcvd " + results[1] + " sent " + results[2]
                             + " delivered " + results[3] + " id " + results[4] + " retransmits " + results[5]
                             + " no_transmits " + results[6] + " att " + reached);
+
+            notified_finished(results[4]);
         }
-        observable.deleteObserver(this::update);
     }
 
 

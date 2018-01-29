@@ -24,9 +24,10 @@ public class ProbabilisticEmitter extends EmitterCounter {
     @Override
     public void emit(Node host, Message msg) {
         number_of_sent = 0;
-        double _prob = CommonState.r.nextDouble();
-        if (_prob < this.probability) {
-            for (Node n : get_neighbors_in_scope(host)) {
+
+        for (Node n : get_neighbors_in_scope(host)) {
+            double _prob = CommonState.r.nextDouble();
+            if (_prob < this.probability) {
                 number_of_sent++;
                 has_finished = false;
 
@@ -41,12 +42,14 @@ public class ProbabilisticEmitter extends EmitterCounter {
                         n,
                         msg.getPid());
 
+                if (verbose != 0)
+                    System.err.println("Node " + host.getID() +
+                            " ProbabilisticEmitter emitted w/" + _prob + "<" + probability + " " + number_of_sent + " messages");
+
             }
+
         }
 
-        if (verbose != 0)
-            System.err.println("Node " + host.getID() +
-                    " ProbabilisticEmitter emitted w/" + _prob + "<" + probability + " " + number_of_sent + " messages");
 
     }
 
