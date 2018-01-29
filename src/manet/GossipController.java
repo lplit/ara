@@ -204,7 +204,7 @@ public class GossipController implements Control, Observer {
      * Observer callback function, activated when a bach of transits ends
      * @param o is an int[5] containing the following info:
      *  - [0] number_of_transits - usually 0
-     *  - [1] number_of_received
+     *  - [1] Number of nodes having received the message.
      *  - [2] number_of_sent
      *  - [3] number_of_delivered
      *  - [4] identifier of gossip bcast
@@ -231,9 +231,9 @@ public class GossipController implements Control, Observer {
 
 
             System.err.println(
-                    "Controller: transits " + results[0] + " rcvd " + results[1] + " sent " + results[2]
-                            + " delivered " + results[3] + " id " + results[4] + " retransmits " + results[5]
-                            + " no_transmits " + results[6] + " att " + reached);
+                    "Controller: transits " + results[0] + " nodes_rcvd " + results[1] + " messages_sent " + results[2]
+                            + " delivered_messages " + results[3] + " gossip_id " + results[4] + " nodes_retransmitted " + results[5]
+                            + " nodes_no_transmitted " + results[6] + " attainability " + reached);
 
             notified_finished(results[4]);
         }

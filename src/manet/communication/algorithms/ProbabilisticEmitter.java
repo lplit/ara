@@ -41,7 +41,6 @@ public class ProbabilisticEmitter extends EmitterCounter {
                                 msg.getPid()),
                         n,
                         msg.getPid());
-
                 if (verbose != 0)
                     System.err.println("Node " + host.getID() +
                             " ProbabilisticEmitter emitted w/" + _prob + "<" + probability + " " + number_of_sent + " messages");

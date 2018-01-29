@@ -19,10 +19,17 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
             number_of_delivered = 0,
             number_of_retransmits = 0,
             number_of_no_transmits = 0,
+            number_of_nodes_retransmitted = 0,
+            number_of_nodes_received = 0,
             last_id = -1;
+
+    private int node_retransmitted = 0;
+
     private static long last_initiator = -1;
 
     private Set<String> received_messages = new HashSet<>();
+
+    private static Set<Long> nodes_ids_received;
 
     private int verbose = 0;
     private final static String tag_gossip = "Gossip";
@@ -34,6 +41,8 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
         this_pid = Configuration.lookupPid(tmp[tmp.length - 1]);
         number_of_transits = 0;
         number_of_sent = 0;
+        node_retransmitted = 0;
+        nodes_ids_received = new HashSet<>();
 
         if (verbose != 0) {
             System.err.println("Gossip up with pid " + this_pid);
@@ -62,7 +71,11 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
         number_of_received = 0;
         number_of_retransmits = 0;
         number_of_no_transmits = 0;
+        number_of_nodes_retransmitted = 0;
+        nodes_ids_received.clear();
 
+
+        node_retransmitted = 1; // initiator so transmits so retransmits
 
         GossipData data = new GossipData(id, id_initiator);
         data.id = id;
@@ -116,12 +129,13 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
         int emitter_pid = Configuration.lookupPid("emitter");
         int local_sent = 0;
         EmitterCounter emitter = (EmitterCounter) node.getProtocol(emitter_pid);
-        number_of_received++;
+
 
         if (!received_messages.contains(data.toString())) {
 
             received_messages.add(data.toString());
 
+            nodes_ids_received.add(node.getID());
 
             emitter.emit(node, new Message(
                     node.getID(),
@@ -134,17 +148,22 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
             number_of_transits += local_sent;
             number_of_sent += local_sent;
             if (node.getID() != data.id_initiator) {
+                node_retransmitted = 0;
                 number_of_retransmits++;
-            }
+
+                }
 
 
             if (verbose != 0)
                 System.err.println("Node " + node.getID() + " emitted " + data.toString() + " "
                         + local_sent + " times " + number_of_retransmits + " retransmits");
         }
-        else {
+        else { // received_messages alread contains message.
             // Not retransmitting.
-            number_of_no_transmits++;
+            if (node_retransmitted == 0) {
+                number_of_no_transmits++;
+                node_retransmitted = 1;
+            }
 
             if (verbose != 0)
                 System.err.println("Node " + node.getID() + " gossip " + data.toString() + " already treated");
@@ -163,10 +182,14 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
         }
         number_of_transits--;
 
+        if (!nodes_ids_received.contains(node.getID())) {
+            number_of_received++;
+            nodes_ids_received.add(node.getID());
+        }
+
         if (event instanceof Message) {
 
             Message msg = (Message) event;
-
 
             if (EmitterCounter.get_neighbor_ids_in_scope(node).contains(msg.getIdSrc())) {
                 number_of_delivered++;
@@ -184,6 +207,8 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
                   return;
             }
             }
+
+
             if (verbose != 0)
                 System.err.println("Node broadcasted " + number_of_transits + " xfers");
 
