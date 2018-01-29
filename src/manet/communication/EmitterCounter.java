@@ -36,6 +36,7 @@ public abstract class EmitterCounter implements Emitter {
     public EmitterCounter(String prefix, Emitter emitter) {
         String tmp[]=prefix.split("\\.");
         this_pid=Configuration.lookupPid(tmp[tmp.length-1]);
+        number_of_sent = 0;
 
         emitter_impl = emitter;
         nodes_received = new HashSet<>();

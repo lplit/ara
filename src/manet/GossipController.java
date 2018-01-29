@@ -1,5 +1,6 @@
 package manet;
 
+import manet.algorithm.gossip.GossipData;
 import manet.algorithm.gossip.GossipProtocolImpl;
 import manet.communication.EmitterCounter;
 import peersim.config.Configuration;
@@ -17,6 +18,7 @@ public class GossipController implements Control, Observer {
     private static final String PAR_EMITTER = "emitter";
 
     private static Set<Integer> received;
+    private static Map<Integer, GossipData> broadcasts;
 
     /* Système de rounds rondes genre. Tuple <id_séquence, size du set>
         Le set == tous les noeuds qui ont reçu le message <id> (Set<NodeId>)
@@ -37,7 +39,7 @@ public class GossipController implements Control, Observer {
 
     private int
             emitter_pid = -1,
-            verbose = 1, // Par default a zero, se change globalement dans le fichier de config
+            verbose = 0, // Par default a zero, se change globalement dans le fichier de config
             id_originator = -1;
 
     private static int id_diffusion = 0;
@@ -53,6 +55,7 @@ public class GossipController implements Control, Observer {
         id_diffusion = 0;
 
         received = new HashSet<>();
+        broadcasts = new HashMap<>();
     }
 
     /**
@@ -83,8 +86,9 @@ public class GossipController implements Control, Observer {
             last_observable.deleteObserver(this::update);
         }
 
-        System.err.println("\n\n\n\n\n");
-        System.err.println("New broadcast, round " + id_diffusion);
+        if (verbose != 0) {
+            System.err.println("\n\nNew broadcast, round " + id_diffusion);
+        }
 
         // On choisit un noeud random dans le réseau
         Node n = Network.get(rand_id);
@@ -104,6 +108,9 @@ public class GossipController implements Control, Observer {
 
         Observable obs = (Observable) n.getProtocol(pid_gossip);
         obs.addObserver(this::update);
+
+        broadcasts.put(id_diffusion, new GossipData(id_diffusion, n.getID()));
+
         gos.initiateGossip(n, id_diffusion, n.getID());
 /*
         for (int i =0; i < Network.size(); i++) {
@@ -118,6 +125,15 @@ public class GossipController implements Control, Observer {
 
     }
 
+    private Node get_node_by_id(long id) {
+        Node n;
+        for (int i=0; i < Network.size(); i++) {
+            n = Network.get(i);
+            if (n.getID() == id) return n;
+        }
+        return null;
+    }
+
     @Override
     public boolean execute() {
 
@@ -128,6 +144,7 @@ public class GossipController implements Control, Observer {
         }
         return false;
     }
+
 
     /**
      * Calcule l' atteignabilité: le pourcentage de noeuds atteignables ayant
@@ -170,23 +187,13 @@ public class GossipController implements Control, Observer {
      */
     @Override
     public void update(Observable observable, Object o) {
-        // Fait des bails ici quand le boolean dans EmitterCouter passe a true
-        // notified_finished
-        //if (verbose != 0)
-        // donc quand une diffusion est termine
-        // on doit chopper l'Att et ER ici
-        // Object is an int[4]
-        //  - [0] number_of_transits - usually 0
-        //  - [1] number_of_received
-        //  - [2] number_of_sent
-        //  - [3] number_of_delivered
-        //  - [4] id of bcast
-        //  - [5] number_of_retransmits
 
         int[] results = (int[]) o;
 
         if (!received.contains(results[4])) {
-            System.err.println("Controller notified of end, diff " + id_diffusion);
+            if (verbose != 0) {
+                System.err.println("Controller notified of end, diff " + id_diffusion);
+            }
             System.err.println(
                     "Controller: transits " + results[0] + " rcvd " + results[1] + " sent " + results[2]
                             + " delivered " + results[3] + " id " + results[4] + " retransmits " + results[5]);

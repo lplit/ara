@@ -73,7 +73,9 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
 
         emit_if_needed(host, data);
         if (number_of_sent == 0) { // émission nulle, broadcast terminé, le noeud est seultout :(
-            System.err.println("Node " + host.getID() + " terminated broadcast alone");
+            if (verbose != 0) {
+                System.err.println("Node " + host.getID() + " terminated broadcast alone");
+            }
             notifyGossip();
         }
 
@@ -171,14 +173,16 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
 
             }
             else {
-                System.err.println(node.getID() +" TOO FAR FROM " + msg.getIdSrc());
+                if (verbose != 0)
+                    System.err.println(node.getID() +" TOO FAR FROM " + msg.getIdSrc());
             }
             }
             if (verbose != 0)
                 System.err.println("Node broadcasted " + number_of_transits + " xfers");
 
         if (number_of_transits == 0) {
-            System.err.println("BROADCAST FINISHED\n\n\n\n");
+            if (verbose != 0)
+                System.err.println("BROADCAST FINISHED\n\n\n\n");
             notifyGossip();
         }
 
