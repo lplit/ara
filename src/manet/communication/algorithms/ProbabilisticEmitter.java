@@ -23,21 +23,31 @@ public class ProbabilisticEmitter extends EmitterCounter {
 
     @Override
     public void emit(Node host, Message msg) {
+        number_of_sent = 0;
         double _prob = CommonState.r.nextDouble();
         if (_prob < this.probability) {
-
-
-            emitter_impl.emit(host, new Message(msg.getIdSrc(), msg.getIdDest(), msg.getTag(), msg, this_pid));
-
             for (Node n : get_neighbors_in_scope(host)) {
-                EDSimulator.add(getLatency(), msg.getIdSrc(), n, this_pid);
-
                 number_of_sent++;
-            }
+                has_finished = false;
 
-            if (verbose != 0)
-                System.err.println("Node " + host.getID() + " ProbabilisticEmitter emitting " + _prob + " < " + probability);
+                EDSimulator.add(
+                        getLatency(),
+                        new Message(
+                                msg.getIdSrc(),
+                                n.getID(),
+                                msg.getTag(),
+                                msg.getContent(),
+                                msg.getPid()),
+                        n,
+                        msg.getPid());
+
+            }
         }
+
+        if (verbose != 0)
+            System.err.println("Node " + host.getID() +
+                    " ProbabilisticEmitter emitted w/" + _prob + "<" + probability + " " + number_of_sent + " messages");
+
     }
 
     @Override
