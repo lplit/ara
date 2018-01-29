@@ -2,51 +2,69 @@ package manet.detection;
 
 import manet.Message;
 import manet.communication.Emitter;
-import manet.communication.EmitterImpl;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
-import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 import peersim.edsim.EDSimulator;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
-    private int this_pid;
-    private int period;
-    private int timer_delay;
-    private int listener_pid;
-    private int verbose = 0;
+
+    private int
+            this_pid = -1,
+            period = -1,
+            timer_delay = -1,
+            listener_pid = -1,
+            verbose = 1;
 
     private static final String PAR_PERIOD = "period";
     private static final String PAR_TIMERDELAY = "timer_delay";
     private static final String PAR_LISTENER_PID = "listenerpid";
-    //Integer timeStamp = 0;
+
+    private static final String tag_probe = "Probe";
+    private static final String tag_heartbeat = "Heartbeat";
+    private static final String tag_timer = "Timer";
+
 
     private List<Long> neighbor_list;
     private Map<Long, Long> neighbor_timers; // Map<NodeID, Timestamp>
 
+
+    /**
+     * Constructor peersim
+     * @param prefix prefix
+     */
     public NeighborProtocolImpl(String prefix) {
         neighbor_list = new ArrayList<>();
         neighbor_timers = new HashMap<Long, Long>();
 
         String tmp[]=prefix.split("\\.");
-            this_pid= Configuration.lookupPid(tmp[tmp.length-1]);
+        this_pid= Configuration.lookupPid(tmp[tmp.length-1]);
+
+        if (verbose != 0)
+            System.err.println("NeighborImpl2 pid " + this_pid);
 
         this.period = Configuration.getInt(prefix+"."+PAR_PERIOD);
         this.timer_delay = Configuration.getInt(prefix + "." + PAR_TIMERDELAY);
         this.listener_pid = Configuration.getPid(prefix + "." + PAR_LISTENER_PID,-1);
+        this.verbose = Configuration.getInt(prefix+"." + "verbose");
 
 
-        }
+    }
 
+    /**
+     * Returns the list of neighbours at current code
+     * @return Neighbor list (list of Nodes)
+     */
     @Override
     public List<Long> getNeighbors() {
+        if (verbose != 0)
+            System.err.println("Returning list with size" + neighbor_list.size());
         return neighbor_list;
     }
 
@@ -65,80 +83,74 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
     }
 
 
-
+    /**
+     * The proper processing method, works with "Heartbeat" and "Timer" message tags.
+     * "Heartbeat" messages are self-bootstrapping
+     * "Timer" activates the timers for others
+     * @param node Current node
+     * @param pid Someone's PID
+     * @param event The arriving event (Message)
+     */
     @Override
     public void processEvent(Node node, int pid, Object event) {
         int emitter_pid = Configuration.lookupPid("emitter");
-//        System.out.println("getting protocol " + emitter_pid);
         Emitter impl = (Emitter) node.getProtocol(emitter_pid);
         Message msg = (Message) event;
 
-        //neighbor_timers.replaceAll((k, v) -> (int) v - this.period);
-
-
         if (this.verbose != 0) {
-            if (CommonState.getIntTime() % 100000 * 60 * 60 == 0) {
-                System.err.println(CommonState.getIntTime());
-            }
+            System.err.println("NeighborImpl2 node " + node.getID() + " received event " + event.toString());
+            if (CommonState.getIntTime() % 100000 * 60 * 60 == 0)
+                System.err.println("Time " + CommonState.getIntTime());
         }
 
 
         if (event instanceof Message) {
-//            System.err.println("Node " + node.getID() + " msg src " + msg.getIdSrc() + " dest " + msg.getIdDest() + " " + msg.getTag() + " " + msg.getContent());
-            /* on filtre déjà nos messages à nous
-                - "Heartbeat" (self-bootstrap)
-                - "Timer" pour déclencher les timers des gens
-             */
+            switch (msg.getTag()) {
+                case tag_heartbeat: // self-message toutes les périodes
+                    EDSimulator.add(this.period, new Message(node.getID(), -1, tag_heartbeat, tag_heartbeat, this_pid), node, this_pid);
+                    // Envoi d'un probe dans le scope pour les voisins, avec un timestamp
+                    impl.emit(node, new Message(node.getID(), -1, tag_probe, CommonState.getTime(), this_pid));
+                    if (verbose != 0) {
+                        System.err.println("NeighborImpl2 node " + node.getID() + " emitting w/pid " + this_pid);
+                        System.err.println("neighborlist " + neighbor_list.toString());
+                    }
+                    break;
 
-                switch (msg.getTag()) {
-                    case "Heartbeat":
-                        if (msg.getIdDest() == -1) {
-                            EDSimulator.add(this.period, new Message(node.getID(), -1, "Heartbeat", "Heartbeat", this_pid), node, this_pid);
-                            //                        System.err.println(("recvd msg src" + msg.getIdSrc() + " dest " + msg.getIdDest()) + " " + msg.getTag() + neighbor_list);
-                            // salut y'a-t-il des nouveaux potos dans mon scope
-                            //                        System.err.println("emitting from neighbor");
-                            impl.emit(node, new Message(msg.getIdSrc(), -1, "Heartbeat", CommonState.getIntTime(), this_pid));
-                        }
-                        else { // du coup là on ne traite plus que les messages des autres
-                            // salutations mon nouveau poto
-                            //if (!neighbor_list.contains(msg.getIdSrc())) {
-                                neighbor_list.add(msg.getIdSrc());
-                        //        for (Long l : neighbor_list) {
-                                    // pour tous les voisins dans la liste, on s'ajoute un timer
-                                    long titi = CommonState.getTime();
-                                System.err.println(titi);
+                case tag_probe: // Réception d'un probe de quelqu'un d'autre
+                    // rajout du voisin s'il n'est pas dans la liste des voisins
+                    if (!neighbor_list.contains(msg.getIdSrc())) {
+                        neighbor_list.add(msg.getIdSrc());
+                        if (verbose != 0)
+                            System.err.println("Node " + node.getID() + " NeighborImpl2 list is " + neighbor_list.toString());
+                    }
+                        // rajout du voisin dans la liste des timers dans tous les cas
+                        neighbor_timers.put(msg.getIdSrc(), (Long) msg.getContent());
 
-                                    /* en vrai là on s'envoie un message. msg.getIdSrc contient la valeur du nouveau node
-                                       mais on se l'envoie à soi-même
-                                     */
+                        EDSimulator.add(
+                                this.timer_delay,
+                                new Message(msg.getIdSrc(), node.getID(), tag_timer, msg.getContent(), this_pid),
+                                node,
+                                this_pid);
 
-                                neighbor_timers.put(msg.getIdSrc(), titi);
-                                EDSimulator.add(this.timer_delay, new Message(msg.getIdSrc(), node.getID(), "Timer", titi, this_pid), node, this_pid);
-
-                                    //      }
-    //                            System.out.println("Sup from node " + msg.getIdSrc() + ", list " + neighbor_list);
-                            //}
-                            //System.out.println(neighbor_list);
-                        }
+                        if (verbose != 0)
+                            System.err.println("Node " + node.getID() + ": received probe from " + msg.getIdSrc() + " with " + msg.getContent());
 
                         break;
-                        case "Timer":
-//                           System.err.println("TIMER Node " + node.getID() + " msg src " + msg.getIdSrc() + " dest " + msg.getIdDest() + " " + msg.getTag() + " " + msg.getContent());
 
-                            //System.err.println("Message " + msg.toString());
-                            //System.err.println(neighbor_timers.get(msg.getIdSrc()) + " == " + msg.getContent());
-                            System.err.println("Node " + node.getID() + " " + neighbor_list)         ;
-                            if (neighbor_list.contains(msg.getIdSrc())) {
-                                if ( neighbor_timers.get(msg.getIdSrc()) == msg.getContent()) {
-                                    neighbor_list.remove(msg.getIdSrc());
-//                                System.out.println(node.getID() + ": list " + neighbor_list + "removed " + msg.getContent());
-                                }
-                            }
-                        break;
-                        default:
-                            System.out.println("IN DEFAULT");
-                        break;
-                }
+                case tag_timer:
+                    if (neighbor_list.contains(msg.getIdSrc()))
+                        if ( neighbor_timers.get(msg.getIdSrc()) == msg.getContent())
+                            neighbor_list.remove(msg.getIdSrc());
+
+                    if (verbose==1)
+                        System.err.println("Node " + node.getID() + " " + neighbor_list)         ;
+
+                    break;
+
+                default:
+                    System.out.println("IN DEFAULT");
+                    break;
+            }
 
 
         }

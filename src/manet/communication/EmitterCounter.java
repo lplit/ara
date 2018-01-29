@@ -23,7 +23,7 @@ public abstract class EmitterCounter implements Emitter {
     protected int
             position_protocol = -1,
             this_pid = -1,
-            verbose = 0,
+            verbose = 1,
             pid_controller = -1;
 
     protected static Boolean has_finished = false;

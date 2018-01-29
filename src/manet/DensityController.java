@@ -6,7 +6,6 @@ import peersim.core.CommonState;
 import peersim.core.Control;
 import peersim.core.Network;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 public class DensityController implements Control {
@@ -79,6 +78,7 @@ public class DensityController implements Control {
 
         for (int i = 0 ; i < Network.size() ; i++) {
             double n_neigs = ((NeighborProtocol) Network.get(i).getProtocol(this_pid)).getNeighbors().size();
+
             sum += n_neigs;
         }
 

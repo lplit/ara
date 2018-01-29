@@ -14,4 +14,5 @@ public class GossipData {
     public String toString() {
         return id + " " + id_initiator;
     }
+
 }
