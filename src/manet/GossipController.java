@@ -8,15 +8,15 @@ import peersim.core.Control;
 import peersim.core.Network;
 import peersim.core.Node;
 
-import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 public class GossipController implements Control, Observer {
 
     private Observable last_observable = null;
     private static final String PAR_NB_DIFFUSIONS = "nb_diffusions";
     private static final String PAR_EMITTER = "emitter";
+
+    private static Set<Integer> received;
 
     /* Système de rounds rondes genre. Tuple <id_séquence, size du set>
         Le set == tous les noeuds qui ont reçu le message <id> (Set<NodeId>)
@@ -51,13 +51,15 @@ public class GossipController implements Control, Observer {
         diffs = Configuration.getInt(prefix + "." + PAR_NB_DIFFUSIONS);
         this.emitter_pid = Configuration.getPid(prefix + "." + PAR_EMITTER);
         id_diffusion = 0;
+
+        received = new HashSet<>();
     }
 
     /**
      * Callback utilisé pour signaler à la classe qu'une diffusion s'est terminée.
      */
     public void notified_finished(int last_broadcast_id) {
-        if (last_broadcast_id < id_diffusion)
+        if (received.contains(last_broadcast_id))
             return;
 
         id_diffusion++;
@@ -180,11 +182,15 @@ public class GossipController implements Control, Observer {
         //  - [4] number_of_nodes
 
         int[] results = (int[]) o;
-        System.err.println("Controller notified of end, diff " + id_diffusion);
-        System.err.println(
-                "Controller: transits " + results[0] + " rcvd " + results[1] + " sent " + results[2]
-                        + " delivered " + results[3] + " id " + results[4]);
-        notified_finished(results[4]);
+
+        if (!received.contains(results[4])) {
+            System.err.println("Controller notified of end, diff " + id_diffusion);
+            System.err.println(
+                    "Controller: transits " + results[0] + " rcvd " + results[1] + " sent " + results[2]
+                            + " delivered " + results[3] + " id " + results[4]);
+            notified_finished(results[4]);
+            received.add(results[4]);
+        }
         observable.deleteObserver(this::update);
     }
 
