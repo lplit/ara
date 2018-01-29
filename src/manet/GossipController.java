@@ -77,13 +77,18 @@ public class GossipController implements Control, Observer {
 
 
 
+
+
         if (id_diffusion < diffs) {
 
             if (verbose != 0) {
                 System.err.println("notified; next gossip is " + id_diffusion);
             }
             nouvelle_diffusion();
+            return;
         }
+
+
     }
 
     private void nouvelle_diffusion() {
@@ -144,7 +149,8 @@ public class GossipController implements Control, Observer {
         int sum_theorique = 0; // Pcq source node
         for (Integer i: connexes.keySet()) {
             sum_theorique += connexes.get(i);
-            System.err.println("Adding " + connexes.get(i));
+            if (verbose != 0)
+                System.err.println("Adding " + connexes.get(i));
         }
         return sum_theorique;
     }
@@ -193,9 +199,14 @@ public class GossipController implements Control, Observer {
      * `r` et `t` le nombre de noeuds qui ont retransmis le messages
      * @return % of reachable nodes that did not rebroadcast
      */
-    private double er() {
-        // TODO: Implement er method
-        return 0.0;
+    private double er(int received, int retransmitted) {
+        double d_r = received;
+        double d_t = retransmitted;
+
+        double ret = ((d_r - d_t)/d_r);
+        d_er.add(ret);
+
+        return ret;
     }
 
 
@@ -228,12 +239,12 @@ public class GossipController implements Control, Observer {
 
             received.add(results[4]);
             double reached = att(results[5]+1); // retransmits + root
-
+            double eco_redif = er(results[1], results[5]);
 
             System.err.println(
                     "Controller: transits " + results[0] + " nodes_rcvd " + results[1] + " messages_sent " + results[2]
                             + " delivered_messages " + results[3] + " gossip_id " + results[4] + " nodes_retransmitted " + results[5]
-                            + " nodes_no_transmitted " + results[6] + " attainability " + reached);
+                            + " nodes_no_transmitted " + results[6] + " attainability " + reached + " economy " + eco_redif);
 
             notified_finished(results[4]);
         }

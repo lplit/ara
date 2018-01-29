@@ -147,6 +147,11 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
             local_sent = emitter.get_number_of_sent();
             number_of_transits += local_sent;
             number_of_sent += local_sent;
+
+            if (local_sent == 0) {
+                /* Rien ne se passe. Le noeud a reçu le message mais ne ré-emet pas, et ne retransmet pas donc. */
+                return;
+            }
             if (node.getID() != data.id_initiator) {
                 node_retransmitted = 0;
                 number_of_retransmits++;
