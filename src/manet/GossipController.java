@@ -14,6 +14,7 @@ import java.util.Observer;
 
 public class GossipController implements Control, Observer {
 
+    private Observable last_observable = null;
     private static final String PAR_NB_DIFFUSIONS = "nb_diffusions";
     private static final String PAR_EMITTER = "emitter";
 
@@ -35,16 +36,19 @@ public class GossipController implements Control, Observer {
             d_er    = new ArrayList<>(); // Historic data for `er`
 
     private int
-            diffs = 0,  // Nombre de diffusions
             emitter_pid = -1,
             verbose = 1, // Par default a zero, se change globalement dans le fichier de config
-            id_diffusion = 0, // First
             id_originator = -1;
+
+    private static int id_diffusion = 0;
+
+    // Nombre de diffusions
+    private static int diffs = 0;
 
     private Boolean first_execute = true;
 
     public GossipController(String prefix) {
-        this.diffs = Configuration.getInt(prefix + "." + PAR_NB_DIFFUSIONS);
+        diffs = Configuration.getInt(prefix + "." + PAR_NB_DIFFUSIONS);
         this.emitter_pid = Configuration.getPid(prefix + "." + PAR_EMITTER);
         id_diffusion = 0;
     }
@@ -52,8 +56,12 @@ public class GossipController implements Control, Observer {
     /**
      * Callback utilisé pour signaler à la classe qu'une diffusion s'est terminée.
      */
-    public void notified_finished() {
+    public void notified_finished(int last_broadcast_id) {
+        if (last_broadcast_id < id_diffusion)
+            return;
+
         id_diffusion++;
+
 
 
         if (id_diffusion < diffs) {
@@ -68,6 +76,10 @@ public class GossipController implements Control, Observer {
     private void nouvelle_diffusion() {
         int rand_id = CommonState.r.nextInt(Network.size());
         id_originator = rand_id;
+
+        if (last_observable != null) {
+            last_observable.deleteObserver(this::update);
+        }
 
         System.err.println("\n\n\n\n\n");
         System.err.println("New broadcast, round " + id_diffusion);
@@ -86,7 +98,10 @@ public class GossipController implements Control, Observer {
 
         GossipProtocolImpl gos = (GossipProtocolImpl) n.getProtocol(pid_gossip);
 
+//        EDSimulator.add(0, new Message(-1, n.getID(), "Gossip", new GossipData(id_diffusion, n.getID()), pid_gossip), n, pid_gossip);
 
+        Observable obs = (Observable) n.getProtocol(pid_gossip);
+        obs.addObserver(this::update);
         gos.initiateGossip(n, id_diffusion, n.getID());
 /*
         for (int i =0; i < Network.size(); i++) {
@@ -97,8 +112,8 @@ public class GossipController implements Control, Observer {
 
         */
 
-        Observable obs = (Observable) n.getProtocol(pid_gossip);
-        obs.addObserver(this::update);
+
+
     }
 
     @Override
@@ -146,7 +161,7 @@ public class GossipController implements Control, Observer {
      *  - [1] number_of_received
      *  - [2] number_of_sent
      *  - [3] number_of_delivered
-     *  - [4] number_of_nodes
+     *  - [4] identifier of gossip bcast
      * @param observable The calling instance
      * @param o int[] containing data from EmitterCounter
      */
@@ -166,10 +181,11 @@ public class GossipController implements Control, Observer {
 
         int[] results = (int[]) o;
         System.err.println("Controller notified of end, diff " + id_diffusion);
-
-            System.err.println("Going to initiate new broadcast from update()");
-            notified_finished();
-
+        System.err.println(
+                "Controller: transits " + results[0] + " rcvd " + results[1] + " sent " + results[2]
+                        + " delivered " + results[3] + " id " + results[4]);
+        notified_finished(results[4]);
+        observable.deleteObserver(this::update);
     }
 
 

@@ -16,14 +16,13 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
             number_of_transits = 0,
             number_of_sent = 0,
             number_of_received = 0,
-            number_of_delivered = 0;
-
-    private static int last_id = -1;
+            number_of_delivered = 0,
+            last_id = -1;
     private static long last_initiator = -1;
 
     private Set<String> received_messages = new HashSet<>();
 
-    private int verbose = 1;
+    private int verbose = 0;
     private final static String tag_gossip = "Gossip";
 
     private final int this_pid;
@@ -55,30 +54,29 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
      */
     @Override
     public void initiateGossip(Node host, int id, long id_initiator) {
-        GossipData data = new GossipData();
+        number_of_delivered = 0;
+        number_of_sent = 0;
+        number_of_transits = 0;
+        number_of_received = 0;
+
+
+
+        GossipData data = new GossipData(id, id_initiator);
         data.id = id;
         data.id_initiator = id_initiator;
-
+        int local_sent = 0;
+        last_id = id;
         int emitter_pid = Configuration.lookupPid("emitter");
         EmitterCounter emitter = (EmitterCounter) host.getProtocol(emitter_pid);
 
-        Message msg = new Message(
-                host.getID(),
-                -1,
-                tag_gossip,
-                data,
-                this_pid);
 
-        if (!received_messages.contains(data.toString())) {
-            received_messages.add(data.toString());
-            emitter.emit(host, msg);
-            number_of_transits += emitter.get_number_of_sent();
-            if (verbose != 0)
-                System.err.println("Node " + host.getID() + " added message " + data.toString());
+
+        emit_if_needed(host, data);
+
+        if (number_of_sent == 0) { // émission nulle, broadcast terminé, le noeud est seultout :(
+            System.err.println("Node " + host.getID() + " terminated broadcast alone");
+            notifyGossip();
         }
-        else
-        if (verbose != 0)
-            System.err.println("Node " + host.getID() + " message " + msg + " already treated");
 
     }
 
@@ -91,7 +89,8 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
                 number_of_transits,
                 number_of_sent,
                 number_of_received,
-                number_of_delivered
+                number_of_delivered,
+                last_id
         };
         setChanged();
         notifyObservers(EndResults);
@@ -108,36 +107,75 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
         return gpi;
     }
 
+    private void emit_if_needed(Node node, GossipData data) {
+        int emitter_pid = Configuration.lookupPid("emitter");
+        int local_sent = 0;
+        EmitterCounter emitter = (EmitterCounter) node.getProtocol(emitter_pid);
+        if (!received_messages.contains(data.toString())) {
+            number_of_delivered++;
+
+            received_messages.add(data.toString());
+
+
+            emitter.emit(node, new Message(
+                    node.getID(),
+                    -1,
+                    tag_gossip,
+                    data,
+                    this_pid)
+            );
+            local_sent = emitter.get_number_of_sent();
+            number_of_transits += local_sent;
+            number_of_sent += local_sent;
+
+            if (verbose != 0)
+                System.err.println("Node " + node.getID() + " emitted " + data.toString() + " " + local_sent + " times");
+        }
+        else {
+            if (verbose != 0)
+                System.err.println("Node " + node.getID() + " gossip " + data.toString() + " already treated");
+
+        }
+    }
+
 
     @Override
     public void processEvent(Node node, int pid, Object event) {
-
-        if (event instanceof Message) {
-            GossipData data = new GossipData();
-
-            Message msg = (Message) event;
-            if (EmitterCounter.get_neighbor_ids_in_scope(node).contains(msg.getIdSrc())) {
-                // le voisin est toujours dans le scope, on délivre donc le GossipMessage
-                data = (GossipData) msg.getContent();
-                // À la première réception du GossipMessage, on ré-emet
-                initiateGossip(node, data.id, data.id_initiator);
-
-
-
-            }
-            number_of_transits--;
-            if (verbose != 0) {
-                System.err.println("Node " + node.getID() + " GossipProtocol xfers " + number_of_transits);
-
-                }
-            if (number_of_transits == 0) {
-                System.err.println("BROADCAST FINISHED\n\n\n\n");
-                notifyGossip();
-            }
+        int emitter_pid = Configuration.lookupPid("emitter");
+        EmitterCounter emitter = (EmitterCounter) node.getProtocol(emitter_pid);
+        int local_sent = 0;
+        if (verbose != 0) {
+            System.err.println("Node " + node.getID() + " GossipProtocol xfers " + number_of_transits);
 
         }
 
+        number_of_transits--;
+
+        if (event instanceof Message) {
+
+            Message msg = (Message) event;
+
+
+            if (EmitterCounter.get_neighbor_ids_in_scope(node).contains(msg.getIdSrc())) {
+                    // le voisin est toujours dans le scope, on délivre donc le GossipMessage
+                    GossipData data = (GossipData) msg.getContent();
+                    last_id = data.id;
+                    // À la première réception du GossipMessage, on ré-emet
+                    emit_if_needed(node, data);
+
+                }
+            }
+            if (verbose != 0)
+                System.err.println("Node broadcasted " + number_of_transits + " xfers");
+
+        if (number_of_transits == 0) {
+            System.err.println("BROADCAST FINISHED\n\n\n\n");
+            notifyGossip();
+        }
+
     }
-}
+
+    }
+
 
 
