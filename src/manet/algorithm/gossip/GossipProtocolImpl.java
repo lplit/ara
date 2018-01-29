@@ -20,9 +20,6 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
     private Set<String> received_messages = new HashSet<>();
 
 
-
-
-
     public GossipProtocolImpl(String prefix) {
         String tmp[] = prefix.split("\\.");
         this_pid = Configuration.lookupPid(tmp[tmp.length - 1]);
@@ -35,7 +32,6 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
     public String show_list() {
         return received_messages.toString();
     }
-
     public Boolean received(GossipData data) {
         return received_messages.contains(data.toString());
     }
@@ -53,7 +49,6 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
         data.id_initiator = id_initiator;
 
         int emitter_pid = Configuration.lookupPid("emitter");
-//        System.out.println("getting protocol " + emitter_pid);
         EmitterCounter emitter = (EmitterCounter) host.getProtocol(emitter_pid);
 
         Message msg = new Message(
@@ -68,13 +63,11 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
             if (verbose != 0)
                 System.err.println("Node " + host.getID() + " added message " + data.toString());
 
+        }
+        else
+        if (verbose != 0)
+            System.err.println("Node " + host.getID() + " message " + msg + " already treated");
 
-        }
-        else {
-            if (verbose != 0)
-                System.err.println("Node " + host.getID() + " message " + msg + " already treated");
-        }
-//        emitter.decrement_transits();
     }
 
     @Override

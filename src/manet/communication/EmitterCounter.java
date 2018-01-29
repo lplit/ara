@@ -18,7 +18,7 @@ import java.util.*;
 
 public abstract class EmitterCounter extends Observable implements Emitter, EDProtocol {
 
-    // # of messages
+    // Stats
     protected static int
             number_of_transits = 0,
             number_of_received = 0,
@@ -38,9 +38,6 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
 
     private static Set<Long> nodes_received;
 
-    public void clear_set() {
-        nodes_received.clear();
-    }
 
     public EmitterCounter(String prefix, Emitter emitter) {
         String tmp[]=prefix.split("\\.");
@@ -55,6 +52,13 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
 
     }
 
+
+    /**
+     * The do-it-all function.
+     * @param node Current node
+     * @param pid Some PID
+     * @param event Current event (message)
+     */
     @Override
     public void processEvent(Node node, int pid, Object event) {
         if (verbose != 0)
@@ -62,22 +66,18 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                     + " EmitterCounter pid " + this_pid
                     + " recvd event " + event.toString()
                     + " pid " + pid);
-
-
         info();
 
         // This message is for me
         if (pid == this_pid && event instanceof Message) {
-
             number_of_transits--;
             Message msg = (Message) event;
             long sender = msg.getIdSrc();
             Message inner_msg = (Message) msg.getContent();
 
             // The sender is still within scope
-            if (get_neighbors_in_scope(node).contains(Network.get((int) sender))) {
+            if (get_neighbors_in_scope(node).contains(Network.get((int) sender)))
                 deliverMessage(inner_msg, node);
-            }
             // We're not within reach any more, do not deliver message
             else {
                 number_not_delivered++;
@@ -88,6 +88,11 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
         check_for_end();
     }
 
+
+    /**
+     * Prepares the results structure, sets modified flag to true
+     * and notifies observers with the results structure
+     */
     public void notifyGossip() {
         int[] EndResults = {
                 number_of_transits,
@@ -101,6 +106,12 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
         notifyObservers(EndResults);
     }
 
+
+    /**
+     * Actual message deliver
+     * @param m Message to be delivered
+     * @param n Node delivering the message
+     */
     public void deliverMessage(Message m, Node n) {
         // Deliver message
         EDSimulator.add(
@@ -112,11 +123,8 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
                         m.getPid()),
                 n,
                 m.getPid());
-//        int protocol_pid = m.getPid();
-//        Protocol prot = n.getProtocol(protocol_pid);
 
         nodes_received.add(n.getID());
-//        notifyObservers(m);
 
         // Message delivre
         number_of_delivered++;
@@ -127,6 +135,75 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
      */
     public abstract void emit(Node host, Message msg);
 
+
+
+
+    protected List<Node> get_neighbors_in_scope(Node host) {
+        ArrayList<Node> list = new ArrayList<>();
+        PositionProtocol prot = (PositionProtocol) host.getProtocol(position_protocol);
+
+        for (int i = 0; i < Network.size(); i++) {
+            Node n = Network.get(i);
+            PositionProtocol prot2 = (PositionProtocol) n.getProtocol(position_protocol);
+            double dist = prot.getCurrentPosition().distance(prot2.getCurrentPosition());
+            if (dist < getScope() && n.getID() != host.getID()) {
+                list.add(n);
+            }
+        }
+        return list;
+    }
+
+
+
+    @Override
+    public Object clone(){
+        EmitterCounter res=null;
+        try {
+            res=(EmitterCounter) super.clone();
+            nodes_received = new HashSet<>();
+        } catch (CloneNotSupportedException e) {}
+
+        res.emitter_impl.clone();
+        return res;
+    }
+
+    /**
+     * Print info if verbose
+     */
+    public void info() {
+        if (verbose != 0)
+            System.err.println("transits " + number_of_transits + "; sent " + number_of_sent
+                    + "; rcvd " + number_of_received + " dlvd " + number_of_delivered
+            + "; not dlvd " + number_not_delivered);
+    }
+
+
+    /**
+     * Check if simulation finished, using the simulation time
+     */
+    private void check_for_end() {
+        if (number_of_transits == 0 && has_finished == false) {
+            if (verbose != 0)
+                System.err.println(CommonState.getTime() + ": message transit finished");
+
+            notifyGossip();
+        }
+        // This wasn't the last message
+        else
+            info();
+    }
+
+    /**
+     * Clears the set of nodes that received the message
+     * Used in-between broadcasts
+     */
+    public void clear_set() {
+        nodes_received.clear();
+    }
+
+    public void decrement_transits() {
+        number_of_transits--;
+    }
 
     @Override
     public int getLatency() {
@@ -146,56 +223,5 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
         return has_finished;
     }
 
-    protected List<Node> get_neighbors_in_scope(Node host) {
-        ArrayList<Node> list = new ArrayList<>();
-        PositionProtocol prot = (PositionProtocol) host.getProtocol(position_protocol);
-
-        for (int i = 0; i < Network.size(); i++) {
-            Node n = Network.get(i);
-            PositionProtocol prot2 = (PositionProtocol) n.getProtocol(position_protocol);
-            double dist = prot.getCurrentPosition().distance(prot2.getCurrentPosition());
-            if (dist < getScope() && n.getID() != host.getID()) {
-                list.add(n);
-            }
-        }
-        return list;
-    }
-
-    public void decrement_transits() {
-        number_of_transits--;
-    }
-
-    @Override
-    public Object clone(){
-        EmitterCounter res=null;
-        try {
-            res=(EmitterCounter) super.clone();
-            nodes_received = new HashSet<>();
-        } catch (CloneNotSupportedException e) {}
-
-        res.emitter_impl.clone();
-        return res;
-    }
-//    public Node getParentNode();
-
-
-
-    public void info() {
-        if (verbose != 0)
-            System.err.println("transits " + number_of_transits + "; sent " + number_of_sent
-                    + "; rcvd " + number_of_received + " dlvd " + number_of_delivered
-            + "; not dlvd " + number_not_delivered);
-    }
-
-    private void check_for_end() {
-        if (number_of_transits == 0 && has_finished == false) {
-            if (verbose != 0)
-                System.err.println(CommonState.getTime() + ": message transit finished");
-
-            notifyGossip();
-        }
-        // This wasn't the last message
-        else
-            info();
-    }
 }
+

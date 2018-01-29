@@ -161,14 +161,19 @@ public class GossipController implements Control, Observer {
         return 0.0;
     }
 
-    public ArrayList<Double> getD_att() {
-        return d_att;
-    }
 
-    public ArrayList<Double> getD_er() {
-        return d_er;
-    }
-
+    /**
+     * The method is called when EmitterCounter flips
+     * Observer callback function, activated when a bach of transits ends
+     * @param o is an int[5] containing the following info:
+     *  - [0] number_of_transits - usually 0
+     *  - [1] number_of_received
+     *  - [2] number_of_sent
+     *  - [3] number_of_delivered
+     *  - [4] number_of_nodes
+     * @param observable The calling instance
+     * @param o int[] containing data from EmitterCounter
+     */
     @Override
     public void update(Observable observable, Object o) {
         // Fait des bails ici quand le boolean dans EmitterCouter passe a true
@@ -187,11 +192,6 @@ public class GossipController implements Control, Observer {
         System.err.println("Controller notified of end, diff " + id_diffusion);
         System.err.println("last size " + last_size + " new size " + results[4]);
 
-
-/*        System.err.println("Got results " + results);
-        for (int i : Results)
-            System.err.print(i+" ");
- */
         if (last_size == results[4]) { // le broadcast est terminé
 
             System.err.println("Going to initiate new broadcast from update()");
@@ -204,4 +204,18 @@ public class GossipController implements Control, Observer {
 
 
     }
+
+
+    /**
+     * Getters
+     */
+
+    public ArrayList<Double> getD_att() {
+        return d_att;
+    }
+    public ArrayList<Double> getD_er() {
+        return d_er;
+    }
+
+
 }

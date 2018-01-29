@@ -19,6 +19,10 @@ public class EmitterImpl implements Emitter {
     public static int messa;
 
 
+    /**
+     * Standard peersim constructor
+     * @param prefix
+     */
     public EmitterImpl(String prefix) {
         String tmp[]=prefix.split("\\.");
         this_pid=Configuration.lookupPid(tmp[tmp.length-1]);
@@ -26,16 +30,26 @@ public class EmitterImpl implements Emitter {
         this.position_protocol=Configuration.getPid(prefix+"."+PAR_POSITIONPROTOCOL);
         this.latency = Configuration.getInt(prefix + "." + PAR_LATENCY);
         this.scope = Configuration.getInt(prefix + "." + PAR_SCOPE);
-        //System.out.println("WOAH");
     }
 
+    /**
+     * Copy constructor
+     * @param latency latency
+     * @param scope scope
+     * @param position_protocol position protocol
+     */
     public EmitterImpl(int latency, int scope, int position_protocol) {
         this.latency = latency;
         this.scope = scope;
         this.position_protocol = position_protocol;
-//        System.err.println("new EmitterImpl " + this.latency + " " + this.scope + " " + this.position_protocol);
     }
 
+
+    /**
+     * This method sends the messages
+     * @param host The current host
+     * @param msg The message it's sending
+     */
     @Override
     public void emit(Node host, Message msg) {
         PositionProtocol prot = (PositionProtocol) host.getProtocol(position_protocol);
