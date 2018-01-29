@@ -44,6 +44,12 @@ public class GossipController implements Control, Observer {
             d_att   = new ArrayList<>(), // Historic data for `att`
             d_er    = new ArrayList<>(); // Historic data for `er`
 
+    private double
+            avg_att     = 0.0, // Last average over d_att
+            stdev_att   = 0.0, // Standard deviation over d_att
+            avg_er      = 0.0, // Last average over d_er
+            stdev_er    = 0.0; // Standard deviation over d_er
+
     private int
             emitter_pid = -1,
             verbose = 0, // Par default a zero, se change globalement dans le fichier de config
@@ -88,8 +94,46 @@ public class GossipController implements Control, Observer {
             return;
         }
 
+        if (id_diffusion == diffs -1) { // Last
+            // Calc avg, stdev pour att et er
+            double
+                    avg = 0.0,
+                    tmp = 0.0,
+                    stdev = 0.0;
+
+            // Avg att
+            for (Double d : d_att)
+                tmp += d;
+            this.avg_att = tmp / d_att.size();
+            tmp=0.;
+
+            // Stdev att
+            for (Double d: d_att)
+                tmp += (d-this.avg_att)*(d-this.avg_att);
+            tmp = tmp / d_att.size();
+            this.stdev_att = Math.sqrt(tmp);
+            tmp = 0.;
+
+            // Avg er
+            for (Double d : d_er)
+                tmp += d;
+            this.avg_er = tmp / d_er.size();
+            tmp=0.;
+
+            // Stdev er
+            for (Double d: d_er)
+                tmp += (d-this.avg_er)*(d-this.avg_er);
+            tmp = tmp / d_er.size();
+            this.stdev_er = Math.sqrt(tmp);
+            tmp = 0.;
+
+        }
+
 
     }
+
+
+
 
     private void nouvelle_diffusion() {
         int rand_id = CommonState.r.nextInt(Network.size());
