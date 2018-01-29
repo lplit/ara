@@ -111,8 +111,8 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
         int emitter_pid = Configuration.lookupPid("emitter");
         int local_sent = 0;
         EmitterCounter emitter = (EmitterCounter) node.getProtocol(emitter_pid);
+
         if (!received_messages.contains(data.toString())) {
-            number_of_delivered++;
 
             received_messages.add(data.toString());
 
@@ -127,8 +127,9 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
             local_sent = emitter.get_number_of_sent();
             number_of_transits += local_sent;
             number_of_sent += local_sent;
-            if (node.getID() != data.id_initiator)
+            if (node.getID() != data.id_initiator) {
                 number_of_retransmits++;
+            }
 
 
             if (verbose != 0)
@@ -160,13 +161,18 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
 
 
             if (EmitterCounter.get_neighbor_ids_in_scope(node).contains(msg.getIdSrc())) {
-                    // le voisin est toujours dans le scope, on délivre donc le GossipMessage
+                number_of_delivered++;
+
+                // le voisin est toujours dans le scope, on délivre donc le GossipMessage
                     GossipData data = (GossipData) msg.getContent();
                     last_id = data.id;
                     // À la première réception du GossipMessage, on ré-emet
                     emit_if_needed(node, data);
 
-                }
+            }
+            else {
+                System.err.println(node.getID() +" TOO FAR FROM " + msg.getIdSrc());
+            }
             }
             if (verbose != 0)
                 System.err.println("Node broadcasted " + number_of_transits + " xfers");
