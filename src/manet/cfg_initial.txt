@@ -42,13 +42,13 @@ control.gossipcontroller.emitter emitter
 protocol.position PositionProtocolImpl
 protocol.position.maxspeed 20
 protocol.position.minspeed 1
-protocol.position.width 1000
-protocol.position.height 1000
+protocol.position.width 1500
+protocol.position.height 1500
 protocol.position.pause 20*MINUTES
 
-protocol.emitter FloodingEmitter
+protocol.emitter ProbabilisticEmitter
 protocol.emitter.latency 90
-protocol.emitter.scope 150
+protocol.emitter.scope 300
 protocol.emitter.probability 0.4
 protocol.emitter.verbose 0
 
@@ -60,17 +60,17 @@ protocol.emitter.positionprotocol position
 #protocol.neighbor.verbose VERB
 
 
-initial_position_strategy Strategy3InitNext
+initial_position_strategy Strategy5Init
 next_destination_strategy Strategy4Next
 
 initial_position_strategy.positionprotocol position
 initial_position_strategy.emitter emitter
-initial_position_strategy.distance_init_min 500
-initial_position_strategy.distance_init_max 1000
+initial_position_strategy.distance_init_min 200
+initial_position_strategy.distance_init_max 100
 
 
 next_destination_strategy.positionprotocol position
 next_destination_strategy.emitter emitter
-next_destination_strategy.distance_min 500
-next_destination_strategy.distance_max 1000
+next_destination_strategy.distance_min 200
+next_destination_strategy.distance_max 200
 
