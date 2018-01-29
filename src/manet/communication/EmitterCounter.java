@@ -3,28 +3,22 @@ package manet.communication;
 import manet.Message;
 import manet.positioning.PositionProtocol;
 import peersim.config.Configuration;
-import peersim.core.CommonState;
 import peersim.core.Network;
 import peersim.core.Node;
-import peersim.edsim.EDProtocol;
-import peersim.edsim.EDSimulator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /** Décorateur sur Emitter qui simplifie la vie et qui compte le nombre de messages en transit.
  *  La classe concrète s'occupe d'envoyer les messages, celle-ci s'occupe de la réception.
  */
 
-public abstract class EmitterCounter extends Observable implements Emitter, EDProtocol {
+public abstract class EmitterCounter implements Emitter {
 
-    // Stats
-    protected static int
-            number_of_transits = 0,
-            number_of_received = 0,
-            number_of_sent = 0,
-            number_of_delivered = 0,
-            number_not_delivered = 0;
+    protected int number_of_sent;
 
     protected int
             position_protocol = -1,
@@ -59,75 +53,31 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
      * @param pid Some PID
      * @param event Current event (message)
      */
-    @Override
+
     public void processEvent(Node node, int pid, Object event) {
         if (verbose != 0)
             System.err.println("Node " + node.getID()
                     + " EmitterCounter pid " + this_pid
                     + " recvd event " + event.toString()
                     + " pid " + pid);
-        info();
+
 
         // This message is for me
         if (pid == this_pid && event instanceof Message) {
-            number_of_transits--;
+
             Message msg = (Message) event;
             long sender = msg.getIdSrc();
-            Message inner_msg = (Message) msg.getContent();
 
             // The sender is still within scope
-            if (get_neighbors_in_scope(node).contains(Network.get((int) sender)))
+/*            if (get_neighbors_in_scope(node).contains(Network.get((int) sender)))
                 deliverMessage(inner_msg, node);
             // We're not within reach any more, do not deliver message
             else {
                 number_not_delivered++;
                 if (verbose != 0)
                     System.err.println(this_pid + " out of scope. Message " + msg.getPid() + "not delivered.");
-            }
+            }*/
         }
-        check_for_end();
-    }
-
-
-    /**
-     * Prepares the results structure, sets modified flag to true
-     * and notifies observers with the results structure
-     */
-    public void notifyGossip() {
-        int[] EndResults = {
-                number_of_transits,
-                number_of_received,
-                number_of_sent,
-                number_of_delivered,
-                nodes_received.size()
-        };
-        has_finished = true;
-        setChanged();
-        notifyObservers(EndResults);
-    }
-
-
-    /**
-     * Actual message deliver
-     * @param m Message to be delivered
-     * @param n Node delivering the message
-     */
-    public void deliverMessage(Message m, Node n) {
-        // Deliver message
-        EDSimulator.add(
-                0,
-                new Message(m.getIdSrc(),
-                        m.getIdDest(),
-                        m.getTag(),
-                        m.getContent(),
-                        m.getPid()),
-                n,
-                m.getPid());
-
-        nodes_received.add(n.getID());
-
-        // Message delivre
-        number_of_delivered++;
     }
 
     @Override
@@ -138,15 +88,36 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
 
 
 
-    protected List<Node> get_neighbors_in_scope(Node host) {
-        ArrayList<Node> list = new ArrayList<>();
+    public static List<Long> get_neighbor_ids_in_scope(Node host) {
+        ArrayList<Long> list = new ArrayList<>();
+        int position_protocol = Configuration.lookupPid("position");
+        int emitter_protocol = Configuration.lookupPid("emitter");
         PositionProtocol prot = (PositionProtocol) host.getProtocol(position_protocol);
+        Emitter emitter = (Emitter) host.getProtocol(emitter_protocol);
 
         for (int i = 0; i < Network.size(); i++) {
             Node n = Network.get(i);
             PositionProtocol prot2 = (PositionProtocol) n.getProtocol(position_protocol);
             double dist = prot.getCurrentPosition().distance(prot2.getCurrentPosition());
-            if (dist < getScope() && n.getID() != host.getID()) {
+            if (dist < emitter.getScope() && n.getID() != host.getID()) {
+                list.add(n.getID());
+            }
+        }
+        return list;
+    }
+
+    public static List<Node> get_neighbors_in_scope(Node host) {
+        ArrayList<Node> list = new ArrayList<>();
+        int position_protocol = Configuration.lookupPid("position");
+        int emitter_protocol = Configuration.lookupPid("emitter");
+        PositionProtocol prot = (PositionProtocol) host.getProtocol(position_protocol);
+        Emitter emitter = (Emitter) host.getProtocol(emitter_protocol);
+
+        for (int i = 0; i < Network.size(); i++) {
+            Node n = Network.get(i);
+            PositionProtocol prot2 = (PositionProtocol) n.getProtocol(position_protocol);
+            double dist = prot.getCurrentPosition().distance(prot2.getCurrentPosition());
+            if (dist < emitter.getScope() && n.getID() != host.getID()) {
                 list.add(n);
             }
         }
@@ -169,29 +140,16 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
 
     /**
      * Print info if verbose
-     */
+     *//*
     public void info() {
         if (verbose != 0)
             System.err.println("transits " + number_of_transits + "; sent " + number_of_sent
                     + "; rcvd " + number_of_received + " dlvd " + number_of_delivered
             + "; not dlvd " + number_not_delivered);
     }
+    */
 
 
-    /**
-     * Check if simulation finished, using the simulation time
-     */
-    private void check_for_end() {
-        if (number_of_transits == 0 && has_finished == false) {
-            if (verbose != 0)
-                System.err.println(CommonState.getTime() + ": message transit finished");
-
-            notifyGossip();
-        }
-        // This wasn't the last message
-        else
-            info();
-    }
 
     /**
      * Clears the set of nodes that received the message
@@ -199,10 +157,6 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
      */
     public void clear_set() {
         nodes_received.clear();
-    }
-
-    public void decrement_transits() {
-        number_of_transits--;
     }
 
     @Override
@@ -215,9 +169,7 @@ public abstract class EmitterCounter extends Observable implements Emitter, EDPr
         return emitter_impl.getScope();
     }
 
-    public static int get_number_of_transits(Message msg) {
-        return number_of_transits;
-    }
+    public int get_number_of_sent() { return number_of_sent; }
 
     public static Boolean get_has_finished() {
         return has_finished;

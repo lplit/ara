@@ -7,22 +7,32 @@ import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 
 import java.util.HashSet;
+import java.util.Observable;
 import java.util.Set;
 
 
-public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
-    private static int number_recvd = 0;
+public class GossipProtocolImpl  extends Observable implements GossipProtocol, EDProtocol {
+    private static int
+            number_of_transits = 0,
+            number_of_sent = 0,
+            number_of_received = 0,
+            number_of_delivered = 0;
+
+    private static int last_id = -1;
+    private static long last_initiator = -1;
+
+    private Set<String> received_messages = new HashSet<>();
 
     private int verbose = 1;
     private final static String tag_gossip = "Gossip";
 
     private final int this_pid;
-    private Set<String> received_messages = new HashSet<>();
-
 
     public GossipProtocolImpl(String prefix) {
         String tmp[] = prefix.split("\\.");
         this_pid = Configuration.lookupPid(tmp[tmp.length - 1]);
+        number_of_transits = 0;
+        number_of_sent = 0;
 
         if (verbose != 0) {
             System.err.println("Gossip up with pid " + this_pid);
@@ -35,6 +45,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
     public Boolean received(GossipData data) {
         return received_messages.contains(data.toString());
     }
+
 
 
     /**
@@ -54,20 +65,36 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
         Message msg = new Message(
                 host.getID(),
                 -1,
-                "Gossip",
+                tag_gossip,
                 data,
                 this_pid);
+
         if (!received_messages.contains(data.toString())) {
             received_messages.add(data.toString());
             emitter.emit(host, msg);
+            number_of_transits += emitter.get_number_of_sent();
             if (verbose != 0)
                 System.err.println("Node " + host.getID() + " added message " + data.toString());
-
         }
         else
         if (verbose != 0)
             System.err.println("Node " + host.getID() + " message " + msg + " already treated");
 
+    }
+
+    /**
+     * Prepares the results structure, sets modified flag to true
+     * and notifies observers with the results structure
+     */
+    public void notifyGossip() {
+        int[] EndResults = {
+                number_of_transits,
+                number_of_sent,
+                number_of_received,
+                number_of_delivered
+        };
+        setChanged();
+        notifyObservers(EndResults);
     }
 
     @Override
@@ -84,11 +111,30 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol {
 
     @Override
     public void processEvent(Node node, int pid, Object event) {
-        GossipData data;
+
         if (event instanceof Message) {
-            data = (GossipData) ((Message) event).getContent();
-            // À la première réception du GossipMessage, on ré-emet
-            initiateGossip(node, data.id, data.id_initiator);
+            GossipData data = new GossipData();
+
+            Message msg = (Message) event;
+            if (EmitterCounter.get_neighbor_ids_in_scope(node).contains(msg.getIdSrc())) {
+                // le voisin est toujours dans le scope, on délivre donc le GossipMessage
+                data = (GossipData) msg.getContent();
+                // À la première réception du GossipMessage, on ré-emet
+                initiateGossip(node, data.id, data.id_initiator);
+
+
+
+            }
+            number_of_transits--;
+            if (verbose != 0) {
+                System.err.println("Node " + node.getID() + " GossipProtocol xfers " + number_of_transits);
+
+                }
+            if (number_of_transits == 0) {
+                System.err.println("BROADCAST FINISHED\n\n\n\n");
+                notifyGossip();
+            }
+
         }
 
     }

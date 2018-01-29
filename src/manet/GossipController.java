@@ -1,7 +1,6 @@
 package manet;
 
 import manet.algorithm.gossip.GossipProtocolImpl;
-import manet.communication.Emitter;
 import manet.communication.EmitterCounter;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
@@ -17,10 +16,6 @@ public class GossipController implements Control, Observer {
 
     private static final String PAR_NB_DIFFUSIONS = "nb_diffusions";
     private static final String PAR_EMITTER = "emitter";
-
-    private static int last_size;
-    private int round_number;
-    //private static Set<Long> nodes_received;
 
     /* Système de rounds rondes genre. Tuple <id_séquence, size du set>
         Le set == tous les noeuds qui ont reçu le message <id> (Set<NodeId>)
@@ -52,15 +47,6 @@ public class GossipController implements Control, Observer {
         this.diffs = Configuration.getInt(prefix + "." + PAR_NB_DIFFUSIONS);
         this.emitter_pid = Configuration.getPid(prefix + "." + PAR_EMITTER);
         id_diffusion = 0;
-        round_number = 0;
-        last_size = -1;
-/*
-        for (int i = 0; i < Network.size(); i++) {
-            Node n = Network.get(i);
-            Observable finisher = (EmitterCounter) n.getProtocol(emitter_pid);
-            finisher.addObserver(this::update);
-        }
-*/
     }
 
     /**
@@ -68,7 +54,7 @@ public class GossipController implements Control, Observer {
      */
     public void notified_finished() {
         id_diffusion++;
-        last_size = 0;
+
 
         if (id_diffusion < diffs) {
 
@@ -82,15 +68,13 @@ public class GossipController implements Control, Observer {
     private void nouvelle_diffusion() {
         int rand_id = CommonState.r.nextInt(Network.size());
         id_originator = rand_id;
-        round_number = 0;
 
         System.err.println("\n\n\n\n\n");
-        System.err.println("New broadcast, round " + round_number);
+        System.err.println("New broadcast, round " + id_diffusion);
 
         // On choisit un noeud random dans le réseau
         Node n = Network.get(rand_id);
 
-        last_size = 1;
         int pid_gossip = Configuration.lookupPid("gossip");
 
         EmitterCounter emitter = (EmitterCounter) n.getProtocol(emitter_pid);
@@ -104,30 +88,22 @@ public class GossipController implements Control, Observer {
 
 
         gos.initiateGossip(n, id_diffusion, n.getID());
-        Observable finisher = (EmitterCounter) n.getProtocol(emitter_pid);
-        finisher.addObserver(this::update);
+/*
+        for (int i =0; i < Network.size(); i++) {
+            Node node_i = Network.get(i);
+            Observable g_i = (Observable) node_i.getProtocol(pid_gossip);
+            g_i.addObserver(this::update);
+        }
+
+        */
+
+        Observable obs = (Observable) n.getProtocol(pid_gossip);
+        obs.addObserver(this::update);
     }
 
     @Override
     public boolean execute() {
-        int delivering_emitter_pid = Configuration.getPid("emitter", -1);
 
-        Emitter emitter;
-/*
-        if (id_originator != -1 && delivering_emitter_pid != -1) {
-            Node n = Network.get(id_originator);
-
-            emitter = (Emitter) n.getProtocol(delivering_emitter_pid);
-            if (emitter instanceof EmitterCounter) {
-                if (EmitterCounter.get_has_finished() == true) {
-                    nouvelle_diffusion();
-                    return false;
-                }
-            }
-        }
-        else
-            System.err.println("Not supposed to be here");
-*/
         if (first_execute) {
             nouvelle_diffusion();
             first_execute = false;
@@ -190,18 +166,9 @@ public class GossipController implements Control, Observer {
 
         int[] results = (int[]) o;
         System.err.println("Controller notified of end, diff " + id_diffusion);
-        System.err.println("last size " + last_size + " new size " + results[4]);
-
-        if (last_size == results[4]) { // le broadcast est terminé
 
             System.err.println("Going to initiate new broadcast from update()");
             notified_finished();
-        }
-        else { // une vague s'est terminée mais pas le broadcast. on a de nouveaux voisins quoi
-            System.err.println("\nBroadcast " + id_diffusion + " round: " + ++round_number);
-            last_size = results[4];
-        }
-
 
     }
 

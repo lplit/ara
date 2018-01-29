@@ -18,50 +18,28 @@ public class FloodingEmitter extends EmitterCounter {
 
     @Override
     public void emit(Node host, Message msg) {
+        number_of_sent = 0;
 
-        // Diffusion à tous les noeuds dans le scope classique
-        /*
-        emitter_impl.emit(
-                host,
-                new Message(
+        for (Node n : get_neighbors_in_scope(host)) {
+            number_of_sent++;
+            has_finished = false;
+
+            EDSimulator.add(
+                    getLatency(),
+                    new Message(
                         msg.getIdSrc(),
-                        msg.getIdDest(),
-                        "EMITTER",
-                        new Message(
-                                msg.getIdSrc(),
-                                msg.getIdDest(),
-                                msg.getTag(),
-                                msg.getContent(),
-                                msg.getPid()),
-                        this_pid));
+                        n.getID(),
+                        msg.getTag(),
+                        msg.getContent(),
+                        msg.getPid()),
+                     n,
+                    msg.getPid());
 
-        number_of_transits += get_neighbors_in_scope(host).size();
-        */
-//        System.err.println("Node " + host.getID() + "Sup, FloodingEmitter emitting");
-        // "Pour tous les noeuds dans le scope", ..
-
-                // On rajoute l'évènement faisant décrémenter le compteur chez ceux qui reçoivent
-                for (Node n : get_neighbors_in_scope(host)) {
-                    number_of_transits++;
-                    number_of_sent++;
-                    has_finished = false;
-
-                    EDSimulator.add(getLatency(), new Message(
-                            msg.getIdSrc(),
-                            n.getID(),
-                            "EMITTER",
-                            new Message(
-                                    msg.getIdSrc(),
-                                    n.getID(),
-                                    msg.getTag(),
-                                    msg.getContent(),
-                                    msg.getPid()),
-                            this_pid), n, this_pid);
-
-                    if (verbose != 0)
-                        System.err.println(host.getID() + " FloodingEmitter incrementing, left: " + number_of_transits);
-                }
             }
+
+            if (verbose != 0)
+                System.err.println("Node " + host.getID() + ": FloodingEmitter sent " + number_of_sent + " messages");
+        }
 
     @Override
     public Object clone() {
