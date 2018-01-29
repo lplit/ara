@@ -211,6 +211,7 @@ public class GossipController implements Control, Observer {
      *  - [3] number_of_delivered
      *  - [4] identifier of gossip bcast
      *  - [5] number_of_retransmits
+     *  - [6] number_of_no_transmits <- each time a node has recvd a message it has already
      * @param observable The calling instance
      * @param o int[] containing data from EmitterCounter
      */
@@ -233,7 +234,7 @@ public class GossipController implements Control, Observer {
             System.err.println(
                     "Controller: transits " + results[0] + " rcvd " + results[1] + " sent " + results[2]
                             + " delivered " + results[3] + " id " + results[4] + " retransmits " + results[5]
-                            + " att " + reached);
+                            + " no_transmits " + results[6] + " att " + reached);
         }
         observable.deleteObserver(this::update);
     }
