@@ -54,10 +54,10 @@ for proba in probas:
                     # line0: att_mean, att_stdev, er_mean, er_stdev
                     # line1: densite_mean, dens_stdev, stdev/densi (ignore)
                     att_mean, att_stdev, er_mean, er_stdev = line.strip().split(";")
-                    atts.append(float(att_mean))
-                    atts_stdev.append(float(att_stdev))
-                    ers.append(float(er_mean))
-                    ers_stdev.append(float(er_stdev))
+                    atts.append(float(att_mean)replace(',', '.'))
+                    atts_stdev.append(float(att_stdev).replace(',', '.'))
+                    ers.append(float(er_mean)replace(',', '.'))
+                    ers_stdev.append(float(er_stdev)replace(',', '.'))
                     line = f.readline()
                     densi_mean, densi_stdev, _ = line.strip().split(";")
             except (OSError, IOError) as e:
