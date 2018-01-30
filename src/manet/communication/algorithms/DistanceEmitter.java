@@ -24,6 +24,7 @@ public class DistanceEmitter extends EmitterCounter {
     @Override
     public void emit(Node host, Message msg) {
         number_of_sent = 0;
+        nodes_received.clear();
         ArrayList<Node> list = new ArrayList<>();
         PositionProtocol prot = (PositionProtocol) host.getProtocol(position_protocol);
 
@@ -48,7 +49,7 @@ public class DistanceEmitter extends EmitterCounter {
                             n,
                             msg.getPid());
                     number_of_sent++;
-
+                    nodes_received.add(n.getID());
                 }
             }
         }

@@ -218,6 +218,8 @@ public class GossipController implements Control, Observer {
         double d_r = received;
         double d_t = retransmitted;
 
+        if (received == 0) d_r = 1; // ici on compte le noeud initiateur, ayant zéro retransmis
+
         double ret = ((d_r - d_t)/d_r);
         d_er.add(ret);
         return ret;
