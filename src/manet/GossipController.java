@@ -220,7 +220,6 @@ public class GossipController implements Control, Observer {
 
         double ret = ((d_r - d_t)/d_r);
         d_er.add(ret);
-
         return ret;
     }
 
@@ -256,11 +255,17 @@ public class GossipController implements Control, Observer {
             double reached = att(results[5]); // retransmits + root
             double eco_redif = er(results[1], results[5]);
 
-            if (verbose == 0) {
+            if (verbose != 0) {
                 System.err.println(
-                        "Controller: transits " + results[0] + " nodes_rcvd " + results[1] + " messages_sent " + results[2]
-                                + " delivered_messages " + results[3] + " gossip_id " + results[4] + " nodes_retransmitted " + results[5]
-                                + " nodes_no_transmitted " + results[6] + " attainability " + reached + " economy " + eco_redif);
+                        "Controller: transits " + results[0]
+                                + " nodes_rcvd " + results[1]
+                                + " messages_sent " + results[2]
+                                + " delivered_messages " + results[3]
+                                + " gossip_id " + results[4]
+                                + " nodes_retransmitted " + results[5]
+                                + " nodes_no_transmitted " + results[6]
+                                + " attainability " + reached
+                                + " economy " + eco_redif);
             }
 //            System.out.format("%f;%f\n", reached, eco_redif);
 
