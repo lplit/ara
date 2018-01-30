@@ -163,13 +163,13 @@ public class GossipController implements Control, Observer {
         Graph g = new MANETGraph(getPositions(), ((Emitter) n.getProtocol(emitter_pid)).getScope());
         final GraphAlgorithms ga = new GraphAlgorithms();
         Hashtable<Integer, Integer> connexes = (Hashtable) ga.weaklyConnectedClusters(g);
-        int sum_theorique = 1; // Pcq source node
+        int sum_theorique = -1; // Pcq source node
         for (Integer i: connexes.keySet()) {
             sum_theorique += connexes.get(i);
             if (verbose != 0)
                 System.err.println("Adding " + connexes.get(i));
         }
-        if (verbose == 0)
+        if (verbose != 0)
             System.err.println("Theoretic reach at start: " + sum_theorique);
         return sum_theorique;
     }
