@@ -39,7 +39,7 @@ for proba in probas:
         for bench in experiences:
             files_treated = files_treated + 1
             progress = float(files_treated)/float(total_xps)*100
-            print '%.2f%% done (%d of %d), %d files total, %d lines skipped so far' % (progress, files_treated, total_xps, len(files)/2, l_skipped)
+            
             fname = "cfg_bench_" + str(size) + "_" + str(proba) + "_" + str(bench) +".results"
             try: 
                 with open(os.path.join(sys.argv[1], fname)) as f:
@@ -71,6 +71,8 @@ for proba in probas:
 
         ccol1 = ("%.4f %s %.4f") % (numpy.average(np_atts), "+-", numpy.average(np_atts_stdev))
         ccol2 = ("%.4f %s %.4f") % (numpy.average(np_er), "+-", numpy.average(np_er_stdev))
+        print '%.2f%% done (%d of %d), %d files total, %d lines skipped so far' % \
+            (progress, files_treated, total_xps, len(files)/2, l_skipped)
         print 'p %.2f n %d' % (proba, size)
         print "Atts", ccol1
-        print "Ers", ccol2, "\n", 
+        print "Ers", ccol2, "\n\n", 
