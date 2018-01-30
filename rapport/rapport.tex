@@ -253,6 +253,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 \end{lstlisting}
 
 \subsection{Influence des stratégies sur la connexité du graphe (Questions 3, 4, 8)}
+\begin{minipage}{0.5\textwidth}
 
 \begin{itemize}
   \item Strategy1InitNext donne des positions initiales et destinations
@@ -273,12 +274,10 @@ aléatoires dans le terrain pour chaque noeud.
       \item Strategy6Init place les noeuds en étoile au milieu du
         terrain, le graphe est donc initialement connexe.\\
 \end{itemize}
-
-
-Différentes combinaisons de ces stratégies et la connexité du graphe
-en résultant sont résumés dans la table \ref{table:SPISDGraphe}.
-
-  \begin{table}[H]
+\end{minipage}%
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \begin{table}[H]
 \centering
     \begin{tabular}{| l | l | l |}
   \hline
@@ -320,6 +319,10 @@ en résultant sont résumés dans la table \ref{table:SPISDGraphe}.
     \caption{Impact des différentes SPI et SD sur la connexité du graphe}
     \label{table:SPISDGraphe}
   \end{table}
+\end{minipage}
+%Différentes combinaisons de ces stratégies et la connexité du graphe
+%en résultant sont résumés dans la table \ref{table:SPISDGraphe}.
+
 
   \subsection{\texttt{DensityController (Question 9)}}
 
@@ -746,14 +749,26 @@ Exemple de sortie:
 Les valeurs correspondent à des moyennes avec écarts-type, obtenus sur
 100 itérations sur chaque combinaison de SPI et SD.
 
-\subsection{\texttt{bench-ex2q1.pl}}
-Exemple: \texttt{./bench-ex2q1.pl <chemin\_peersim>}
+\subsection{\texttt{bench-ex2q\{1,3,4\}.pl}}
+Exemple: \texttt{./bench-ex2q\{1,3,4\}.pl <chemin\_peersim>}
 
-Le script crée un dossier \texttt{resultats/bench\_<date>\_ex2q1} où
+Le script crée un dossier \texttt{resultats/bench\_<date>\_ex2q\{1,3,4\}} où
 seront stockés les résultats des différentes exécutions, les noms des fichiers
 étant différentiés par la taille du réseau.
 
-\subsection{\texttt{bench-ex2q3.pl}}
+\subsection{\texttt{bench-ex2q5.pl}}
+Exemple: \texttt{./bench-ex2q5.pl <chemin\_peersim>}
+Le script crée un dossier \texttt{resultats/bench\_<date>\_ex2q5} où
+seront stockés les résultats des différentes exécutions, les noms des
+fichiers étant différentiés par la taille du réseau, la probabilité
+donnée et le numéro de l'itération.
+
+Les scripts de l'exercice 2 (hormis la question 1) sortent un fichier
+par exécutions, de forme:
+\begin{verbatim}
+Att;Ed-Att;ER;Ed-ER
+D;ED;ED/D
+\end{verbatim}
 
 \end{appendix}
 
