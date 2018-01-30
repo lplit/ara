@@ -71,5 +71,6 @@ for proba in probas:
 
         ccol1 = ("%.4f %s %.4f") % (numpy.average(np_atts), "+-", numpy.average(np_atts_stdev))
         ccol2 = ("%.4f %s %.4f") % (numpy.average(np_er), "+-", numpy.average(np_er_stdev))
+        print 'p %.2f n %d' % (proba, size)
         print "Atts", ccol1
         print "Ers", ccol2, "\n", 
