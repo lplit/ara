@@ -115,9 +115,10 @@ public class GossipController implements Control, Observer {
             this.stdev_er = Math.sqrt(tmp);
             tmp = 0.;
 
+            System.out.format("%.2f;%.2f;%.2f;%.2f\n", avg_att, stdev_att, avg_er, stdev_er);
+
         }
 
-        System.out.format("%.2f;%.2f;%.2f;%.2f\n", avg_att, stdev_att, avg_er, stdev_er);
 
 
     }
@@ -195,11 +196,13 @@ public class GossipController implements Control, Observer {
      * @return % of reachable nodes
      */
     private double att(int retransmits) {
-
-        double att = (this.att_th*1.0/retransmits);
+        double att;
+        if (retransmits != 0)
+            att = ((double)retransmits)/att_th*100;
+        else att = 1.0;
         d_att.add(att);
         if (verbose != 0)
-            System.err.println("Reach : " + att);
+            System.err.println("Reach : " + att + " att_th " + att_th + "retransmits " + retransmits);
         return att;
     }
 
