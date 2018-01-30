@@ -23,6 +23,7 @@ public class DistanceEmitter extends EmitterCounter {
 
     @Override
     public void emit(Node host, Message msg) {
+        number_of_sent = 0;
         ArrayList<Node> list = new ArrayList<>();
         PositionProtocol prot = (PositionProtocol) host.getProtocol(position_protocol);
 
@@ -35,16 +36,18 @@ public class DistanceEmitter extends EmitterCounter {
             PositionProtocol prot2 = (PositionProtocol) n.getProtocol(position_protocol);
             double dist = prot.getCurrentPosition().distance(prot2.getCurrentPosition());
             if (dist < getScope() && n.getID() != host.getID()) {
+
                 if (random < (dist / getScope())) {
+
                     EDSimulator.add(
                             getLatency(),
-                            new Message(msg.getIdSrc(),
-                                    n.getID(),
+                            new Message(host.getID(),
+                                    msg.getIdDest(),
                                     msg.getTag(),
-                                    msg,
-                                    this_pid),
+                                    msg.getContent(), msg.getPid()),
                             n,
-                            this_pid);
+                            msg.getPid());
+                    number_of_sent++;
 
                 }
             }
