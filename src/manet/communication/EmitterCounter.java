@@ -21,13 +21,16 @@ public abstract class EmitterCounter implements Emitter {
     protected int
             position_protocol = -1,
             this_pid = -1,
-            verbose = 1,
+            verbose = 0,
             pid_controller = -1,
             number_of_sent = -1;
 
     protected static Boolean has_finished = false;
     protected Emitter emitter_impl;
-    private static Set<Long> nodes_received;
+
+    protected Set<Long> nodes_received;
+
+    protected Set<Node> nodes_private;
 
 
     /**
@@ -42,6 +45,7 @@ public abstract class EmitterCounter implements Emitter {
 
         emitter_impl = emitter;
         nodes_received = new HashSet<>();
+        nodes_private = new HashSet<>();
 
         this.position_protocol= Configuration.getPid(prefix+"."+PAR_POSITIONPROTOCOL);
         this.verbose = Configuration.getInt(prefix+".verbose");
@@ -110,6 +114,7 @@ public abstract class EmitterCounter implements Emitter {
         try {
             res=(EmitterCounter) super.clone();
             nodes_received = new HashSet<>();
+            nodes_private = new HashSet<>();
         } catch (CloneNotSupportedException e) {}
 
         res.emitter_impl.clone();
@@ -138,6 +143,8 @@ public abstract class EmitterCounter implements Emitter {
     }
 
     public int get_number_of_sent() { return number_of_sent; }
+
+    public Set<Long> get_ids_of_sent() { return nodes_received; }
 
     public static Boolean get_has_finished() {
         return has_finished;
