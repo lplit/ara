@@ -94,7 +94,7 @@ public class GossipController implements Control, Observer {
             return;
         }
 
-        if (id_diffusion == diffs -1) { // Last
+        if (id_diffusion >= diffs ) { // Last
             // Calc avg, stdev pour att et er
             double
                     avg = 0.0,
@@ -128,6 +128,8 @@ public class GossipController implements Control, Observer {
             tmp = 0.;
 
         }
+
+        System.out.format("%.2f;%.2f;%.2f;%.2f\n", avg_att, stdev_att, avg_er, stdev_er);
 
 
     }
@@ -291,7 +293,7 @@ public class GossipController implements Control, Observer {
                                 + " delivered_messages " + results[3] + " gossip_id " + results[4] + " nodes_retransmitted " + results[5]
                                 + " nodes_no_transmitted " + results[6] + " attainability " + reached + " economy " + eco_redif);
             }
-            System.out.format("%f;%f\n", reached, eco_redif);
+//            System.out.format("%f;%f\n", reached, eco_redif);
 
             notified_finished(results[4]);
         }
