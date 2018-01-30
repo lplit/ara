@@ -55,7 +55,7 @@ protocol.emitter.scope 300
 protocol.emitter.verbose VERB
 protocol.emitter.positionprotocol position
 
-protocol.neighbor NeighborProtocolImpl2
+protocol.neighbor NeighborProtocolImpl
 protocol.neighbor.period 3000
 protocol.neighbor.timer_delay 3500
 protocol.neighbor.verbose VERB
@@ -128,9 +128,12 @@ sub date {
 my $bench_dir;
 
 $bench_dir = join("_", "bench_ex2q5", date());
+$bench_dir = join("/", "results", $bench_dir);
 
+print "bench_dir: ", $bench_dir, ", \n";
 
-system("mkdir $bench_dir");
+system("mkdir -p $bench_dir");
+
 
 sub get_config_filename() {
     return join "/", $bench_dir, $filename;
