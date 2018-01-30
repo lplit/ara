@@ -175,13 +175,6 @@ public class DensityController implements Control {
     }
 
 
-    /* Getters */
-    public double getEdt() { return edt; }
-    public double getEt() { return et; }
-    public double getDt() { return dt; }
-    public double getEit() { return eit; }
-    public double getDit() { return dit; }
-
     /** We're lazy so functions for q10
      * Col1 = D(t=end)
      * Col2 = E(t=end) / D(t=end)
@@ -200,6 +193,19 @@ public class DensityController implements Control {
             System.err.println("Should have flushed");
     }
 
+
+
+    /* Getters */
+    public double getEdt() { return edt; }
+    public double getEt() { return et; }
+    public double getDt() { return dt; }
+    public double getEit() { return eit; }
+    public double getDit() { return dit; }
+
+
+    /**
+     * Debug preview method
+     */
     public void printState() {
         String ddt = "[";
         String det = "[";

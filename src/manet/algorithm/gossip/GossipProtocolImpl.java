@@ -99,6 +99,13 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
     /**
      * Prepares the results structure, sets modified flag to true
      * and notifies observers with the results structure
+     *  - [0] number_of_transits - usually 0
+     *  - [1] Number of nodes having received the message.
+     *  - [2] number_of_sent
+     *  - [3] number_of_delivered
+     *  - [4] identifier of gossip bcast
+     *  - [5] number_of_retransmits
+     *  - [6] number_of_no_transmits <- each time a node has recvd a message it has already
      */
     public void notifyGossip() {
         int[] EndResults = {
@@ -125,6 +132,12 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
         return gpi;
     }
 
+
+    /**
+     * This method emits following the constraints
+     * @param node Emitting node
+     * @param data Data to be emitted
+     */
     private void emit_if_needed(Node node, GossipData data) {
         int emitter_pid = Configuration.lookupPid("emitter");
         int local_sent = 0;
@@ -150,21 +163,23 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
 
             if (local_sent == 0) {
                 /* Rien ne se passe. Le noeud a reçu le message mais ne ré-emet pas, et ne retransmet pas donc. */
+                // TODO: Does this mean that we're all alone and that there's noone in the scope?
                 return;
             }
+
+            // We didn't initiate this bcast
             if (node.getID() != data.id_initiator) {
+                // TODO: Wtf is going on here? retransmitted = 0? Shouldn't it be =1 ?
                 node_retransmitted = 0;
                 number_of_retransmits++;
-
-                }
+            }
 
 
             if (verbose != 0)
                 System.err.println("Node " + node.getID() + " emitted " + data.toString() + " "
                         + local_sent + " times " + number_of_retransmits + " retransmits");
         }
-        else { // received_messages alread contains message.
-            // Not retransmitting.
+        else { // We've already received this message, not retransmitting
             if (node_retransmitted == 0) {
                 number_of_no_transmits++;
                 node_retransmitted = 1;
@@ -181,10 +196,9 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
     public void processEvent(Node node, int pid, Object event) {
         int emitter_pid = Configuration.lookupPid("emitter");
         EmitterCounter emitter = (EmitterCounter) node.getProtocol(emitter_pid);
-        if (verbose != 0) {
+        if (verbose != 0)
             System.err.println("Node " + node.getID() + " GossipProtocol xfers " + number_of_transits + " sent " + number_of_sent);
 
-        }
         number_of_transits--;
 
         if (!nodes_ids_received.contains(node.getID())) {
@@ -193,39 +207,35 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
         }
 
         if (event instanceof Message) {
-
             Message msg = (Message) event;
-
             if (EmitterCounter.get_neighbor_ids_in_scope(node).contains(msg.getIdSrc())) {
                 number_of_delivered++;
 
                 // le voisin est toujours dans le scope, on délivre donc le GossipMessage
-                    GossipData data = (GossipData) msg.getContent();
-                    last_id = data.id;
-                    // À la première réception du GossipMessage, on ré-emet
-                    emit_if_needed(node, data);
+                GossipData data = (GossipData) msg.getContent();
+                last_id = data.id;
+                // À la première réception du GossipMessage, on ré-emet
+                emit_if_needed(node, data);
 
             }
             else {
                 if (verbose != 0)
                     System.err.println(node.getID() +" TOO FAR FROM " + msg.getIdSrc());
-                  return;
+                return;
             }
-            }
-
-
-            if (verbose != 0)
-                System.err.println("Node broadcasted " + number_of_transits + " xfers");
-
-        if (number_of_transits == 0) {
-            if (verbose != 0)
-                System.err.println("BROADCAST FINISHED\n\n\n\n");
-            notifyGossip();
         }
 
-    }
 
+        if (verbose != 0)
+            System.err.println("Node broadcasted " + number_of_transits + " xfers");
+
+        if (number_of_transits == 0) {
+            notifyGossip();
+            if (verbose != 0)
+                System.err.println("BROADCAST FINISHED\n\n\n\n");
+        }
     }
+}
 
 
 

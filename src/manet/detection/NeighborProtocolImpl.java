@@ -84,9 +84,10 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 
 
     /**
-     * The proper processing method, works with "Heartbeat" and "Timer" message tags.
+     * The proper processing method, works with "Heartbeat", "Timer" and "Probe" message tags.
      * "Heartbeat" messages are self-bootstrapping
      * "Timer" activates the timers for others
+     * "Probe" Adds to neighbours if not yet present
      * @param node Current node
      * @param pid Someone's PID
      * @param event The arriving event (Message)
@@ -106,8 +107,10 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 
         if (event instanceof Message) {
             switch (msg.getTag()) {
+
                 case tag_heartbeat: // self-message toutes les périodes
-                    EDSimulator.add(this.period, new Message(node.getID(), -1, tag_heartbeat, tag_heartbeat, this_pid), node, this_pid);
+                    EDSimulator.add(this.period, new Message(node.getID(), -1,
+                            tag_heartbeat, tag_heartbeat, this_pid), node, this_pid);
                     // Envoi d'un probe dans le scope pour les voisins, avec un timestamp
                     impl.emit(node, new Message(node.getID(), -1, tag_probe, CommonState.getTime(), this_pid));
                     if (verbose != 0) {
@@ -121,21 +124,23 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                     if (!neighbor_list.contains(msg.getIdSrc())) {
                         neighbor_list.add(msg.getIdSrc());
                         if (verbose != 0)
-                            System.err.println("Node " + node.getID() + " NeighborImpl2 list is " + neighbor_list.toString());
+                            System.err.println("Node " + node.getID()
+                                    + " NeighborImpl2 list is " + neighbor_list.toString());
                     }
-                        // rajout du voisin dans la liste des timers dans tous les cas
-                        neighbor_timers.put(msg.getIdSrc(), (Long) msg.getContent());
+                    // rajout du voisin dans la liste des timers dans tous les cas
+                    neighbor_timers.put(msg.getIdSrc(), (Long) msg.getContent());
 
-                        EDSimulator.add(
-                                this.timer_delay,
-                                new Message(msg.getIdSrc(), node.getID(), tag_timer, msg.getContent(), this_pid),
-                                node,
-                                this_pid);
+                    EDSimulator.add(
+                            this.timer_delay,
+                            new Message(msg.getIdSrc(), node.getID(), tag_timer, msg.getContent(), this_pid),
+                            node,
+                            this_pid);
 
-                        if (verbose != 0)
-                            System.err.println("Node " + node.getID() + ": received probe from " + msg.getIdSrc() + " with " + msg.getContent());
-
-                        break;
+                    if (verbose != 0)
+                        System.err.println("Node " + node.getID()
+                                + ": received probe from " + msg.getIdSrc()
+                                + " with " + msg.getContent());
+                    break;
 
                 case tag_timer:
                     if (neighbor_list.contains(msg.getIdSrc()))
@@ -144,7 +149,6 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 
                     if (verbose==1)
                         System.err.println("Node " + node.getID() + " " + neighbor_list)         ;
-
                     break;
 
                 default:

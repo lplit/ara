@@ -495,3 +495,16 @@ On implémente une classe encapsulant la classe `EmitterImpl` avec le Design
 Pattern `Decorator`. Cette classe entretient une liste de voisins
 atteignables pendant un broadcast, et l'identifiant du noeud parent lui
 ayant envoyé le message.
+
+### Algo end of bcast 
+
+
+ Système de rounds rondes genre. Tuple <id_séquence, size du set>
+ Le set == tous les noeuds qui ont reçu le message <id> (Set<NodeId>)
+
+ On stocke la valeur courante du set à la première itération (== 1 comme y'a déjà l'initiateur)
+ - à chaque round, le receveur s'ajoute au set (incrémente la taille du set)
+ - on compare la taille du set de l'itération courante avec la valeur stockée. 
+ Si ça a cbangé, ça veut dire qu'on est dans le même broadcast mais qu'on a atteint des nouveaux voisins entre-temps, donc c'est le même reund.
+ - SINON si size(t-1) == size(t) c'est qu'on a plus rien et là notifyAll
+ 

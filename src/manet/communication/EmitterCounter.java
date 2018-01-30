@@ -18,21 +18,23 @@ import java.util.Set;
 
 public abstract class EmitterCounter implements Emitter {
 
-    protected int number_of_sent;
-
     protected int
             position_protocol = -1,
             this_pid = -1,
             verbose = 1,
-            pid_controller = -1;
+            pid_controller = -1,
+            number_of_sent = -1;
 
     protected static Boolean has_finished = false;
-
     protected Emitter emitter_impl;
-
     private static Set<Long> nodes_received;
 
 
+    /**
+     * PeerSim-compliant constructor
+     * @param prefix PeerSim Config stuffs
+     * @param emitter PeerSim Config stuffs
+     */
     public EmitterCounter(String prefix, Emitter emitter) {
         String tmp[]=prefix.split("\\.");
         this_pid=Configuration.lookupPid(tmp[tmp.length-1]);
@@ -47,48 +49,17 @@ public abstract class EmitterCounter implements Emitter {
 
     }
 
-
-    /**
-     * The do-it-all function.
-     * @param node Current node
-     * @param pid Some PID
-     * @param event Current event (message)
-     */
-
-    public void processEvent(Node node, int pid, Object event) {
-        if (verbose != 0)
-            System.err.println("Node " + node.getID()
-                    + " EmitterCounter pid " + this_pid
-                    + " recvd event " + event.toString()
-                    + " pid " + pid);
-
-
-        // This message is for me
-        if (pid == this_pid && event instanceof Message) {
-
-            Message msg = (Message) event;
-            long sender = msg.getIdSrc();
-
-            // The sender is still within scope
-/*            if (get_neighbors_in_scope(node).contains(Network.get((int) sender)))
-                deliverMessage(inner_msg, node);
-            // We're not within reach any more, do not deliver message
-            else {
-                number_not_delivered++;
-                if (verbose != 0)
-                    System.err.println(this_pid + " out of scope. Message " + msg.getPid() + "not delivered.");
-            }*/
-        }
-    }
-
     @Override
     /** Cette méthode doit incrémenter number_of_transits au moment de l'émission.
      */
     public abstract void emit(Node host, Message msg);
 
 
-
-
+    /**
+     * Gets the unique IDs of nodes in scope of @param host
+     * @param host Node whose neighbours will be returned
+     * @return List of node ids
+     */
     public static List<Long> get_neighbor_ids_in_scope(Node host) {
         ArrayList<Long> list = new ArrayList<>();
         int position_protocol = Configuration.lookupPid("position");
@@ -107,6 +78,12 @@ public abstract class EmitterCounter implements Emitter {
         return list;
     }
 
+
+    /**
+     * Returns Nodes in scope
+     * @param host Source node
+     * @return List of Node
+     */
     public static List<Node> get_neighbors_in_scope(Node host) {
         ArrayList<Node> list = new ArrayList<>();
         int position_protocol = Configuration.lookupPid("position");
@@ -140,25 +117,15 @@ public abstract class EmitterCounter implements Emitter {
     }
 
     /**
-     * Print info if verbose
-     *//*
-    public void info() {
-        if (verbose != 0)
-            System.err.println("transits " + number_of_transits + "; sent " + number_of_sent
-                    + "; rcvd " + number_of_received + " dlvd " + number_of_delivered
-            + "; not dlvd " + number_not_delivered);
-    }
-    */
-
-
-
-    /**
      * Clears the set of nodes that received the message
      * Used in-between broadcasts
      */
     public void clear_set() {
         nodes_received.clear();
     }
+
+
+    // Getters
 
     @Override
     public int getLatency() {

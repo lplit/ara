@@ -19,6 +19,7 @@ import java.util.*;
 public class GossipController implements Control, Observer {
 
     private int position_pid;
+    private Boolean first_execute = true;
     private Observable last_observable = null;
     private static final String PAR_NB_DIFFUSIONS = "nb_diffusions";
     private static final String PAR_POSITION = "position";
@@ -27,41 +28,33 @@ public class GossipController implements Control, Observer {
     private static Set<Integer> received;
     private static Map<Integer, GossipData> broadcasts;
 
-    /* Système de rounds rondes genre. Tuple <id_séquence, size du set>
-        Le set == tous les noeuds qui ont reçu le message <id> (Set<NodeId>)
-
-        On stocke la valeur courante du set à la première itération (== 1 comme y'a déjà l'initiateur)
-        - à chaque round, le receveur s'ajoute au set (incrémente la taille du set)
-        - on compare la taille du set de l'itération courante avec la valeur stockée. Si ça a cbangé, ça veut dire qu'on
-          est dans le même broadcast mais qu'on a atteint des nouveaux voisins entre-temps, donc c'est le même reund.
-          - SINON si size(t-1) == size(t) c'est qu'on a plus rien et là notifyAll
-     */
-
-
-
     // Used to calculate the average and stdev
     private ArrayList<Double>
-            d_att   = new ArrayList<>(), // Historic data for `att`
-            d_er    = new ArrayList<>(); // Historic data for `er`
+            d_att           = new ArrayList<>(), // Historic data for `att`
+            d_er            = new ArrayList<>(); // Historic data for `er`
 
     private double
-            avg_att     = 0.0, // Last average over d_att
-            stdev_att   = 0.0, // Standard deviation over d_att
-            avg_er      = 0.0, // Last average over d_er
-            stdev_er    = 0.0; // Standard deviation over d_er
+            avg_att         = 0.0,  // Last average over d_att
+            stdev_att       = 0.0,  // Standard deviation over d_att
+            avg_er          = 0.0,  // Last average over d_er
+            stdev_er        = 0.0;  // Standard deviation over d_er
 
     private int
-            emitter_pid = -1,
-            verbose = 0, // Par default a zero, se change globalement dans le fichier de config
-            id_originator = -1,
-            att_th = -1; // Theoretic reach at start of bcast
+            emitter_pid     = -1,
+            verbose         = 0,    // Par default a zero, se change globalement dans le fichier de config
+            id_originator   = -1,   // Originator's PID
+            att_th          = -1;   // Theoretic reach at start of bcast
 
-    private static int id_diffusion = 0;
+    private static int
+            diffs           = 0,    // Nombre de diffusions (config)
+            id_diffusion    = 0;    // Current diffusion number
 
-    // Nombre de diffusions
-    private static int diffs = 0;
 
-    private Boolean first_execute = true;
+
+
+
+
+
 
     public GossipController(String prefix) {
         diffs = Configuration.getInt(prefix + "." + PAR_NB_DIFFUSIONS);
@@ -80,16 +73,11 @@ public class GossipController implements Control, Observer {
     public void notified_finished(int last_broadcast_id) {
 
         id_diffusion++;
-
-
-
-
-
+        // Still some bcasts to run
         if (id_diffusion < diffs) {
 
-            if (verbose != 0) {
+            if (verbose != 0)
                 System.err.println("notified; next gossip is " + id_diffusion);
-            }
             nouvelle_diffusion();
             return;
         }
@@ -135,80 +123,58 @@ public class GossipController implements Control, Observer {
     }
 
 
-
-
+    /**
+     * Function responsible for launching new bcast
+     */
     private void nouvelle_diffusion() {
         int rand_id = CommonState.r.nextInt(Network.size());
         id_originator = rand_id;
 
-        if (last_observable != null) {
+        if (last_observable != null)
             last_observable.deleteObserver(this::update);
-        }
 
-        if (verbose != 0) {
-            System.err.println("\n\nNew broadcast, round " + id_diffusion);
-        }
 
         // On choisit un noeud random dans le réseau
         Node n = Network.get(rand_id);
-
         int pid_gossip = Configuration.lookupPid("gossip");
-
         EmitterCounter emitter = (EmitterCounter) n.getProtocol(emitter_pid);
         emitter.clear_set();
-
+        GossipProtocolImpl gos = (GossipProtocolImpl) n.getProtocol(pid_gossip);
+        Observable obs = (Observable) n.getProtocol(pid_gossip);
+        obs.addObserver(this::update);
+        broadcasts.put(id_diffusion, new GossipData(id_diffusion, n.getID()));
+        this.att_th = attTheo(n); // New broadcast, overwrite the value
 
         if(verbose !=0)
             System.err.println("Node " + n.getID() + " initiating gossip #" + id_diffusion + " pid " + pid_gossip);
 
-        GossipProtocolImpl gos = (GossipProtocolImpl) n.getProtocol(pid_gossip);
-
-//        EDSimulator.add(0, new Message(-1, n.getID(), "Gossip", new GossipData(id_diffusion, n.getID()), pid_gossip), n, pid_gossip);
-
-        Observable obs = (Observable) n.getProtocol(pid_gossip);
-        obs.addObserver(this::update);
-
-        broadcasts.put(id_diffusion, new GossipData(id_diffusion, n.getID()));
-
-
-
-        this.att_th = attTheo(n);
-
-
-
         gos.initiateGossip(n, id_diffusion, n.getID());
-/*
-        for (int i =0; i < Network.size(); i++) {
-            Node node_i = Network.get(i);
-            Observable g_i = (Observable) node_i.getProtocol(pid_gossip);
-            g_i.addObserver(this::update);
-        }
-
-        */
     }
 
 
+    /**
+     * Calcualtes the theoretical reach of node @param n.
+     * Meaning that it calculates the weakly connected clusters of @param n
+     * and sums their size, plus adds one for the initiator node
+     * @param n
+     * @return
+     */
     private int attTheo(Node n) {
         Graph g = new MANETGraph(getPositions(), ((Emitter) n.getProtocol(emitter_pid)).getScope());
         final GraphAlgorithms ga = new GraphAlgorithms();
         Hashtable<Integer, Integer> connexes = (Hashtable) ga.weaklyConnectedClusters(g);
-        int sum_theorique = 0; // Pcq source node
+        int sum_theorique = 1; // Pcq source node
         for (Integer i: connexes.keySet()) {
             sum_theorique += connexes.get(i);
             if (verbose != 0)
                 System.err.println("Adding " + connexes.get(i));
         }
+        if (verbose == 0)
+            System.err.println("Theoretic reach at start: " + sum_theorique);
         return sum_theorique;
     }
 
-    private Node get_node_by_id(long id) {
-        Node n;
-        for (int i=0; i < Network.size(); i++) {
-            n = Network.get(i);
-            if (n.getID() == id) return n;
-        }
-        return null;
-    }
+
 
     @Override
     public boolean execute() {
@@ -262,11 +228,11 @@ public class GossipController implements Control, Observer {
      * @param o is an int[5] containing the following info:
      *  - [0] number_of_transits - usually 0
      *  - [1] Number of nodes having received the message.
-     *  - [2] number_of_sent
-     *  - [3] number_of_delivered
-     *  - [4] identifier of gossip bcast
-     *  - [5] number_of_retransmits
-     *  - [6] number_of_no_transmits <- each time a node has recvd a message it has already
+     *  - [2] Total number of messages sent
+     *  - [3] Total number of messages delivered
+     *  - [4] Broadcast id
+     *  - [5] Number of nodes that retransmitted the message
+     *  - [6] Total number of messages not-retransmited (i.e. received redundantly)
      * @param observable The calling instance
      * @param o int[] containing data from EmitterCounter
      */
@@ -284,10 +250,10 @@ public class GossipController implements Control, Observer {
             GossipData bcast_data = broadcasts.get(results[4]);
 
             received.add(results[4]);
-            double reached = att(results[5]+1); // retransmits + root
+            double reached = att(results[5]); // retransmits + root
             double eco_redif = er(results[1], results[5]);
 
-            if (verbose != 0) {
+            if (verbose == 0) {
                 System.err.println(
                         "Controller: transits " + results[0] + " nodes_rcvd " + results[1] + " messages_sent " + results[2]
                                 + " delivered_messages " + results[3] + " gossip_id " + results[4] + " nodes_retransmitted " + results[5]
@@ -321,4 +287,20 @@ public class GossipController implements Control, Observer {
         }
         return res;
     }
+
+    /**
+     * Since Network.get(i) does not guarantee the same not to be returned at two different times,
+     * this function does exactly that but by working with the unique node IDs.
+     * @param id
+     * @return
+     */
+    private Node get_node_by_id(long id) {
+        Node n;
+        for (int i=0; i < Network.size(); i++) {
+            n = Network.get(i);
+            if (n.getID() == id) return n;
+        }
+        return null;
+    }
+
 }
