@@ -554,6 +554,7 @@ public class DensityController implements Control {
 
 \subsection{Impact de la portée sur la densité du graphe (Questions 10 et 11)}
 
+\begin{minipage}{0.40\textwidth}
 Dans la stratégie 1, l'étendue de la portée a un impact sur la
 connexité du graphe, la stratégie de déplacement étant celle de
 choisir des destinations aléatoires dans le terrain. Il est plus
@@ -570,6 +571,10 @@ que $marge$ est plutôt petit (20) et reste constant, alors que la
 portée peut varier jusqu'à 1000. Le graphe, dans la stratégie 3, est beaucoup
 plus étendu, et les noeuds peuvent avoir moins d'arcs directs
 entre eux.
+
+\end{minipage}%
+\hfill
+\begin{minipage}{0.55\textwidth}
   \begin{table}[H]
     \centering
     \begin{tabular}{|c|c|c|c|c|c|}
@@ -597,7 +602,7 @@ Portee & SPI & SD & D & E/D & ED/D \\
     \end{tabular}
 \caption{Valeurs obtenues pour la question 10, normalisées sur 100 itérations}
 \end{table}
-
+\end{minipage}
 
 
 \begin{figure}[H]
@@ -611,6 +616,23 @@ Portee & SPI & SD & D & E/D & ED/D \\
 \section{Exercice 2 - Étude de protocoles de diffusion}
 \subsection{Impact du nombre de noeuds sur la densité du
   graphe (Question 1)}
+\begin{minipage}{0.5\textwidth}
+  Selon le graphe, le réseau est plutôt chaotique sur un nombre de
+  noeuds faible, allant jusqu'à 50 selon nos résultats. L'écart-type
+  entre les différentes valeurs mesurées est fort, le réseau peut
+  avoir du mal à s'interconnecter selon les différentes valeurs
+  initiales aléatoires prises. À partir de 50 noeuds, le réseau a un
+  comportement attendu et la densité croît de manière relativement
+  stable, avec un écart-type faible entre les mesures.
+
+  En dessous de 50 noeuds, on ne peut donc pas forcément s'attendre à
+  un placement de noeuds idéal, de manière à ce que tous les noeuds
+  soient connectés avec beaucoup de voisins à proximité.
+  \vfill
+\end{minipage}%
+\hfill
+\begin{minipage}{0.5\textwidth}
+\begin{tabular}{p{\textwidth} l}
 \begin{table}[H]
   \centering
   \begin{tabular}{|l|r|r|}
@@ -632,7 +654,10 @@ Portee & SPI & SD & D & E/D & ED/D \\
      180 & 62.37 +- 5.31 & 0.03 +- 0.01 \\ \hline
      200 & 50.33 +- 7.25 & 0.02 +- 0.01 \\ \hline
   \end{tabular}
+  \caption{Valeurs obtenues pour la question 1, normalisés sur 100 itérations}
 \end{table}
+\end{tabular}
+\end{minipage}
 
 
 \begin{figure}[H]
@@ -647,14 +672,22 @@ Portee & SPI & SD & D & E/D & ED/D \\
 \subsection{Question 2}
 On a défini une classe abstraite \texttt{EmitterCounter} utilisant le
 design pattern \textsl{Strategy}, en rendant la méthode \texttt{emit}
-abstraite. Celle-ci se charge de la délivrance d'un message à un noeud
-en assurant la propriété qu'à l'instant  $t_{reception}=t_{emission}+period$, le noeud émetteur se trouve toujours à portée du noeud
-récepteur.
+abstraite. Une sous-classe concrète de celle-ci implémente une politique particulière d'émission
+(\texttt{FloodingEmitter}, \texttt{ProbabilisticEmitter}, ...) et rend
+le nombre de messages envoyés selon cette politique.
+Cette information est destinée à \texttt{GossipProtocol} qui se charge
+de la délivrance (ou non) du message selon si le noeud émetteur se
+trouve encore dans la portée du récepteur.
 
-La sous-classe concrète se charge d'implémenter la méthode
-\texttt{emit} en encapsulant le message du protocole de manière à ce
-que \texttt{EmitterCounter} puisse bien s'assurer de la
-(non-)délivrance du message au niveau du noeud récepteur.
+On a essayé d'implémenter
+cette politique de délivrance au niveau de l'émetteur
+(\texttt{EmitterCounter}) en le faisant traiter des réceptions de
+messages de son protocole encapsulant des messages de n'importe quel
+protocole au-dessus de lui-même, mais le simulateur rendait trop difficile de détecter
+une terminaison de manière simple. La fonction EDSimulator.add(0, ..)
+rajoute un évènement à la fin de la file d'éxecution, mais on voulait
+faire un traitement juste après la délivrance du message par \texttt{EmitterCounter}.
+
 
 \pagebreak
 
@@ -685,7 +718,7 @@ que \texttt{EmitterCounter} puisse bien s'assurer de la
     \subsection{\texttt{src/bench.pl}}
     Exemple: \texttt{./bench.pl <chemin\_peersim>}
 
-    Le script crée un dossier \texttt{bench\_<date>} où seront stockés les
+    Le script crée un dossier \texttt{resultats/bench\_<date>} où seront stockés les
     résultats pour la question 8 de l'exercise 1. Le dossier contiendra
     les fichiers de configuration pour les expériences sous le nom
     \texttt{cfg\_bench\_<scope>\_<SPI>\_<SD>}, les résultats d'autres
@@ -712,6 +745,15 @@ Exemple de sortie:
 \end{verbatim}
 Les valeurs correspondent à des moyennes avec écarts-type, obtenus sur
 100 itérations sur chaque combinaison de SPI et SD.
+
+\subsection{\texttt{bench-ex2q1.pl}}
+Exemple: \texttt{./bench-ex2q1.pl <chemin\_peersim>}
+
+Le script crée un dossier \texttt{resultats/bench\_<date>\_ex2q1} où
+seront stockés les résultats des différentes exécutions, les noms des fichiers
+étant différentiés par la taille du réseau.
+
+\subsection{\texttt{bench-ex2q3.pl}}
 
 \end{appendix}
 
