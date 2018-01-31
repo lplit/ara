@@ -1,7 +1,7 @@
 package manet;
 
 import manet.algorithm.gossip.GossipData;
-import manet.algorithm.gossip.GossipProtocolImpl;
+import manet.algorithm.gossip.GossipProtocol;
 import manet.communication.Emitter;
 import manet.communication.EmitterCounter;
 import manet.positioning.Position;
@@ -41,7 +41,7 @@ public class GossipController implements Control, Observer {
 
     private int
             emitter_pid     = -1,
-            verbose         = 0,    // Par default a zero, se change globalement dans le fichier de config
+            verbose         = 1,    // Par default a zero, se change globalement dans le fichier de config
             id_originator   = -1,   // Originator's PID
             att_th          = -1;   // Theoretic reach at start of bcast
 
@@ -140,7 +140,7 @@ public class GossipController implements Control, Observer {
         int pid_gossip = Configuration.lookupPid("gossip");
         EmitterCounter emitter = (EmitterCounter) n.getProtocol(emitter_pid);
         emitter.clear_set();
-        GossipProtocolImpl gos = (GossipProtocolImpl) n.getProtocol(pid_gossip);
+        GossipProtocol gos = (GossipProtocol) n.getProtocol(pid_gossip);
         Observable obs = (Observable) n.getProtocol(pid_gossip);
         obs.addObserver(this::update);
         broadcasts.put(id_diffusion, new GossipData(id_diffusion, n.getID()));
@@ -197,8 +197,12 @@ public class GossipController implements Control, Observer {
      */
     private double att(int retransmits) {
         double att;
-        if (retransmits != 0)
-            att = ((double)retransmits)/att_th*100;
+        double retr = (double) retransmits;
+
+        if (retr == 0.0) retr++; // One note has received = retransmitted; the initiator node
+
+        if (att_th != 0)
+            att = retr/att_th*100;
         else att = 1.0;
         d_att.add(att);
         if (verbose != 0)

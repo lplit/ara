@@ -1,9 +1,7 @@
 package manet;
 
 import manet.algorithm.gossip.GossipProtocol;
-import manet.algorithm.gossip.GossipProtocolImpl;
 import manet.detection.NeighborProtocol;
-import manet.detection.NeighborProtocolImpl;
 import peersim.config.Configuration;
 import peersim.core.Node;
 
@@ -33,7 +31,7 @@ public class MonitorableImpl implements Monitorable {
             res.add("Neighbors " + impl.getNeighbors());
         }
 
-        GossipProtocolImpl gossip = (GossipProtocolImpl) host.getProtocol(gossip_pid);
+        GossipProtocol gossip = (GossipProtocol) host.getProtocol(gossip_pid);
         if (gossip_pid != 0) {
             res.add("Gossip ");
             res.add(gossip.show_list());
