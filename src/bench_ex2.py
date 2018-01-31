@@ -22,6 +22,7 @@ l_skipped       = []
 total_xps       = len(probas)*len(nodes)*len(experiences)
 skipped_lines   = [] # Debug shit
 fails           = [] # Debug shit, files not found
+csv_summaries   = [] # This gets dumped to file at the end
 
 print "Parsing files in ", sys.argv[1]
 print "Gonna treat", total_xps , "files."
@@ -50,6 +51,7 @@ for proba in probas:
                         print "Empty line, skip"
                         l_skipped.append((proba, size, iteration))
                         skipped_lines.append(line)
+                        fails.append(("l1_empty", fname))
                         continue
 
                     att_mean, att_stdev, er_mean, er_stdev = line.strip().split(";")
@@ -59,6 +61,7 @@ for proba in probas:
                         print "Empty line, skip"
                         l_skipped.append((proba, size, iteration))
                         skipped_lines.append(line)
+                        fails.append(("l2_empty", fname))
                         continue
 
                     # At this point we know the file is valid, can count it
@@ -66,7 +69,7 @@ for proba in probas:
 
                     densi_mean, densi_stdev, _ = line.strip().split(";")
 
-                    # 'replace' calls for barbarian locales using ',' as splitter
+                    # 'replace' calls for barbaric locales using ',' as splitter
                     densities.append(float(densi_mean.replace(',', '.')))
                     densities_stdev.append(float(densi_stdev.replace(',', '.')))
 
@@ -81,26 +84,40 @@ for proba in probas:
                 continue
         
         # 1 Bench set treatment done, do maths on values, clean tables
-        np_atts = numpy.array(atts)
-        np_atts_stdev = numpy.array(atts_stdev)
-        np_er = numpy.array(ers)
-        np_er_stdev = numpy.array(ers_stdev)
-        np_den = numpy.array(densities)
-        np_den_stdev = numpy.array(densities_stdev)
+        np_atts = numpy.average(numpy.array(atts))
+        np_atts_stdev = numpy.average(numpy.array(atts_stdev))
+        np_er = numpy.average(numpy.array(ers))
+        np_er_stdev = numpy.average(numpy.array(ers_stdev))
+        np_den = numpy.average(numpy.array(densities))
+        np_den_stdev = numpy.average(numpy.array(densities_stdev))
 
-
-        c_atts = ("%.4f %s %.4f") % (numpy.average(np_atts), "+-", numpy.average(np_atts_stdev))
-        c_er = ("%.4f %s %.4f") % (numpy.average(np_er), "+-", numpy.average(np_er_stdev))
-        c_dens = ("%.4f %s %.4f") % (numpy.average(np_den), "+-", numpy.average(np_den_stdev))
+        c_atts = ("%.4f %s %.4f") % (np_atts, "+-", np_atts_stdev)
+        c_er = ("%.4f %s %.4f") % (np_er, "+-", np_er_stdev)
+        c_dens = ("%.4f %s %.4f") % (np_den, "+-", np_den_stdev)
 
         progress = float(files_treated)/float(total_xps)*100
+
+        # CSV much
+        line = ("|%.2f|%d|%.2f|%.2f|%.2f|%.2f|%d|") \
+                % (proba, size, np_atts, np_atts_stdev,\
+                     np_er, np_er_stdev, int(np_den))
+        
+        csv_summaries.append(line)
+        print line
 
         print '[%.2f%%](%d/%d) - %d files\nP: %.2f N: %d' % \
             (progress, files_treated, total_xps, bench_files_opened, proba, size)
         print "Atts\t", c_atts
         print "Ers\t", c_er
-        print "Dens\t", c_dens
-        print l_skipped
-        print skipped_lines, "\n\n"
+        print "Dens\t", c_dens, "\n"
 
-print "Errors", fails
+print "Errors"
+for e in zip(fails, l_skipped, skipped_lines):
+    print e
+
+print
+# Save to file
+csv_title = "|proba|size|att|att_stdev|er|er_stdev|den|"
+print csv_title
+for r in csv_summaries:
+    print r
