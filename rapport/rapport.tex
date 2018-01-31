@@ -309,6 +309,17 @@ rajoute un évènement à la fin de la file d'éxecution, mais on voulait
 faire un traitement juste après la délivrance du message par \texttt{EmitterCounter}.
 
 \subsection{Question 4 (\texttt{FloodingEmitter})}
+Quelque soit la densité du graphe, tant qu'il est connexe,
+\texttt{FloodingEmitter} assure une atteignabilité de diffusion de
+100\%. L'économie de rediffusion est naturellement nulle, comme
+l'émetteur effectue une rediffusion dans tous les cas.
+\begin{figure}[H]
+\begin{minipage}{\textwidth}
+  \centering
+    \includegraphics[width=\textwidth]{images/ex2q4.png}
+    \caption{Atteignabilité et économie de rediffusion avec \texttt{FloodingEmitter}.}
+\end{minipage}
+\end{figure}
 
 \subsection{Question 5 (\texttt{ProbabilisticEmitter})}
 
@@ -402,7 +413,7 @@ Les valeurs correspondent à des moyennes avec écarts-type, obtenus sur
 exemple: \texttt{bench\_ex2.py <chemin\_results>}\\
 Ce script traite les resultats des simulations de l'exercise deux. Il prepare deux fichiers, stockes dans le dossier specifie dans l'appel - \texttt{summary.csv} et \texttt{summary\_all.csv}.\\
 
-\texttt{summary.csv} contient des valeurs normalises sur le nombre d'experiences, tandis que \texttt{summary\_all.csv} store simplement tout les resultats, sans compter les moyennes.
+\texttt{summary.csv} contient des valeurs normalisées sur le nombre d'expériences, tandis que \texttt{summary\_all.csv} stocke simplement tous les résultats, sans compter les moyennes.
 
 
 \subsection{\texttt{bench-ex2q\{1,3,4\}.pl}}
