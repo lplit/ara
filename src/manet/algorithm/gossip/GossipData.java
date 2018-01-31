@@ -1,5 +1,7 @@
 package manet.algorithm.gossip;
 
+import java.util.Scanner;
+
 public class GossipData {
     public int id;
     public long id_initiator;
@@ -13,6 +15,12 @@ public class GossipData {
     @Override
     public String toString() {
         return id + " " + id_initiator;
+    }
+
+    public GossipData(String str) {
+        Scanner s = new Scanner(str);
+        id = s.nextInt();
+        id_initiator = s.nextLong();
     }
 
 }

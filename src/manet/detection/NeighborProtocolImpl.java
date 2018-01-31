@@ -106,7 +106,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 
 
         if (event instanceof Message) {
-            switch (msg.getTag()) {
+            switch (msg.getTag().split("//")[0]) {
 
                 case tag_heartbeat: // self-message toutes les périodes
                     EDSimulator.add(this.period, new Message(node.getID(), -1,
@@ -152,7 +152,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
                     break;
 
                 default:
-                    System.out.println("IN DEFAULT");
+                    System.out.println("IN DEFAULT" + msg);
                     break;
             }
 
