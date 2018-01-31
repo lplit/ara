@@ -121,3 +121,10 @@ csv_title = "|proba|size|att|att_stdev|er|er_stdev|den|"
 print csv_title
 for r in csv_summaries:
     print r
+
+
+with open(os.path.join(sys.argv[1], "summary.csv"), 'w+') as f:
+    f.write(csv_title + os.linesep)
+    for r in csv_summaries:
+        f.write(r + os.linesep)
+    f.close()
