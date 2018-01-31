@@ -19,9 +19,12 @@ public class FloodingEmitter extends EmitterCounter {
     @Override
     public void emit(Node host, Message msg) {
         number_of_sent = 0;
+        nodes_received.clear();
 
         for (Node n : get_neighbors_in_scope(host)) {
             number_of_sent++;
+            nodes_received.add(n.getID());
+
             has_finished = false;
 
             EDSimulator.add(

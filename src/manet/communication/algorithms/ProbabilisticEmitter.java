@@ -35,10 +35,10 @@ public class ProbabilisticEmitter extends EmitterCounter {
             first_sent = true;
             for (Node n : get_neighbors_in_scope(host)) {
                 number_of_sent++;
+                nodes_received.add(n.getID());
+                nodes_private.add(n);
                 has_finished = false;
-
-
-
+                
                 EDSimulator.add(
                         getLatency(),
                         new Message(
@@ -55,6 +55,23 @@ public class ProbabilisticEmitter extends EmitterCounter {
 
             }
 
+        }
+
+        for (Node n : nodes_private) {
+            String new_tag = msg.getTag() + "//" + nodes_received;
+            EDSimulator.add(
+                    getLatency(),
+                    new Message(
+                            msg.getIdSrc(),
+                            n.getID(),
+                            new_tag,
+                            msg.getContent(),
+                            msg.getPid()),
+                    n,
+                    msg.getPid());
+            if (verbose != 0) {
+                System.err.println("Node " + host.getID() + " ProbabilisticEmitter delivering with tag " + new_tag);
+            }
         }
 
 
