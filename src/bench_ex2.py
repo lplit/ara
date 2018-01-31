@@ -26,7 +26,7 @@ print "Parsing files in ", sys.argv[1]
 print "Gonna treat", total_xps , "files."
 files_treated = 0
 files = os.listdir(sys.argv[1])
-l_skipped = 0
+l_skipped = []
 
 for proba in probas:
     for size in nodes:
@@ -47,7 +47,7 @@ for proba in probas:
                     line = f.readline().strip()
                     if len(line) == 0:
                         print "Empty line, skip"
-                        l_skipped = l_skipped+1
+                        l_skipped.append((proba, size, bench))
                         continue
                     
                     # Here files are formatted as follows: 
@@ -80,9 +80,8 @@ for proba in probas:
         c_er = ("%.4f %s %.4f") % (numpy.average(np_er), "+-", numpy.average(np_er_stdev))
         c_dens = ("%.4f %s %.4f") % (numpy.average(np_den), "+-", numpy.average(np_den_stdev))
 
-        print '%.2f%% done (%d of %d), %d files total, %d lines skipped so far' % \
-            (progress, files_treated, total_xps, len(files)/2, l_skipped)
-        print 'p %.2f n %d' % (proba, size)
+        print '[%.2f%%](%d/%d) - P: %.2f N: %d - %d files total, skipped: %s' % \
+            (progress, files_treated, total_xps, proba, size, len(files)/2, l_skipped)
         print "Atts\t", c_atts
         print "Ers\t", c_er
         print "Dens\t", c_dens, "\n\n"

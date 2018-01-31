@@ -215,8 +215,7 @@ sub bench {
     print "Results file ", $results_file, "seed ", $random_seed, "\n";
     open (my $bench_res, '<', $results_file) or die "Could not open ", $results_file, "\n";
     #	$results_file =~ s/^$//g;
-    print "Results file:\n";
-    print $results_file;
+    print "Results file: ", $results_file;
     print "\n\n";
     close($results_file);
 }
