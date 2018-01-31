@@ -14,12 +14,14 @@ import math
 # Calc mean and stdev over history
 # values are ()
 
-probas          = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+probas          = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 nodes           = [20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 200]
 experiences     = [0, 1, 2, 3, 4]
 files_treated   = 0 # Total files visited
 l_skipped       = [] 
 total_xps       = len(probas)*len(nodes)*len(experiences)
+skipped_lines   = [] # Debug shit
+fails           = [] # Debug shit, files not found
 
 print "Parsing files in ", sys.argv[1]
 print "Gonna treat", total_xps , "files."
@@ -44,17 +46,19 @@ for proba in probas:
             try: 
                 with open(os.path.join(sys.argv[1], fname)) as f:
                     line = f.readline().strip()
-                    if len(line) == 0:
+                    if len(line) == 0 or line[0] == "nan":
                         print "Empty line, skip"
                         l_skipped.append((proba, size, iteration))
+                        skipped_lines.append(line)
                         continue
 
                     att_mean, att_stdev, er_mean, er_stdev = line.strip().split(";")
 
                     line = f.readline().strip()
-                    if len(line) == 0:
+                    if len(line) == 0 or line[0] == "nan":
                         print "Empty line, skip"
                         l_skipped.append((proba, size, iteration))
+                        skipped_lines.append(line)
                         continue
 
                     # At this point we know the file is valid, can count it
@@ -73,6 +77,7 @@ for proba in probas:
                     ers_stdev.append(float(er_stdev.replace(',', '.')))
 
             except (OSError, IOError) as e:
+                fails.append((e, fname))
                 continue
         
         # 1 Bench set treatment done, do maths on values, clean tables
@@ -91,8 +96,11 @@ for proba in probas:
         progress = float(files_treated)/float(total_xps)*100
 
         print '[%.2f%%](%d/%d) - %d files\nP: %.2f N: %d' % \
-            (progress, files_treated, total_xps, bench_files_opened, proba,  size)
+            (progress, files_treated, total_xps, bench_files_opened, proba, size)
         print "Atts\t", c_atts
         print "Ers\t", c_er
         print "Dens\t", c_dens
-        print "Skipped\t", l_skipped, "\n\n"
+        print l_skipped
+        print skipped_lines, "\n\n"
+
+print "Errors", fails
