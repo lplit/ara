@@ -153,6 +153,7 @@ my $runs = 5;
 
 
 # ATTENTION CECI PEUT VITE PRENDRE LONGTEMPS SELON LA TAILLE DU RESEAU
+# on fait du O(n2) genre
 my $all_exps = $runs * scalar @nodes;
 my $iteration = 0;
 for (my $number_of_exps = 0; $number_of_exps < $runs ; $number_of_exps++) {
@@ -226,54 +227,3 @@ sub bench {
     print "\n\n";
     close($results_file);
 }
-
-
-
-    #[
-    #~pod
-
-
-#control.graph GraphicalMonitor
-#control.graph.positionprotocol position
-#control.graph.time_slow 0.0002
-#control.graph.step 1
-#control.graph.emitter emitter
-#control.graph.neighborprotocol neighbor
-
-#control.density DensityController
-#control.density.neighbours neighbor
-#control.density.step 1000
-#control.density.verbose 1
-
-#protocol.position PositionProtocolImpl
-#protocol.position.maxspeed 20
-#protocol.position.minspeed 1
-#protocol.position.width 1500
-#protocol.position.height 1500
-#protocol.position.pause 1200
-#
-#protocol.emitter EmitterImpl
-#protocol.emitter.latency 90
-#protocol.emitter.scope 125
-#protocol.emitter.positionprotocol position
-#
-#protocol.neighbor NeighborProtocolImpl
-#protocol.neighbor.period 3000
-#protocol.neighbor.timer_delay 3500
-#
-#
-#initial_position_strategy Strategy5Init
-#next_destination_strategy Strategy1InitNext
-#
-#initial_position_strategy.positionprotocol position
-#initial_position_strategy.emitter emitter
-#
-#
-#next_destination_strategy.positionprotocol position
-#next_destination_strategy.emitter emitter
-#next_destination_strategy.distance_min 100
-#next_destination_strategy.distance_max 500
-#
-#    ~cut
-# ]
-#
