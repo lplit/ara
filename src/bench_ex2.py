@@ -58,8 +58,12 @@ for proba in probas:
                     atts_stdev.append(float(att_stdev.replace(',', '.')))
                     ers.append(float(er_mean.replace(',', '.')))
                     ers_stdev.append(float(er_stdev.replace(',', '.')))
+
                     line = f.readline()
                     densi_mean, densi_stdev, _ = line.strip().split(";")
+                    densities.append(float(densi_mean.replace(',', '.')))
+                    densities_stdev.append(float(densi_stdev.replace(',', '.')))
+
             except (OSError, IOError) as e:
                 continue
         
@@ -68,11 +72,17 @@ for proba in probas:
         np_atts_stdev = numpy.array(atts_stdev)
         np_er = numpy.array(ers)
         np_er_stdev = numpy.array(ers_stdev)
+        np_den = numpy.array(densities)
+        np_den_stdev = numpy.array(densities_stdev)
 
-        ccol1 = ("%.4f %s %.4f") % (numpy.average(np_atts), "+-", numpy.average(np_atts_stdev))
-        ccol2 = ("%.4f %s %.4f") % (numpy.average(np_er), "+-", numpy.average(np_er_stdev))
+
+        c_atts = ("%.4f %s %.4f") % (numpy.average(np_atts), "+-", numpy.average(np_atts_stdev))
+        c_er = ("%.4f %s %.4f") % (numpy.average(np_er), "+-", numpy.average(np_er_stdev))
+        c_dens = ("%.4f %s %.4f") % (numpy.average(np_den), "+-", numpy.average(np_den_stdev))
+
         print '%.2f%% done (%d of %d), %d files total, %d lines skipped so far' % \
             (progress, files_treated, total_xps, len(files)/2, l_skipped)
         print 'p %.2f n %d' % (proba, size)
-        print "Atts", ccol1
-        print "Ers", ccol2, "\n\n", 
+        print "Atts", c_atts
+        print "Ers", c_er
+        print "Dens", c_dens, "\n\n"
