@@ -49,6 +49,7 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
         }
     }
 
+    @Override
     public String show_list() {
         return received_messages.toString();
     }
