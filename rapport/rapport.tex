@@ -289,7 +289,7 @@ Portee & SPI & SD & D & E/D & ED/D \\
 \end{minipage}
 \end{figure}
 
-\subsection{Question 2}
+\subsection{Question 2 (\texttt{EmitterCounter})}
 On a défini une classe abstraite \texttt{EmitterCounter} utilisant le
 design pattern \textsl{Strategy}, en rendant la méthode \texttt{emit}
 abstraite. Une sous-classe concrète de celle-ci implémente une politique particulière d'émission
@@ -307,6 +307,36 @@ protocole au-dessus de lui-même, mais le simulateur rendait trop difficile de d
 une terminaison de manière simple. La fonction EDSimulator.add(0, ..)
 rajoute un évènement à la fin de la file d'éxecution, mais on voulait
 faire un traitement juste après la délivrance du message par \texttt{EmitterCounter}.
+
+\subsection{Question 4 (\texttt{FloodingEmitter})}
+
+\subsection{Question 5 (\texttt{ProbabilisticEmitter})}
+
+Le pourcentage de messages reçus augmente clairement selon la
+probabilité. Selon les résultats expérimentaux, il faut définir une probabilité autour
+de 0.3 afin d'obtenir une atteignabilité d'au moins 90\%. À partir
+d'une densité de graphe de 5, l'atteignabilité ne descend pas
+en-dessous des 80\%. Pour obtenir une atteignabilité moyenne du graphe
+d'au moins 99\%, il faudrait utiliser une probabilité d'au moins 0.7.
+
+Les courbes figurant sur le graphe représentent les différentes
+classes d'atteignabilité définies dans la question de l'exercice. La
+courbe grise et orange montrent qu'il est vite possible d'atteindre la
+majorité du graphe, même avec une densité faible.
+
+\begin{figure}[H]
+\begin{minipage}{\textwidth}
+  \centering
+    \includegraphics[width=\textwidth]{images/ex2q5-log-trendlines.png}
+    \caption{Probabilité en fonction de la densité. Le graphe contient
+    les valeurs de 5 éxecutions différentes pour un même ensemble de
+    valeurs initiales (nombre de noeuds/densité et probabilité).}
+\end{minipage}
+\end{figure}
+
+\subsection{Question 6 (\texttt{InverseProportionalEmitter})}
+
+\subsection{Question 7 (\texttt{DistanceEmitter})}
 
 
 \pagebreak
