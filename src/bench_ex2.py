@@ -83,6 +83,6 @@ for proba in probas:
         print '%.2f%% done (%d of %d), %d files total, %d lines skipped so far' % \
             (progress, files_treated, total_xps, len(files)/2, l_skipped)
         print 'p %.2f n %d' % (proba, size)
-        print "Atts", c_atts
-        print "Ers", c_er
-        print "Dens", c_dens, "\n\n"
+        print "Atts\t", c_atts
+        print "Ers\t", c_er
+        print "Dens\t", c_dens, "\n\n"
