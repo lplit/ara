@@ -43,7 +43,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
     private static Set<Long> nodes_ids_received;
 
-    private int verbose = 1;
+    private int verbose = 0;
     private final static String tag_gossip = "Gossip";
     private final static String PAR_TIMER_MIN = "timer_min";
     private final static String PAR_TIMER_MAX = "timer_max";

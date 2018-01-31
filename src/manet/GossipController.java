@@ -41,7 +41,7 @@ public class GossipController implements Control, Observer {
 
     private int
             emitter_pid     = -1,
-            verbose         = 1,    // Par default a zero, se change globalement dans le fichier de config
+            verbose         = 0,    // Par default a zero, se change globalement dans le fichier de config
             id_originator   = -1,   // Originator's PID
             att_th          = -1;   // Theoretic reach at start of bcast
 
