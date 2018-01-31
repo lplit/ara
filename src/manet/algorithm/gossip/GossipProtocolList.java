@@ -43,7 +43,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
     private static Set<Long> nodes_ids_received;
 
-    private int verbose = 0;
+    private int verbose = 1;
     private final static String tag_gossip = "Gossip";
     private final static String PAR_TIMER_MIN = "timer_min";
     private final static String PAR_TIMER_MAX = "timer_max";
@@ -108,7 +108,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
 
         emit_if_needed(host, data);
-        if (number_of_sent == 0) { // émission nulle, broadcast terminé, le noeud est seultout :(
+        if (emitter.get_number_of_sent() == 0) { // émission nulle, broadcast terminé, le noeud est seultout :(
             if (verbose != 0) {
                 System.err.println("Node " + host.getID() + " terminated broadcast alone");
             }
@@ -186,7 +186,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
                 System.err.println("Node " + node.getID() + " emitted " + data.toString() + " "
                         + local_sent + " times " + number_of_retransmits + " retransmits");
 
-            if (local_sent == 0) {
+            if (local_sent == 0 && tried_retransmit == 0) {
                 if (verbose != 0)
                     System.err.println("Node " + node.getID() + " Gossip adding timer " + neighbors_not_delivered);
                 // Avoiding the end of bcast. Decrement happens at timer receive.
@@ -206,7 +206,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
             if (node_retransmitted == 0 && tried_retransmit == 1) {
                 number_of_no_transmits++;
                 node_retransmitted = 1;
-            } else {
+            } else if (tried_retransmit == 0) {
                 emitter.emit(node, new Message(
                         node.getID(),
                         -1,

@@ -11,25 +11,33 @@ import peersim.edsim.EDSimulator;
 /** Émitteur probabiliste aléatoire dans le scope. Exercice 5 question 5. */
 public class ProbabilisticEmitter extends EmitterCounter {
     private static String PAR_PROBABILITY = "probability";
-
+    private Boolean first_sent;
     private double probability = 0;
 
 
+    public void setFirst_sent() {
+        this.first_sent = !first_sent;
+    }
+
     public ProbabilisticEmitter(String prefix) {
         super(prefix, new EmitterImpl(prefix));
-
+        first_sent = false;
         this.probability = Configuration.getDouble(prefix+"." + PAR_PROBABILITY);
     }
 
     @Override
     public void emit(Node host, Message msg) {
         number_of_sent = 0;
-
-        for (Node n : get_neighbors_in_scope(host)) {
-            double _prob = CommonState.r.nextDouble();
-            if (_prob < this.probability) {
+        nodes_received.clear();
+        nodes_private.clear();
+        double _prob = CommonState.r.nextDouble();
+        if (_prob < this.probability || first_sent == false) {
+            first_sent = true;
+            for (Node n : get_neighbors_in_scope(host)) {
                 number_of_sent++;
                 has_finished = false;
+
+
 
                 EDSimulator.add(
                         getLatency(),

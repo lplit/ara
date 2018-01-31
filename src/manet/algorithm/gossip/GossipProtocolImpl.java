@@ -95,6 +95,9 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
             notifyGossip();
         }
 
+
+
+
     }
 
     /**
@@ -143,7 +146,6 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
         int emitter_pid = Configuration.lookupPid("emitter");
         int local_sent = 0;
         EmitterCounter emitter = (EmitterCounter) node.getProtocol(emitter_pid);
-
 
         if (!received_messages.contains(data.toString())) {
 

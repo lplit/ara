@@ -4,6 +4,8 @@ import manet.algorithm.gossip.GossipData;
 import manet.algorithm.gossip.GossipProtocol;
 import manet.communication.Emitter;
 import manet.communication.EmitterCounter;
+import manet.communication.algorithms.DistanceEmitter;
+import manet.communication.algorithms.ProbabilisticEmitter;
 import manet.positioning.Position;
 import manet.positioning.PositionProtocol;
 import peersim.config.Configuration;
@@ -92,6 +94,7 @@ public class GossipController implements Control, Observer {
             // Avg att
             for (Double d : d_att)
                 tmp += d;
+            //this.avg_att = tmp / d_att.size();
             this.avg_att = tmp / d_att.size();
             tmp=0.;
 
@@ -116,7 +119,7 @@ public class GossipController implements Control, Observer {
             tmp = 0.;
 
             System.out.format("%.2f;%.2f;%.2f;%.2f\n", avg_att, stdev_att, avg_er, stdev_er);
-
+            d_er.clear();
         }
 
 
@@ -140,6 +143,15 @@ public class GossipController implements Control, Observer {
         int pid_gossip = Configuration.lookupPid("gossip");
         EmitterCounter emitter = (EmitterCounter) n.getProtocol(emitter_pid);
         emitter.clear_set();
+        if (emitter instanceof ProbabilisticEmitter) {
+            ((ProbabilisticEmitter) emitter).setFirst_sent();
+            //System.err.println("BLOOOOOOOOOOOOOOO");
+        }
+
+        if (emitter instanceof DistanceEmitter) {
+            ((DistanceEmitter) emitter).setFirst_sent();
+            //System.err.println("BLOOOOOOOOOOOOOOO");
+        }
         GossipProtocol gos = (GossipProtocol) n.getProtocol(pid_gossip);
         Observable obs = (Observable) n.getProtocol(pid_gossip);
         obs.addObserver(this::update);
@@ -195,18 +207,18 @@ public class GossipController implements Control, Observer {
      * nd recu / nombre d'sent
      * @return % of reachable nodes
      */
-    private double att(int retransmits) {
+    private double att(int reached) {
         double att;
-        double retr = (double) retransmits;
+        double retr = (double) reached;
 
         if (retr == 0.0) retr++; // One note has received = retransmitted; the initiator node
 
         if (att_th != 0)
-            att = retr/att_th*100;
+            att = retr/Network.size()*100;
         else att = 1.0;
         d_att.add(att);
         if (verbose != 0)
-            System.err.println("Reach : " + att + " att_th " + att_th + "retransmits " + retransmits);
+            System.err.println("Reach : " + att + " att_th " + att_th + "retransmits " + reached);
         return att;
     }
 
@@ -225,6 +237,7 @@ public class GossipController implements Control, Observer {
         if (received == 0) d_r = 1; // ici on compte le noeud initiateur, ayant zéro retransmis
 
         double ret = ((d_r - d_t)/d_r);
+        ret *= 100;
         d_er.add(ret);
         return ret;
     }
@@ -258,7 +271,7 @@ public class GossipController implements Control, Observer {
             GossipData bcast_data = broadcasts.get(results[4]);
 
             received.add(results[4]);
-            double reached = att(results[5]); // retransmits + root
+            double reached = att(results[1]); // retransmits + root
             double eco_redif = er(results[1], results[5]);
 
             if (verbose != 0) {
