@@ -47,11 +47,12 @@ protocol.position.width 1500
 protocol.position.height 1500
 protocol.position.pause 20*MINUTES
 
-protocol.emitter FloodingEmitter
+protocol.emitter InverseProportionalEmitter
 protocol.emitter.latency 90
 protocol.emitter.scope 300
 protocol.emitter.probability 0.3
 protocol.emitter.verbose VERB
+protocol.emitter.val_k 0.5
 
 protocol.emitter.positionprotocol position
 
