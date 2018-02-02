@@ -41,6 +41,7 @@ control.gossipcontroller.nb_diffusions 5
 control.gossipcontroller.at 0
 control.gossipcontroller.emitter emitter
 control.gossipcontroller.position position
+control.gossipcontroller.verbose 1
 
 protocol.position PositionProtocolImpl
 protocol.position.maxspeed 20

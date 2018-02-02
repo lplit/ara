@@ -33,8 +33,6 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
     private int node_retransmitted = 0;
 
-    private static long last_initiator = -1;
-
     private Set<String> received_messages = new HashSet<>();
 
     private Set<Long> neighbors_not_delivered;
@@ -152,7 +150,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
         int emitter_pid = Configuration.lookupPid("emitter");
         int local_sent = 0;
         EmitterCounter emitter = (EmitterCounter) node.getProtocol(emitter_pid);
-        int random_timer = CommonState.r.nextInt(timer_max) + timer_min;
+        int random_timer = CommonState.r.nextInt(timer_max - timer_min) + timer_min;
 
 
         if (!received_messages.contains(data.toString())) {
@@ -185,7 +183,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
             if (verbose != 0)
                 System.err.println("Node " + node.getID() + " emitted " + data.toString() + " "
-                        + local_sent + " times " + number_of_retransmits + " retransmits");
+                        + local_sent + " times " + number_of_retransmits + " retransmits" + number_of_transits + " xfers");
 
             if (local_sent == 0 && tried_retransmit == 0) {
                 if (verbose != 0)
@@ -204,10 +202,12 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
         }
         else { // received_messages already contains message.
             // Not retransmitting. Arming a timer for another potential transmission.
+
             if (node_retransmitted == 0 && tried_retransmit == 1) {
                 number_of_no_transmits++;
                 node_retransmitted = 1;
-            } else if (tried_retransmit == 0) {
+
+            } else if (tried_retransmit == 0 && node_retransmitted == 0) {
                 emitter.emit(node, new Message(
                         node.getID(),
                         -1,
@@ -219,20 +219,24 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
                 number_of_transits += local_sent;
                 number_of_sent += local_sent;
                 tried_retransmit = 1;
+                neighbors_not_delivered.clear();
+//                if (number_of_transits == 0) {
+//                    if (verbose != 0)
 
-                if (tried_retransmit == 1 && local_sent == 0) {
-                    if (verbose != 0)
-                        System.err.println("Notifying of double broadcast termination, " + number_of_transits + " xfers");
-                    notifyGossip(); // spaghetti case of emitter emitting alone twice
-                }
+//                    notifyGossip(); // spaghetti case of emitter emitting alone twice
+//                }
                 if (verbose != 0) {
-                    System.err.println("Node " + node.getID() + " GossipList trying to re-emit, " + local_sent + " sent.");
+                    System.err.println("Node " + node.getID() + " GossipList trying to re-emit " + data + ": " + local_sent + " sent.");
                 }
             }
 
             if (verbose != 0)
                 System.err.println("Node " + node.getID() + " gossip " + data.toString() + " already treated");
 
+            if (tried_retransmit == 1 && number_of_transits == 0) {
+                System.err.println("Notifying of double broadcast termination, " + number_of_transits + " xfers");
+                notifyGossip(); // terminaison initiateur
+            }
 
         }
 
@@ -254,6 +258,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
         if (verbose != 0) {
             System.err.println("Node " + node.getID() + " GossipList recvd " + event + " " + number_of_transits + "xfers");
+            System.err.println("Node's neighbor_not_dlvd list " + neighbors_not_delivered);
         }
 
         if (event instanceof Message) {
@@ -261,7 +266,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
             Message msg = (Message) event;
             if (msg.getTag().startsWith("GossipTimer")) {
                 // Decrementing timer-related transit.
-                number_of_transits--;
+//                number_of_transits--;
                 if (!neighbors_not_delivered.isEmpty()) {
                     if (verbose != 0)
                         System.err.println("Node " + node.getID() + "GossipTimer recvd timer; list is " + neighbors_not_delivered);
@@ -281,6 +286,8 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
             if (EmitterCounter.get_neighbor_ids_in_scope(node).contains(msg.getIdSrc())) {
                 number_of_delivered++;
 
+
+
                 // le voisin est toujours dans le scope, on délivre donc le GossipMessage
                     GossipData data = (GossipData) msg.getContent();
 
@@ -294,11 +301,14 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
                     // On met à jour le GossipData courant sur lequel on travaille, comme on l'a reçu pour la première fois
                     // On réinitialise par ailleurs les variables privées
-                    if (current_data.id != data.id && current_data.id_initiator != data.id_initiator) {
+                    if (current_data.id < data.id && current_data.id_initiator != data.id_initiator) {
                         current_data = data;
                         node_retransmitted = 0;
                         tried_retransmit = 0;
                         neighbors_not_delivered.clear();
+
+                        if (verbose != 0)
+                            System.err.println("Node " + node.getID() + " recvd new Gossip " + data + " tag " + msg.getTag());
                     }
                     // À la première réception du GossipMessage, on ré-emet
                     emit_if_needed(node, data);
@@ -313,7 +323,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
 
             if (verbose != 0)
-                System.err.println("Node broadcasted " + number_of_transits + " xfers");
+                System.err.println("Node broadcasted " + number_of_transits + " xfers " + emitter.get_number_of_sent() + " sent");
 
         if (number_of_transits == 0) {
             if (verbose != 0)

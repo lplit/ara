@@ -62,6 +62,7 @@ public class GossipController implements Control, Observer {
         diffs = Configuration.getInt(prefix + "." + PAR_NB_DIFFUSIONS);
         this.emitter_pid = Configuration.getPid(prefix + "." + PAR_EMITTER);
         this.position_pid = Configuration.getPid(prefix + "." + PAR_POSITION);
+        this.verbose = Configuration.getInt(prefix+".verbose");
 
         id_diffusion = 0;
 
