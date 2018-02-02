@@ -42,7 +42,7 @@ showspaces=false,
 showstringspaces=false}
 
 \title{Rapport projet ARA 2017-2018}
-\author{Mickael Rudek, Oskar Viljasaar}
+\author{Michal Rudek, Oskar Viljasaar}
 
 \begin{document}
 \maketitle
@@ -74,25 +74,6 @@ distance parcourue en une unité de temps.
 Une fois la destination atteinte, le noeud s'arrête pendant un tic,
  sinon il boucle en demandeant une nouvelle destination de la
  stratégie de déplacement.
-
-
- \subsection{Contenu du fichier de configuration pour la question 2}
-
-\begin{verbatim}
-simulation.endtime 50000
-random.seed 5
-network.size 10
-init.initialisation Initialisation
-control.graph GraphicalMonitor
-control.graph.positionprotocol position
-control.graph.time_slow 0.0002
-control.graph.step 1
-\end{verbatim}
-
-\subsection{Questions 3 et 4}
-Voir la sous-section 1.6.
-
-\subsection{Implémentation de l'interface \texttt{Emitter} (Question 5)}
 
 \subsection{Influence des stratégies sur la connexité du graphe (Questions 3, 4, 8)}
 \begin{minipage}{0.45\textwidth}
@@ -376,69 +357,64 @@ majorité du graphe, même avec une densité faible.
       configuration Peersim, initialisé à \texttt{src/manet/cfg\_initial.txt} par défaut.
     \end{itemize}
 
-    \subsection{\texttt{src/bench.pl}}
-    Exemple: \texttt{./bench.pl <chemin\_peersim>}
+    \subsection{Scripts de lancement de simulations}
+    Une série de scripts \texttt{perl} sont fournis avec le projet,
+    prenant en argument le chemin d'installation Peersim, fournissant
+    une manière rapide de simuler plusieurs expériences.
 
-    Le script crée un dossier \texttt{resultats/bench\_<date>} où seront stockés les
-    résultats pour la question 8 de l'exercise 1. Le dossier contiendra
-    les fichiers de configuration pour les expériences sous le nom
-    \texttt{cfg\_bench\_<scope>\_<SPI>\_<SD>}, les résultats d'autres
-    fichiers, de même nom avec l'extension \texttt{.result}. Ces derniers contiennent les résultats de 100 expériences avec autant de différentes graines aléatoires.
+    Les scripts créent un dossier \texttt{resultats/bench\_<exercice>\_<date>/} où seront stockés les
+    résultats utiles pour la question. Le dossier contiendra
+    un fichier de configuration pour chaque chaque expériences, et un
+    autre fichier \texttt{.results} contenant les résultats des
+    simulations sur plusieurs itérations. Chaque expérience est éxecutée avec une graine aléatoire différente.
 
-    \subsection{\texttt{src/bench.py}}
-    exemple: \texttt{bench.py <chemin\_results>}
-
-    Dans le dossier \texttt{<chemin\_results>} doivent se trouver les fichiers résultats créés par \texttt{bench.pl}. Utilisé pour les resultats de benchmark, pour remplir les tableaux.
-
-Exemple de sortie:
-\begin{verbatim}
-/ara/src/results/cfg_bench_500_3_3.result
-| 2.3830 +- 0.0684 | 0.4320 +- 0.0426 | 0.2300 +- 0.0335 |
-
-/ara/src/results/cfg_bench_875_3_3.result
-| 2.3390 +- 0.1023 | 0.4400 +- 0.0369 | 0.2140 +- 0.0201 |
-
-/ara/src/results/cfg_bench_750_1_1.result
-| 2.2740 +- 0.1165 | 0.4630 +- 0.0518 | 0.2320 +- 0.0325 |
-
-/ara/src/results/cfg_bench_375_1_1.result
-| 0.7130 +- 0.0447 | 0.6550 +- 0.0457 | 0.1790 +- 0.0230 |
-\end{verbatim}
-Les valeurs correspondent à des moyennes avec écarts-type, obtenus sur
-100 itérations sur chaque combinaison de SPI et SD.
-
-
-
-\subsection{\texttt{src/bench\_ex2.py}}
-exemple: \texttt{bench\_ex2.py <chemin\_results>}\\
-Ce script traite les resultats des simulations de l'exercise deux. Il prepare deux fichiers, stockes dans le dossier specifie dans l'appel - \texttt{summary.csv} et \texttt{summary\_all.csv}.\\
-
-\texttt{summary.csv} contient des valeurs normalisées sur le nombre d'expériences, tandis que \texttt{summary\_all.csv} stocke simplement tous les résultats, sans compter les moyennes.
-
-
-\subsection{\texttt{bench-ex2q\{1,3,4\}.pl}}
-Exemple: \texttt{./bench-ex2q\{1,3,4\}.pl <chemin\_peersim>}
-
-Le script crée un dossier \texttt{resultats/bench\_<date>\_ex2q\{1,3,4\}} où
-seront stockés les résultats des différentes exécutions, les noms des fichiers
-étant différentiés par la taille du réseau.
-
-\subsection{\texttt{bench-ex2q5.pl}}
-Exemple: \texttt{./bench-ex2q5.pl <chemin\_peersim>}
-Le script crée un dossier \texttt{resultats/bench\_<date>\_ex2q5} où
-seront stockés les résultats des différentes exécutions, les noms des
-fichiers étant différentiés par la taille du réseau, la probabilité
-donnée et le numéro de l'itération.
 
 Les scripts de l'exercice 2 (hormis la question 1) sortent un fichier
 par exécutions, de forme:
+
 \begin{verbatim}
-Att;Ed-Att;ER;Ed-ER
-D;ED;ED/D
+$ cat results/bench_ex2q5_2018-02-02-23:00:20/cfg_bench_30_0.2_0.results
+70,34;26,44;0,18;0,29
+2,45;0,19;0,06
 \end{verbatim}
 
 
+
+
+Les valeurs de la première ligne représentent l'atteignabilité, son
+écart-type et l'économie de rediffusion
+respectivement. (\texttt{GossipController})
+
+
+Les valeurs de la deuxième ligne représentent la densité, son
+écart-type et le pourcentage respectif à ces valeurs. (\texttt{DensityController})
+
+\subsection{Scripts de traitement de données}
+exemple: \texttt{bench\_ex2.py <chemin\_results>}\\
+Ces scripts calculent les moyennes et écarts-type sur les fichiers
+résultats fournis par les scripts de lancement de simulation. Les
+donées produites par ces scripts sont utilisés pour les
+représentations graphiques des résultats de simulation.
+
+
 \section{Extraits de code}
+
+
+\subsection{Fichier de configuration (Exercice 1 question 2)}
+
+\begin{verbatim}
+simulation.endtime 50000
+random.seed 5
+network.size 10
+init.initialisation Initialisation
+control.graph GraphicalMonitor
+control.graph.positionprotocol position
+control.graph.time_slow 0.0002
+control.graph.step 1
+\end{verbatim}
+
+
+
 \subsection{Implémentation de l'interface \texttt{Emitter} (Exercice 1
   Question 5)}
 \begin{lstlisting}
@@ -457,49 +433,69 @@ public class EmitterImpl implements Emitter {
 
     private int latency;
     private int scope;
-    private int this_pid;
+    protected int this_pid;
     private int position_protocol;
 
-    private static final String PAR_LATENCY = "latency";
-    private static final String PAR_SCOPE = "scope";
-    private static final String PAR_POSITIONPROTOCOL = "positionprotocol";
+    public static int messa;
 
+
+    /**
+     * Standard peersim constructor
+     * @param prefix
+     */
     public EmitterImpl(String prefix) {
         String tmp[]=prefix.split("\\.");
         this_pid=Configuration.lookupPid(tmp[tmp.length-1]);
+        //System.out.println(prefix + "." + PAR_POSITIONPROTOCOL);
         this.position_protocol=Configuration.getPid(prefix+"."+PAR_POSITIONPROTOCOL);
         this.latency = Configuration.getInt(prefix + "." + PAR_LATENCY);
         this.scope = Configuration.getInt(prefix + "." + PAR_SCOPE);
     }
 
+    /**
+     * Copy constructor
+     * @param latency latency
+     * @param scope scope
+     * @param position_protocol position protocol
+     */
+    public EmitterImpl(int latency, int scope, int position_protocol) {
+        this.latency = latency;
+        this.scope = scope;
+        this.position_protocol = position_protocol;
+    }
+
+
+    /**
+     * This method sends the messages
+     * @param host The current host
+     * @param msg The message it's sending
+     */
     @Override
     public void emit(Node host, Message msg) {
-        PositionProtocol prot =
-            (PositionProtocol) host.getProtocol(position_protocol);
-
+        PositionProtocol prot = (PositionProtocol) host.getProtocol(position_protocol);
         for (int i=0; i < Network.size(); i++) {
             Node n = Network.get(i);
-            PositionProtocol prot2 =
-                (PositionProtocol) n.getProtocol(position_protocol);
-            double dist =
-                prot.getCurrentPosition().distance(prot2.getCurrentPosition());
+            PositionProtocol prot2 = (PositionProtocol) n.getProtocol(position_protocol);
+            double dist = prot.getCurrentPosition().distance(prot2.getCurrentPosition());
             if (dist < scope && n.getID() != host.getID()) {
-                EDSimulator.add(latency, new Message(msg.getIdSrc(),
-                                                     n.getID(),
-                                                     msg.getTag(),
-                                                     msg.getContent(),
-                                                     msg.getPid()),
-                                                     n, msg.getPid());
+                if (msg.getIdDest() == -1)
+                    EDSimulator.add(latency,
+                            new Message(msg.getIdSrc(), n.getID(), msg.getTag(), msg.getContent(), msg.getPid()),
+                            n, msg.getPid());
             }
         }
 
     }
 
     @Override
-    public int getLatency() { return latency; }
+    public int getLatency() {
+        return latency;
+    }
 
     @Override
-    public int getScope() { return scope; }
+    public int getScope() {
+        return scope;
+    }
 
     @Override
     public Object clone(){
@@ -510,95 +506,7 @@ public class EmitterImpl implements Emitter {
         return res;
     }
 }
-\end{lstlisting}
 
-\subsection{Implémentation de l'interface \texttt{NeighborProtocol}
-  (Exercice 1 Question 6)}
-
-
-\begin{lstlisting}
-package manet.detection;
-
-import manet.Message;
-import manet.communication.EmitterImpl;
-import peersim.config.Configuration;
-import peersim.core.Node;
-import peersim.edsim.EDProtocol;
-import peersim.edsim.EDSimulator;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
-    private int this_pid;
-    private int period;
-    private int timer_delay;
-    private int listener_pid;
-
-    private static final String PAR_PERIOD = "period";
-    private static final String PAR_TIMERDELAY = "timer_delay";
-    private static final String PAR_LISTENER_PID = "listenerpid";
-    Integer timeStamp = 0;
-
-    private List<Long> neighbor_list;
-
-    public NeighborProtocolImpl(String prefix) {
-        neighbor_list = new ArrayList<>();
-
-        String tmp[]=prefix.split("\\.");
-        this_pid= Configuration.lookupPid(tmp[tmp.length-1]);
-        this.period = Configuration.getInt(prefix+"."+PAR_PERIOD);
-        this.timer_delay = Configuration.getInt(prefix + "." + PAR_TIMERDELAY);
-        this.listener_pid = Configuration.getPid(prefix + "." + PAR_LISTENER_PID,-1);
-        }
-
-    @Override
-    public List<Long> getNeighbors() { return neighbor_list; }
-
-    @Override
-    public Object clone() {
-        NeighborProtocolImpl res = null;
-        try {
-            res = (NeighborProtocolImpl) super.clone();
-            neighbor_list = new ArrayList<>();
-            timeStamp = new Integer(0);
-        } catch (CloneNotSupportedException e) {
-
-        }
-        return res;
-    }
-
-    @Override
-    public void processEvent(Node node, int pid, Object event) {
-        int emitter_pid = Configuration.lookupPid("emitter");
-        EmitterImpl impl = (EmitterImpl) node.getProtocol(emitter_pid);
-        Message msg = (Message) event;
-
-        if (event instanceof Message) {
-            switch (msg.getTag()) {
-                case "Heartbeat":
-                    if (msg.getIdSrc() == msg.getIdDest()) {
-                        EDSimulator.add(this.period, event, node, pid);
-                        impl.emit(node, new Message(node.getID(), 0,
-                                        "Heartbeat",
-                                        "Heartbeat", this_pid));
-                    }
-                    else {
-                        if(!neighbor_list.contains(msg.getIdSrc()))
-                            neighbor_list.add(msg.getIdSrc());
-                        break;
-                    }
-                    break;
-                default:
-                    System.out.println("IN DEFAULT");
-            }
-        }
-        else {
-            System.out.println("no good message");
-        }
-        return;
-    }
-}
 \end{lstlisting}
 
 
@@ -613,7 +521,6 @@ import peersim.core.CommonState;
 import peersim.core.Control;
 import peersim.core.Network;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 public class DensityController implements Control {
@@ -625,15 +532,14 @@ public class DensityController implements Control {
 
     private final int this_pid;
 
-    private int verbose = 0;
-    // Est-ce que l'on print les resultats sur stdout
+    private int verbose = 0; // Est-ce que l'on print les resultats sur stdout
     private int step; // step du controlleur
 
     private double
             dit = 0.0,  // la moyenne du nombre de voisins par noeud a l'instant t (densite)
             eit = 0.0,  // l'ecart-type de dit (donc a l'instant t)
-            dt  = 0.0,  // densite moyenne sur le temps (avg of d_dt)
-            et  = 0.0,  // disparite moyenne de densite sur le temps (avg of d_et)
+            dt  = 0.0,  // densite moyenne sur le temps (avg of d\_dt)
+            et  = 0.0,  // disparite moyenne de densite sur le temps (avg of d\_et)
             edt = 0.0;  // variation de la densite au cours du temps (ecart type des valeurs d_dt,
     // donc de toute la sim jusqu'a mtn)
 
@@ -662,7 +568,7 @@ public class DensityController implements Control {
         dit = dit();
         eit = eit();
 
-        if (this.verbose != 0)
+//        if (this.verbose != 0)
             if (CommonState.getTime() >= CommonState.getEndTime()-step)
                 printCols();
 
@@ -687,6 +593,7 @@ public class DensityController implements Control {
 
         for (int i = 0 ; i < Network.size() ; i++) {
             double n_neigs = ((NeighborProtocol) Network.get(i).getProtocol(this_pid)).getNeighbors().size();
+
             sum += n_neigs;
         }
 
@@ -733,13 +640,13 @@ public class DensityController implements Control {
      * @return average density so far
      */
     public double dt() {
-        double avg = 0.0;
+        double sum = 0.0, ret = 0.;
         if (!d_dt.isEmpty()) {
             for (Double d : d_dt)
-                avg += d;
-            avg = avg / d_dt.size();
+                sum += d;
+            ret = sum / d_dt.size();
         }
-        return avg;
+        return ret;
     }
 
     /**
@@ -751,13 +658,13 @@ public class DensityController implements Control {
      * @return average density so far
      */
     public double et() {
-        double avg = 0.0;
+        double sum = 0.0, ret = 0.;
         if (!d_et.isEmpty()) {
             for (Double d : d_et)
-                avg += d;
-            avg = avg / d_et.size();
+                sum += d;
+            ret = sum / d_et.size();
         }
-        return avg;
+        return ret;
     }
 
     /**
@@ -783,13 +690,6 @@ public class DensityController implements Control {
     }
 
 
-    /* Getters */
-    public double getEdt() { return edt; }
-    public double getEt() { return et; }
-    public double getDt() { return dt; }
-    public double getEit() { return eit; }
-    public double getDit() { return dit; }
-
     /** We're lazy so functions for q10
      * Col1 = D(t=end)
      * Col2 = E(t=end) / D(t=end)
@@ -802,8 +702,25 @@ public class DensityController implements Control {
     public void printCols() {
         String s = String.format("%.2f;%.2f;%.2f", col1(), col2(), col3());
         System.out.println(s);
+        System.out.flush();
+
+        if (verbose != 0)
+            System.err.println("Should have flushed");
     }
 
+
+
+    /* Getters */
+    public double getEdt() { return edt; }
+    public double getEt() { return et; }
+    public double getDt() { return dt; }
+    public double getEit() { return eit; }
+    public double getDit() { return dit; }
+
+
+    /**
+     * Debug preview method
+     */
     public void printState() {
         String ddt = "[";
         String det = "[";
