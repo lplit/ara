@@ -111,7 +111,7 @@ sub date {
 
 my $bench_dir;
 
-$bench_dir = join("_", "bench", date());
+$bench_dir = join("_", "results/bench-ex1", date());
 
 
 system("mkdir $bench_dir");
