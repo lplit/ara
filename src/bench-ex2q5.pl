@@ -35,6 +35,7 @@ control.gossipcontroller.nb_diffusions 500
 control.gossipcontroller.at 0
 control.gossipcontroller.emitter emitter
 control.gossipcontroller.position position
+control.gossipcontroller.verbose 0
 
 control.density DensityController
 control.density.neighbours neighbor

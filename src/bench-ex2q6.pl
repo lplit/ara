@@ -33,6 +33,7 @@ protocol.gossip.verbose VERB
 control.gossipcontroller GossipController
 control.gossipcontroller.nb_diffusions 500
 control.gossipcontroller.at 0
+control.gossipcontroller.verbose 0
 control.gossipcontroller.emitter emitter
 control.gossipcontroller.position position
 
@@ -161,7 +162,7 @@ for (my $number_of_exps = 0; $number_of_exps < $runs ; $number_of_exps++) {
     foreach my $size (@nodes)
 	# calcul des ebscisses densités déjà
     {
-	for (my $k = 0.5; $k < $size; $k += 0.5) {
+	for (my $k = 1; $k < $size; $k += $size/4) {
 #	foreach my $proba (@probabilities) {
 	    my $filename =  join "_", $file_base, $size, $k, $number_of_exps;
 	    $filename = join "/", $bench_dir, $filename;

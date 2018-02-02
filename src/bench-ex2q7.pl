@@ -35,6 +35,7 @@ control.gossipcontroller.nb_diffusions 500
 control.gossipcontroller.at 0
 control.gossipcontroller.emitter emitter
 control.gossipcontroller.position position
+control.gossipcontroller.verbose 0
 
 control.density DensityController
 control.density.neighbours neighbor
@@ -49,7 +50,7 @@ protocol.position.width 1500
 protocol.position.height 1500
 protocol.position.pause 20*MINUTES
 
-protocol.emitter FloodingEmitter
+protocol.emitter DistanceEmitter
 protocol.emitter.latency 90
 protocol.emitter.scope 300
 protocol.emitter.verbose VERB

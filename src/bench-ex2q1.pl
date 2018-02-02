@@ -47,7 +47,7 @@ protocol.emitter.scope 300
 
 protocol.emitter.positionprotocol position
 
-protocol.neighbor NeighborProtocolImpl2
+protocol.neighbor NeighborProtocolImpl
 protocol.neighbor.period 3000
 protocol.neighbor.timer_delay 3500
 protocol.neighbor.verbose VERB

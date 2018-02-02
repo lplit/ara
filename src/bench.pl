@@ -51,7 +51,7 @@ protocol.emitter.positionprotocol position
 protocol.neighbor NeighborProtocolImpl
 protocol.neighbor.period 3000
 protocol.neighbor.timer_delay 3500
-
+protocol.neighbor.verbose 0
     ";
 
 my $file_second = "
