@@ -212,10 +212,8 @@ public class GossipController implements Control, Observer {
         double att;
         double retr = (double) reached;
 
-        if (retr == 0.0) retr++; // One note has received = retransmitted; the initiator node
-
         if (att_th != 0)
-            att = retr/Network.size()*100;
+            att = (retr+1.0)/Network.size()*100;
         else att = 1.0;
         d_att.add(att);
         if (verbose != 0)

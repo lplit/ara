@@ -211,7 +211,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
                     System.err.println("Node " + node.getID() + " gossip " + data.toString() + " already treated");
 
             } else if (tried_retransmit == 0 && node_retransmitted == 0) {
-                emitter.emit(node, new Message(
+                emitter.force_emit(node, new Message(
                         node_src,
                         -1,
                         tag_gossip,
@@ -237,7 +237,8 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
         }
         if (tried_retransmit == 1 && number_of_transits == 0) {
-            System.err.println("Notifying of double broadcast termination, " + number_of_transits + " xfers");
+            if (verbose != 0)
+                System.err.println("Notifying of double broadcast termination, " + number_of_transits + " xfers");
             notifyGossip(); // terminaison initiateur
         }
 
@@ -304,7 +305,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
                     // On met à jour le GossipData courant sur lequel on travaille, comme on l'a reçu pour la première fois
                     // On réinitialise par ailleurs les variables privées
-                    if (current_data.id < data.id && current_data.id_initiator != data.id_initiator) {
+                    if (current_data.id < data.id) {
                         current_data = data;
                         node_retransmitted = 0;
                         tried_retransmit = 0;

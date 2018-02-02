@@ -5,6 +5,7 @@ import manet.positioning.PositionProtocol;
 import peersim.config.Configuration;
 import peersim.core.Network;
 import peersim.core.Node;
+import peersim.edsim.EDSimulator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -57,6 +58,33 @@ public abstract class EmitterCounter implements Emitter {
     /** Cette méthode doit incrémenter number_of_transits au moment de l'émission.
      */
     public abstract void emit(Node host, Message msg);
+
+    public void force_emit(Node host, Message msg) {
+        number_of_sent = 0;
+        nodes_received.clear();
+
+        for (Node n : get_neighbors_in_scope(host)) {
+            number_of_sent++;
+            nodes_received.add(n.getID());
+
+            has_finished = false;
+
+            EDSimulator.add(
+                    getLatency(),
+                    new Message(
+                            host.getID(),
+                            n.getID(),
+                            msg.getTag(),
+                            msg.getContent(),
+                            msg.getPid()),
+                    n,
+                    msg.getPid());
+
+        }
+
+        if (verbose != 0)
+            System.err.println("Node " + host.getID() + ": EmitterCounter forced emission " + number_of_sent + " messages");
+    }
 
 
     /**
