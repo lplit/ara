@@ -154,7 +154,7 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
             nodes_ids_received.add(node.getID());
 
             emitter.emit(node, new Message(
-                    node.getID(),
+                    node_src,
                     -1,
                     tag_gossip,
                     data,
