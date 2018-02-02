@@ -37,7 +37,7 @@ control.density.step 2*MINUTES
 control.density.verbose VERB
 
 control.gossipcontroller GossipController
-control.gossipcontroller.nb_diffusions 5
+control.gossipcontroller.nb_diffusions 2
 control.gossipcontroller.at 0
 control.gossipcontroller.emitter emitter
 control.gossipcontroller.position position
@@ -50,7 +50,7 @@ protocol.position.width 1500
 protocol.position.height 1500
 protocol.position.pause 20*MINUTES
 
-protocol.emitter ProbabilisticEmitter
+protocol.emitter DistanceEmitter
 protocol.emitter.latency 90
 protocol.emitter.scope 300
 protocol.emitter.probability 0.2

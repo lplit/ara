@@ -63,7 +63,7 @@ public class ProbabilisticEmitter extends EmitterCounter {
             EDSimulator.add(
                     getLatency(),
                     new Message(
-                            msg.getIdSrc(),
+                            host.getID(),
                             n.getID(),
                             new_tag,
                             msg.getContent(),
@@ -71,7 +71,7 @@ public class ProbabilisticEmitter extends EmitterCounter {
                     n,
                     msg.getPid());
             if (verbose != 0) {
-                System.err.println("Node " + host.getID() + " ProbabilisticEmitter delivering with tag " + new_tag);
+                System.err.println("Node " + host.getID() + " ProbabilisticEmitter emitting with tag " + new_tag);
             }
         }
 

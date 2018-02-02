@@ -107,7 +107,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
 
 
-        emit_if_needed(host, data);
+        emit_if_needed(host, data, host.getID());
         if (emitter.get_number_of_sent() == 0) { // émission nulle, broadcast terminé, le noeud est seultout :(
             if (verbose != 0) {
                 System.err.println("Node " + host.getID() + " terminated broadcast alone");
@@ -147,7 +147,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
         return gpi;
     }
 
-    private void emit_if_needed(Node node, GossipData data) {
+    private void emit_if_needed(Node node, GossipData data, long node_src) {
         int emitter_pid = Configuration.lookupPid("emitter");
         int local_sent = 0;
         EmitterCounter emitter = (EmitterCounter) node.getProtocol(emitter_pid);
@@ -161,7 +161,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
             nodes_ids_received.add(node.getID());
 
             emitter.emit(node, new Message(
-                    node.getID(),
+                    node_src,
                     -1,
                     tag_gossip,
                     data,
@@ -212,7 +212,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
             } else if (tried_retransmit == 0 && node_retransmitted == 0) {
                 emitter.emit(node, new Message(
-                        node.getID(),
+                        node_src,
                         -1,
                         tag_gossip,
                         data,
@@ -234,11 +234,11 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
             }
 
 
-            if (tried_retransmit == 1 && number_of_transits == 0) {
-                System.err.println("Notifying of double broadcast termination, " + number_of_transits + " xfers");
-                notifyGossip(); // terminaison initiateur
-            }
 
+        }
+        if (tried_retransmit == 1 && number_of_transits == 0) {
+            System.err.println("Notifying of double broadcast termination, " + number_of_transits + " xfers");
+            notifyGossip(); // terminaison initiateur
         }
 
 
@@ -265,16 +265,18 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
         if (event instanceof Message) {
 
             Message msg = (Message) event;
+            long node_src = msg.getIdSrc();
             if (msg.getTag().startsWith("GossipTimer")) {
                 // Decrementing timer-related transit.
 //                number_of_transits--;
                 if (!neighbors_not_delivered.isEmpty()) {
                     if (verbose != 0)
                         System.err.println("Node " + node.getID() + "GossipTimer recvd timer; list is " + neighbors_not_delivered);
-                    emit_if_needed(node, (GossipData) msg.getContent());
+                    emit_if_needed(node, (GossipData) msg.getContent(), node_src);
                     tried_retransmit = 1;
                 }
 
+                check_finished();
                 return;
             }
             if (!nodes_ids_received.contains(node.getID())) {
@@ -312,7 +314,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
                             System.err.println("Node " + node.getID() + " recvd new Gossip " + data + " tag " + msg.getTag());
                     }
                     // À la première réception du GossipMessage, on ré-emet
-                    emit_if_needed(node, data);
+                    emit_if_needed(node, data, node_src);
 
             }
             else {
@@ -322,12 +324,17 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
             }
             }
 
+        check_finished();
+
+    }
+
+    void check_finished() {
         if (number_of_transits == 0) {
+
             if (verbose != 0)
                 System.err.println("BROADCAST FINISHED\n\n\n\n");
             notifyGossip();
         }
-
     }
 
     }

@@ -87,7 +87,7 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
 
 
 
-        emit_if_needed(host, data);
+        emit_if_needed(host, data, host.getID());
         if (number_of_sent == 0) { // émission nulle, broadcast terminé, le noeud est seultout :(
             if (verbose != 0) {
                 System.err.println("Node " + host.getID() + " terminated broadcast alone");
@@ -142,7 +142,7 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
      * @param node Emitting node
      * @param data Data to be emitted
      */
-    private void emit_if_needed(Node node, GossipData data) {
+    private void emit_if_needed(Node node, GossipData data, long node_src) {
         int emitter_pid = Configuration.lookupPid("emitter");
         int local_sent = 0;
         EmitterCounter emitter = (EmitterCounter) node.getProtocol(emitter_pid);
@@ -211,6 +211,7 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
 
         if (event instanceof Message) {
             Message msg = (Message) event;
+            long node_src = msg.getIdSrc();
             if (EmitterCounter.get_neighbor_ids_in_scope(node).contains(msg.getIdSrc())) {
                 number_of_delivered++;
 
@@ -218,7 +219,7 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
                 GossipData data = (GossipData) msg.getContent();
                 last_id = data.id;
                 // À la première réception du GossipMessage, on ré-emet
-                emit_if_needed(node, data);
+                emit_if_needed(node, data, node_src);
 
             }
             else {

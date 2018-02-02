@@ -36,7 +36,7 @@ public class InverseProportionalEmitter extends EmitterCounter {
                 EDSimulator.add(
                         getLatency(),
                         new Message(
-                                msg.getIdSrc(),
+                                host.getID(),
                                 n.getID(),
                                 msg.getTag(),
                                 msg.getContent(),

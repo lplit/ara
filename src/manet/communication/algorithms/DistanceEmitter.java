@@ -35,34 +35,45 @@ public class DistanceEmitter extends EmitterCounter {
         nodes_private.clear();
         ArrayList<Node> list = new ArrayList<>();
         PositionProtocol prot = (PositionProtocol) host.getProtocol(position_protocol);
+        double random = CommonState.r.nextDouble();
 
-        for (Node n : get_neighbors_in_scope(host)) {
-            double random = CommonState.r.nextDouble();
+        /* Là on tire une fois pour l'émetteur puis on check si on veut faire de l'émission avec */
+        PositionProtocol prot2 = (PositionProtocol) get_node_by_id(msg.getIdSrc()).getProtocol(position_protocol);
+        double dist = prot.getCurrentPosition().distance(prot2.getCurrentPosition());
 
+        if (host.getID() == msg.getIdSrc())
+            dist = getScope();
 
-            /* Là on tire une fois par noeud voisin puis on check si on veut faire de l'émission avec */
-            PositionProtocol prot2 = (PositionProtocol) n.getProtocol(position_protocol);
-            double dist = prot.getCurrentPosition().distance(prot2.getCurrentPosition());
+        if (random < (dist / getScope())) {
+            if (verbose != 0)
+                System.err.println("Node " + host.getID() + " DistanceEmitter rand " + random + "<" + dist / getScope());
 
-            if (dist < getScope() && n.getID() != host.getID()) {
-                if (random < (dist / getScope())) {
-                    if (verbose != 0) {
-                        System.err.println("Node " + host.getID() + " DistanceEmitter rand " + random + "<" + dist/getScope());
-                    }
-                    EDSimulator.add(
-                            getLatency(),
-                            new Message(msg.getIdSrc(),
-                                    n.getID(),
-                                    msg.getTag(),
-                                    msg.getContent(), msg.getPid()),
-                            n,
-                            msg.getPid());
+            for (Node n : get_neighbors_in_scope(host)) {
+
+                if (dist <= getScope() && n.getID() != host.getID()) {
                     number_of_sent++;
                     nodes_received.add(n.getID());
+                    nodes_private.add(n);
                     has_finished = false;
-                }
-                else if (verbose != 0) {
+                } else if (verbose != 0) {
                     System.err.println("Node " + host.getID() + " DistanceEmitter NOT emitting");
+                }
+            }
+
+            for (Node n : nodes_private) {
+                String new_tag = msg.getTag() + "//" + nodes_received;
+                EDSimulator.add(
+                        getLatency(),
+                        new Message(
+                                host.getID(),
+                                n.getID(),
+                                new_tag,
+                                msg.getContent(),
+                                msg.getPid()),
+                        n,
+                        msg.getPid());
+                if (verbose != 0) {
+                    System.err.println("Node " + host.getID() + " DistanceEmitter emitting with tag " + new_tag);
                 }
             }
         }

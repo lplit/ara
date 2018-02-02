@@ -150,5 +150,20 @@ public abstract class EmitterCounter implements Emitter {
         return has_finished;
     }
 
+
+    /**
+     * Since Network.get(i) does not guarantee the same not to be returned at two different times,
+     * this function does exactly that but by working with the unique node IDs.
+     * @param id
+     * @return
+     */
+    public static Node get_node_by_id(long id) {
+        Node n;
+        for (int i=0; i < Network.size(); i++) {
+            n = Network.get(i);
+            if (n.getID() == id) return n;
+        }
+        return null;
+    }
 }
 
