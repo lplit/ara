@@ -13,7 +13,7 @@ random.seed 42
 
 init.initialisation Initialisation
 
-control.graph GraphicalMonitor
+#control.graph GraphicalMonitor
 control.graph.positionprotocol position
 control.graph.time_slow 0.0002
 control.graph.step 1
@@ -26,7 +26,7 @@ protocol.monitorable.gossipprotocol gossip
 protocol.monitorable.neighborprotocol neighbor
 
 protocol.gossip GossipProtocolList
-protocol.gossip.verbose 1
+protocol.gossip.verbose VERB
 protocol.gossip.timer_min 1000
 protocol.gossip.timer_max 1500
 
@@ -50,11 +50,11 @@ protocol.position.width 1500
 protocol.position.height 1500
 protocol.position.pause 20*MINUTES
 
-protocol.emitter ProbabilisticEmitter
+protocol.emitter InverseProportionalEmitter
 protocol.emitter.latency 90
 protocol.emitter.scope 300
 protocol.emitter.probability 0.2
-protocol.emitter.verbose 0
+protocol.emitter.verbose VERB
 protocol.emitter.val_k 0.5
 
 protocol.emitter.positionprotocol position
