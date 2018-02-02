@@ -43,7 +43,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
     private static Set<Long> nodes_ids_received;
 
-    private int verbose = 1;
+    private int verbose = 0;
     private final static String tag_gossip = "Gossip";
     private final static String PAR_TIMER_MIN = "timer_min";
     private final static String PAR_TIMER_MAX = "timer_max";
@@ -62,6 +62,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
         timer_min = Configuration.getInt(prefix + "." + PAR_TIMER_MIN);
         timer_max = Configuration.getInt(prefix + "." + PAR_TIMER_MAX);
+        this.verbose = Configuration.getInt(prefix+".verbose");
 
         if (verbose != 0) {
             System.err.println("Gossip up with pid " + this_pid);
@@ -219,16 +220,19 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
                 number_of_sent += local_sent;
                 tried_retransmit = 1;
 
+                if (tried_retransmit == 1 && local_sent == 0) {
+                    if (verbose != 0)
+                        System.err.println("Notifying of double broadcast termination, " + number_of_transits + " xfers");
+                    notifyGossip(); // spaghetti case of emitter emitting alone twice
+                }
                 if (verbose != 0) {
-                    System.err.println("Node " + node.getID() + " GossipList trying to re-emit");
+                    System.err.println("Node " + node.getID() + " GossipList trying to re-emit, " + local_sent + " sent.");
                 }
             }
 
             if (verbose != 0)
                 System.err.println("Node " + node.getID() + " gossip " + data.toString() + " already treated");
 
-            if (tried_retransmit == 1 && number_of_transits == 0)
-                notifyGossip(); // spaghetti case of emitter emitting alone twice
 
         }
 
@@ -257,7 +261,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
             Message msg = (Message) event;
             if (msg.getTag().startsWith("GossipTimer")) {
                 // Decrementing timer-related transit.
-
+                number_of_transits--;
                 if (!neighbors_not_delivered.isEmpty()) {
                     if (verbose != 0)
                         System.err.println("Node " + node.getID() + "GossipTimer recvd timer; list is " + neighbors_not_delivered);
