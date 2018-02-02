@@ -92,6 +92,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
         number_of_nodes_retransmitted = 0;
         nodes_ids_received.clear();
         tried_retransmit = 0;
+        node_retransmitted = 0;
 
         int r = CommonState.r.nextInt(timer_max) + timer_min;
 
@@ -206,6 +207,8 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
             if (node_retransmitted == 0 && tried_retransmit == 1) {
                 number_of_no_transmits++;
                 node_retransmitted = 1;
+                if (verbose != 0)
+                    System.err.println("Node " + node.getID() + " gossip " + data.toString() + " already treated");
 
             } else if (tried_retransmit == 0 && node_retransmitted == 0) {
                 emitter.emit(node, new Message(
@@ -230,8 +233,6 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
                 }
             }
 
-            if (verbose != 0)
-                System.err.println("Node " + node.getID() + " gossip " + data.toString() + " already treated");
 
             if (tried_retransmit == 1 && number_of_transits == 0) {
                 System.err.println("Notifying of double broadcast termination, " + number_of_transits + " xfers");
@@ -257,7 +258,7 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
 
 
         if (verbose != 0) {
-            System.err.println("Node " + node.getID() + " GossipList recvd " + event + " " + number_of_transits + "xfers");
+            System.err.println("Node " + node.getID() + " GossipList recvd " + event + " " + number_of_transits + " xfers");
             System.err.println("Node's neighbor_not_dlvd list " + neighbors_not_delivered);
         }
 
@@ -320,10 +321,6 @@ public class GossipProtocolList extends Observable implements GossipProtocol, ED
                   return;
             }
             }
-
-
-            if (verbose != 0)
-                System.err.println("Node broadcasted " + number_of_transits + " xfers " + emitter.get_number_of_sent() + " sent");
 
         if (number_of_transits == 0) {
             if (verbose != 0)

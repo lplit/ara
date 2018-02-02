@@ -38,7 +38,7 @@ public class ProbabilisticEmitter extends EmitterCounter {
                 nodes_received.add(n.getID());
                 nodes_private.add(n);
                 has_finished = false;
-                
+/*
                 EDSimulator.add(
                         getLatency(),
                         new Message(
@@ -49,6 +49,7 @@ public class ProbabilisticEmitter extends EmitterCounter {
                                 msg.getPid()),
                         n,
                         msg.getPid());
+                        */
                 if (verbose != 0)
                     System.err.println("Node " + host.getID() +
                             " ProbabilisticEmitter emitted w/" + _prob + "<" + probability + " " + number_of_sent + " messages");
