@@ -18,7 +18,6 @@ VERB 0
 
 debug_config none
 simulation.endtime 12*HEURES
-random.seed 4
 
 init.initialisation Initialisation
 
