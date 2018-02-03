@@ -485,6 +485,60 @@ meme tableau mais pour latex et avec %.2f
  200 & 50.33 +- 7.25 & 0.02 +- 0.01 \\ \hline
 
 
+
+Theoriquement last time, 10 iterations
+
+ mike@debian  ~/Documents/benchara/src   master  ./bench_ex2q1.py bench_x2_2018-02-02-22:29:38 
+Parsing files in  bench_x2_2018-02-02-22:29:38
+| taille | d | ed/d |
+bench_x2_2018-02-02-22:29:38/cfg_bench_10.results  over  2 iterations.
+| 3.3200 +- 0.0000 | 0.3400 +- 0.0000 | 0.2600 +- 0.0000 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_20.results  over  10 iterations.
+| 6.8880 +- 1.0349 | 0.3080 +- 0.0719 | 0.5540 +- 0.3022 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_30.results  over  10 iterations.
+| 10.9260 +- 2.1148 | 0.1780 +- 0.0685 | 0.2820 +- 0.2052 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_40.results  over  10 iterations.
+| 16.0460 +- 4.0076 | 0.1100 +- 0.0200 | 0.1760 +- 0.1100 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_50.results  over  10 iterations.
+| 21.9580 +- 4.9567 | 0.0740 +- 0.0120 | 0.0800 +- 0.0190 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_60.results  over  10 iterations.
+| 23.3700 +- 6.0258 | 0.0800 +- 0.0179 | 0.1320 +- 0.0549 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_70.results  over  10 iterations.
+| 23.1180 +- 4.7414 | 0.0660 +- 0.0080 | 0.0880 +- 0.0387 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_80.results  over  10 iterations.
+| 27.2640 +- 1.7603 | 0.0580 +- 0.0147 | 0.0700 +- 0.0369 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_90.results  over  10 iterations.
+| 37.5960 +- 3.8381 | 0.0520 +- 0.0160 | 0.0640 +- 0.0287 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_100.results  over  10 iterations.
+| 35.3820 +- 3.2318 | 0.0360 +- 0.0080 | 0.0420 +- 0.0160 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_120.results  over  10 iterations.
+| 37.7860 +- 5.2780 | 0.0360 +- 0.0080 | 0.0380 +- 0.0117 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_140.results  over  10 iterations.
+| 47.4220 +- 12.2087 | 0.0300 +- 0.0063 | 0.0400 +- 0.0167 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_160.results  over  10 iterations.
+| 49.1500 +- 10.2916 | 0.0280 +- 0.0075 | 0.0380 +- 0.0264 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_180.results  over  10 iterations.
+| 62.3760 +- 5.3164 | 0.0280 +- 0.0040 | 0.0380 +- 0.0133 |
+
+bench_x2_2018-02-02-22:29:38/cfg_bench_200.results  over  10 iterations.
+| 50.3340 +- 7.2594 | 0.0240 +- 0.0049 | 0.0240 +- 0.0136 |
+
+
+
+
 ## Question 2
 
 > Expliquez votre démarche pour régler ce problème. Votre solution devra se faire de manière non intrusive, ni dans le code applicatif, ni dans le code qui vous a été fourni.

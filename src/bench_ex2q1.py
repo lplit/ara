@@ -1,5 +1,9 @@
 #! /usr/bin/python
 
+# For x1q10 and x2q1
+# for x2q1 ignore col2
+
+
 import sys
 import os
 import numpy
@@ -32,6 +36,6 @@ for file in os.listdir(sys.argv[1]):
             print "\n"
             print f.name, " over ", len(lines), "iterations."
             ccol1 = ("%.4f %s %.4f") % (numpy.average(nc1), "+-", numpy.std(nc1))
-            ccol2 = ("%.4f %s %.4f") % (numpy.average(nc2), "+-", numpy.std(nc2))
+            ccol2 = ("%.4f %s %.4f") % (numpy.average(nc2), "+-", numpy.std(nc2)) # Ignore for X2Q1
             ccol3 = ("%.4f %s %.4f") % (numpy.average(nc3), "+-", numpy.std(nc3))
             print "|", ccol1, "|", ccol2, "|", ccol3, "|"
