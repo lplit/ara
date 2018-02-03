@@ -15,14 +15,15 @@ for file in os.listdir(sys.argv[1]):
             c3 = []
             lines = f.readlines()
             for line in lines:
-                col1, col2, col3 = line.split(';')
-                col3 = float(col3.strip().replace(',', '.'))
-                col2 = float(col2.strip().replace(',', '.'))
-                col1 = float(col1.strip().replace(',', '.'))
+                if len(line.strip()) != 0:
+                    col1, col2, col3 = line.split(';')
+                    col3 = float(col3.strip().replace(',', '.'))
+                    col2 = float(col2.strip().replace(',', '.'))
+                    col1 = float(col1.strip().replace(',', '.'))
 
-                c1.append(col1)
-                c2.append(col2)
-                c3.append(col3)
+                    c1.append(col1)
+                    c2.append(col2)
+                    c3.append(col3)
 
             nc1 = numpy.array(c1)
             nc2 = numpy.array(c2)
