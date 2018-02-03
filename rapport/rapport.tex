@@ -54,22 +54,20 @@ showstringspaces=false}
 \subsection{Algorithme de déplacement d'un noeud (Question 1)}
 
 \begin{verbatim}
-Movement protocol:
-- if not moving
-    - assign random speed lower than max
-- moving
-    - use `PositioningStrategiesFactory` to get next destination
-    - Calc distance to next destination
-    - if too far to reach `destination` in one hop
-        - calculate next `x` and `y`
-        - move to that position
-    - if destination reached, stop
-    - else continue running
+- si le noeud est immobile:
+    noeud.vitesse <- rand(vitesse_max)
+- si le noeud est en mouvement:
+    dest <- next_destination();
+    - si (dest.distance > distance_hop):
+        aller aussi loin que possible vers le noeud;
+    - si noeud.position = destination:
+      arrêter le noeud;
+    - sinon continuer;
 \end{verbatim}
 L'algorithme utilise le protocole de déplacement suivant:
 Une valeur de la vitesse est aléatoirement choisie dans l'intervalle
 $ \left[ \texttt{speed\_min}; \texttt{speed\_max} \right] $.
-Vu qu'on est en temps discretisé, $distance\_to\_next$ représente la
+Vu qu'on est en temps discretisé, $distance\_hop$ représente la
 distance parcourue en une unité de temps.
 Une fois la destination atteinte, le noeud s'arrête pendant un tic,
  sinon il boucle en demandeant une nouvelle destination de la
@@ -270,6 +268,8 @@ Portee & SPI & SD & D & E/D & ED/D \\
 \end{minipage}
 \end{figure}
 
+\pagebreak
+
 \subsection{Question 2 (\texttt{EmitterCounter})}
 On a défini une classe abstraite \texttt{EmitterCounter} utilisant le
 design pattern \textsl{Strategy}, en rendant la méthode \texttt{emit}
@@ -285,15 +285,21 @@ cette politique de délivrance au niveau de l'émetteur
 (\texttt{EmitterCounter}) en le faisant traiter des réceptions de
 messages de son protocole encapsulant des messages de n'importe quel
 protocole au-dessus de lui-même, mais le simulateur rendait trop difficile de détecter
-une terminaison de manière simple. La fonction EDSimulator.add(0, ..)
+une terminaison de manière simple. La fonction \texttt{EDSimulator.add(0, ...)}
 rajoute un évènement à la fin de la file d'éxecution, mais on voulait
-faire un traitement juste après la délivrance du message par \texttt{EmitterCounter}.
+faire un traitement juste après la délivrance du message par
+\texttt{EmitterCounter}.
+
+\vfill
 
 \subsection{Question 4 (\texttt{FloodingEmitter})}
 Quelque soit la densité du graphe, tant qu'il est connexe,
 \texttt{FloodingEmitter} assure une atteignabilité de diffusion de
 100\%. L'économie de rediffusion est naturellement nulle, comme
 l'émetteur effectue une rediffusion dans tous les cas.
+
+
+
 \begin{figure}[H]
 \begin{minipage}{\textwidth}
   \centering
@@ -301,6 +307,8 @@ l'émetteur effectue une rediffusion dans tous les cas.
     \caption{Atteignabilité et économie de rediffusion avec \texttt{FloodingEmitter}.}
 \end{minipage}
 \end{figure}
+
+\pagebreak
 
 \subsection{Question 5 (\texttt{ProbabilisticEmitter})}
 
@@ -329,6 +337,26 @@ majorité du graphe, même avec une densité faible.
 \subsection{Question 6 (\texttt{InverseProportionalEmitter})}
 
 \subsection{Question 7 (\texttt{DistanceEmitter})}
+
+\pagebreak
+
+\subsection{Question 8 (\texttt{GossipProtocolList})}
+La classe \texttt{GossipProtocolList} a été implémenté de manière à ce
+qu'à la première \textit{non}-transmission d'un message, le message
+est ré-émis \textbf{dans tous les cas} après le déclenchement d'un
+timer à durée aléatoire entre \texttt{timer\_min} et
+\texttt{timer\_max}. De ce fait, nous atteignons des valeurs
+d'atteignabilité importantes (100\% le plus souvent avec \texttt{DistanceEmitter}).
+
+\begin{figure}[H]
+\begin{minipage}{\textwidth}
+  \centering
+    \includegraphics[width=\textwidth]{images/ex2x8.png}
+    \caption{Atteignabilité et économie de rediffusion de
+      \texttt{DistanceEmitter} combiné avec la détection du voisinage
+      n'ayant pas reçu les messages (\texttt{GossipProtocolList}).}
+\end{minipage}
+\end{figure}
 
 
 \pagebreak
