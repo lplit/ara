@@ -23,6 +23,7 @@ total_xps       = len(probas)*len(nodes)*len(experiences)
 skipped_lines   = [] # Debug shit
 fails           = [] # Debug shit, files not found
 csv_summaries   = [] # This gets dumped to file at the end
+print_summaries = [] # For markdown printing
 
 print "Parsing files in ", sys.argv[1]
 print "Gonna treat", total_xps , "files."
@@ -102,7 +103,14 @@ for proba in probas:
                 % (proba, size, np_atts, np_atts_stdev,\
                      np_er, np_er_stdev, int(np_den))
         
-        csv_summaries.append(line)
+
+        line_file = ("%.2f;%d;%.2f;%.2f;%.2f;%.2f;%d") \
+                % (proba, size, np_atts, np_atts_stdev,\
+                     np_er, np_er_stdev, int(np_den))
+
+        csv_summaries.append(line_file)
+        print_summaries.append(line)
+
         print line
 
         print '[%.2f%%](%d/%d) - %d files\nP: %.2f N: %d' % \
@@ -116,13 +124,15 @@ for e in zip(fails, l_skipped, skipped_lines):
     print e
 
 print
-# Save to file
-csv_title = "|proba|size|att|att_stdev|er|er_stdev|den|"
-print csv_title
-for r in csv_summaries:
+
+csv_title = "proba;size;att;att_stdev;er;er_stdev;den"
+print_title = "|proba|size|att|att_stdev|er|er_stdev|den"
+
+print print_title
+for r in print_summaries:
     print r
 
-
+# Save to csv
 with open(os.path.join(sys.argv[1], "summary.csv"), 'w+') as f:
     f.write(csv_title + os.linesep)
     for r in csv_summaries:
