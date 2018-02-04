@@ -13,6 +13,7 @@ total_xps       = len(nodes)*len(experiences)
 skipped_lines   = [] # Debug shit
 fails           = [] # Debug shit, files not found
 csv_summaries   = [] # This gets dumped to file at the end
+print_summaries = [] # For printing
 
 print "Parsing files in ", sys.argv[1]
 print "Gonna treat", total_xps , "files."
@@ -87,11 +88,17 @@ for size in nodes:
     progress = float(files_treated)/float(total_xps)*100
 
     # CSV much
-    line = ("%d;%.2f;%.2f;%.2f;%.2f;%.2f") \
+    csv_line = ("%d;%.2f;%.2f;%.2f;%.2f;%.2f") \
             % (size, np_atts, np_atts_stdev,\
                     np_er, np_er_stdev, np_den)
-    
-    csv_summaries.append(line)
+
+    print_line = ("%d & %.2f & %.2f & %.2f & %.2f & %.2f \\ \hline") \
+            % (size, np_atts, np_atts_stdev,\
+                    np_er, np_er_stdev, np_den)
+
+    print_summaries.append(print_line)
+    csv_summaries.append(csv_line)
+
     print line
 
     print '[%.2f%%](%d/%d) - %d files\nN: %d' % \
@@ -108,7 +115,7 @@ print
 # Save to file
 csv_title = "size;att;att_stdev;er;er_stdev;den"
 print csv_title
-for r in csv_summaries:
+for r in print_summaries:
     print r
 
 
