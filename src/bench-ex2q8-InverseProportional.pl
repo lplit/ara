@@ -29,6 +29,8 @@ control.graph.neighborprotocol neighbor
 
 protocol.gossip GossipProtocolList
 protocol.gossip.verbose VERB
+protocol.gossip.timer_min 1000
+protocol.gossip.timer_max 1500
 
 control.gossipcontroller GossipController
 control.gossipcontroller.nb_diffusions 500
