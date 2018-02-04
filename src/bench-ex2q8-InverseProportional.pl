@@ -27,7 +27,7 @@ control.graph.step 1
 control.graph.emitter emitter
 control.graph.neighborprotocol neighbor
 
-protocol.gossip GossipProtocolImpl
+protocol.gossip GossipProtocolList
 protocol.gossip.verbose VERB
 
 control.gossipcontroller GossipController
