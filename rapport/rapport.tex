@@ -263,6 +263,7 @@ Portee & SPI & SD & D & E/D & ED/D \\
 \end{tabular}
 \end{minipage}
 
+\vfill
 
 \begin{figure}[H]
 \begin{minipage}{\textwidth}
@@ -344,6 +345,8 @@ majorité du graphe, même avec une densité faible.
 \pagebreak
 
 \subsection{Question 7 (\texttt{DistanceEmitter})}
+
+\begin{minipage}{0.5\textwidth}
 Dans le code, l'émetteur \texttt{DistanceEmitter} rediffuse un message
 selon la probabilité $p$ donnée dans l'énoncé: plus l'émetteur est
 loin du récepteur, plus le récepteur a donc de chance de rediffuser le
@@ -355,6 +358,34 @@ une économie de rediffusion oscillant entre 30 et 40\%. Les
 expériences étant éxecutées à chaque fois avec une différente graine
 aléatoire, l'atteignabilité d'un message peut varier selon le
 placement parfois inopportun de certains noeuds.
+\end{minipage}
+\hfill
+\begin{minipage}{0.4\textwidth}
+  \begin{table}[H]
+    \begin{tabular}{|l|l|l|l|l|l|}
+      \hline
+Noeuds &\textsl{Att} & \textsl{EAtt} & \textsl{ER} & \textsl{EER} &
+\textsl{D} \\ \hline
+20 & 97.34 & 9.23 & 37.09 & 13.27 & 7.37 \\ \hline
+30 & 99.38 & 5.02 & 32.60 & 10.38 & 12.22 \\ \hline
+40 & 97.87 & 7.43 & 33.33 & 9.43 & 14.02 \\ \hline
+50 & 98.75 & 5.71 & 31.14 & 8.26 & 15.94 \\ \hline
+60 & 99.99 & 0.15 & 31.74 & 6.79 & 25.59 \\ \hline
+70 & 99.92 & 0.25 & 30.46 & 6.19 & 27.11 \\ \hline
+80 & 99.53 & 3.53 & 32.23 & 7.67 & 33.61 \\ \hline
+90 & 99.59 & 4.17 & 29.79 & 6.39 & 29.05 \\ \hline
+100 & 99.89 & 0.94 & 29.60 & 5.35 & 36.56 \\ \hline
+120 & 100.00 & 0.01 & 28.98 & 4.91 & 41.84 \\ \hline
+140 & 99.95 & 0.89 & 29.34 & 4.98 & 44.81 \\ \hline
+160 & 99.98 & 0.10 & 28.27 & 4.33 & 50.14 \\ \hline
+200 & 99.98 & 0.08 & 28.78 & 4.14 & 67.65 \\ \hline
+    \end{tabular}
+    \caption{Valeurs obtenues pour la question 1, normalisés sur 100 itérations}
+  \end{table}
+
+\end{minipage}
+
+
 \begin{figure}[H]
 \begin{minipage}{\textwidth}
   \centering
