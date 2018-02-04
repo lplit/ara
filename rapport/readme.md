@@ -945,7 +945,17 @@ Sortir la phrase "Vu qu'on est en temps discretise blabla" au debut de paragraph
 
 Partout faut ajouter des "densites" dans les minimums de proba qu'on cite. Genre "Pour obtenir une att moyenne du graphe d'au moins 99% il faudrait utiliser une proba d'au moins 0.7 avec 6 voisins"
 
+2.5
+
+k doit donc varier entre 0 exclus et V -> le V, inclus? eclus?
+V est jamais defini.
+
+
+
 Other 
 
 Graphes et tableaux sur x iterations: 
 Preciser que la graine etait aleatoirement tiree pour chaque sim
+
+
+On a pas de conclusions (!)
