@@ -49,6 +49,14 @@ showstringspaces=false}
 
 
 \tableofcontents
+
+\vfill
+\begin{itemize}
+  \item Les codes demandés dans différentes questions du sujet se
+    trouvent dans l'annexe.
+  \item Chaque simulation a été éxecutée avec une différente graine de
+    valeur aléatoire.
+    \end{itemize}
 \pagebreak
 \section{Exercice 1 - Implémentation d'un MANET dans PeerSim}
 \subsection{Algorithme de déplacement d'un noeud (Question 1)}
@@ -67,11 +75,11 @@ showstringspaces=false}
 L'algorithme utilise le protocole de déplacement suivant:
 Une valeur de la vitesse est aléatoirement choisie dans l'intervalle
 $ \left[ \texttt{speed\_min}; \texttt{speed\_max} \right] $.
-Vu qu'on est en temps discretisé, $distance\_hop$ représente la
+$distance\_hop$ représente la
 distance parcourue en une unité de temps.
 Une fois la destination atteinte, le noeud s'arrête pendant un tic,
- sinon il boucle en demandeant une nouvelle destination de la
- stratégie de déplacement.
+sinon il boucle en demandeant une nouvelle destination à la
+stratégie de déplacement.
 
 \subsection{Influence des stratégies sur la connexité du graphe (Questions 3, 4, 8)}
 \begin{minipage}{0.45\textwidth}
@@ -224,7 +232,7 @@ Portee & SPI & SD & D & E/D & ED/D \\
   noeuds faible, allant jusqu'à 50 selon nos résultats. La densité,
   naturellement, est faible avec un petit nombre de noeuds. L'écart-type
   entre les différentes valeurs mesurées est fort, les noeuds ont du
-  mal à établie des liens selon les différentes valeurs
+  mal à établir des liens selon les différentes valeurs
   initiales aléatoires prises. À partir de 50 noeuds, le réseau a un
   comportement prévisible et la densité croît de manière relativement
   stable, avec un écart-type faible entre différentes mesures.
@@ -320,10 +328,11 @@ l'émetteur effectue une rediffusion dans tous les cas.
 
 Le pourcentage de messages reçus augmente clairement selon la
 probabilité. Selon les résultats expérimentaux, il faut définir une probabilité autour
-de 0.3 afin d'obtenir une atteignabilité d'au moins 90\%. À partir
-d'une densité de graphe de 5, l'atteignabilité ne descend pas
-en-dessous des 80\%. Pour obtenir une atteignabilité moyenne du graphe
-d'au moins 99\%, il faudrait utiliser une probabilité d'au moins 0.7.
+de 0.4 afin d'obtenir une atteignabilité d'au moins 90\%, pour une
+densité moyenne de 4. Par ailleur, à partir de cette densité, l'atteignabilité ne descend jamais
+en dessous des 80\%. Pour obtenir une atteignabilité moyenne du graphe
+d'au moins 99\%, il faudrait utiliser une probabilité d'au moins 0.7
+avec une densité d'au moins 6.
 
 Les courbes figurant sur le graphe représentent les différentes
 classes d'atteignabilité définies dans la question de l'exercice. Les
@@ -345,7 +354,7 @@ majorité du graphe, même avec une densité faible.
 \subsection{Question 6 (\texttt{InverseProportionalEmitter})}
 On a fait le choix de prendre $k$ comme étant inversement
 proportionnelle au voisinage. $k$ doit donc varier entre 0 exclus et
-V. Ici, on a pris $k = 1$, puis on l'incrémente trois fois de
+V inclus. Ici, on a pris $k = 1$, puis on l'incrémente trois fois de
 $V/4$. Une bonne valeur de $k$ semble se situer entre $V/4$ et $V/2$,
 pour avoir une atteignabilité forte tout en ayant une certaine
 économie de rediffusion dans le graphe.
@@ -434,6 +443,10 @@ baisse pas de manière forte selon la densité; l'algorithme de
 détection de voisinage n'ayant pas reçu de message se prouve plutôt
 efficace dans ce cas de figure.
 
+InverseProportionalEmitter avec GossipProtocolList nous assure 100\%
+d'atteignabilité à tout moment, ce qui nous assure une forte économie
+de rediffusion sur des valeurs de $k$ faibles.
+
 \begin{figure}[H]
 
   \noindent\par
@@ -457,9 +470,9 @@ efficace dans ce cas de figure.
   \begin{minipage}{0.9\textwidth}
     \begin{center}
       \centering
-      \includegraphics[width=\textwidth]{images/ex2x8.png}
+      \includegraphics[width=\textwidth]{images/ex2x8-4-InvProb.png}
       \caption{Atteignabilité et économie de rediffusion de
-        \texttt{DistanceEmitter} combiné avec la détection du voisinage
+        \texttt{InverseProportionalEmitter} combiné avec la détection du voisinage
         n'ayant pas reçu les messages (\texttt{GossipProtocolList}).}
     \end{center}
   \end{minipage}}
@@ -467,6 +480,13 @@ efficace dans ce cas de figure.
 
 \pagebreak
 
+\subsection{Question 9}
+L'algorithme de détection de messages potentiellement non-reçus dans
+le voisinage améliore grandement l'atteignabilité des algorithmes de
+diffusion testés ci-dessus. L'émetteur \texttt{DistanceEmitter} a
+tendance à marcher sur toutes les densités, on pourrait utiliser
+\texttt{InverseProportionalEmitter} sur des faibles densités à
+condition d'utiliser la détection de messages non-reçus.
 
 \begin{appendix}
   \section{Compilation, lancement du code et jeux de test}
@@ -851,37 +871,6 @@ public class DensityController implements Control {
     public double getEit() { return eit; }
     public double getDit() { return dit; }
 
-
-    /**
-     * Debug preview method
-     */
-    public void printState() {
-        String ddt = "[";
-        String det = "[";
-        String dedt = "[";
-
-        for (Double d : d_dt)
-            ddt += String.format(" %.2f\t", d);
-
-        for (Double d : d_et)
-            det += String.format(" %.2f\t", d);
-
-        for (Double d : d_edt)
-            dedt += String.format(" %.2f\t", d);
-
-        ddt += "]";
-        det += "]";
-        dedt += "]";
-
-        String s = String.format("dit: %.2f\teit: %.2f\tdt: %.2f\tet: %.2f\tedt: %.2f\n" +
-                        "d_dt:\t%s\n" +
-                        "d_et:\t%s\n" +
-                        "d_edt:\t%s\n",
-                dit, eit, dt, et, edt, ddt, det, dedt);
-
-
-        System.out.println(s);
-    }
 }
 \end{lstlisting}
 
