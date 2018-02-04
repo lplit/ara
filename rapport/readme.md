@@ -923,3 +923,29 @@ Latex
 140 & 99.95 & 0.89 & 29.34 & 4.98 & 44.81 \ \hline
 160 & 99.98 & 0.10 & 28.27 & 4.33 & 50.14 \ \hline
 200 & 99.98 & 0.08 & 28.78 & 4.14 & 67.65 \ \hline
+
+
+# Blabla rapport
+
+1 
+
+Ajouter une petite phrase en mode les questions code sont dans l'annexe 
+
+1.1 
+
+Sortir la phrase "Vu qu'on est en temps discretise blabla" au debut de paragraphe
+
+2.1 
+
+"Les noeuds ont du mal a etablie des liens" etablir?
+
+2.4 
+
+"il faut definir une proba aoutr de 0.3 afin" plus vers 0.4 I'd say.
+
+Partout faut ajouter des "densites" dans les minimums de proba qu'on cite. Genre "Pour obtenir une att moyenne du graphe d'au moins 99% il faudrait utiliser une proba d'au moins 0.7 avec 6 voisins"
+
+Other 
+
+Graphes et tableaux sur x iterations: 
+Preciser que la graine etait aleatoirement tiree pour chaque sim
