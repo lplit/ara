@@ -340,9 +340,24 @@ majorité du graphe, même avec une densité faible.
 \end{minipage}
 \end{figure}
 
-\subsection{Question 6 (\texttt{InverseProportionalEmitter})}
-
 \pagebreak
+
+\subsection{Question 6 (\texttt{InverseProportionalEmitter})}
+On a fait le choix de prendre $k$ comme étant inversement
+proportionnelle au voisinage. $k$ doit donc varier entre 0 exclus et
+V. Ici, on a pris $k = 1$, puis on l'incrémente trois fois de
+$V/4$. Une bonne valeur de $k$ semble se situer entre $V/4$ et $V/2$,
+pour avoir une atteignabilité forte tout en ayant une certaine
+économie de rediffusion dans le graphe.
+
+\begin{figure}[H]
+\begin{minipage}{\textwidth}
+  \centering
+    \includegraphics[width=\textwidth]{images/ex2x8-2.png}
+    \caption{Atteignabilité et économie de rediffusion avec \texttt{InverseProportionalEmitter}.}
+\end{minipage}
+\end{figure}
+
 
 \subsection{Question 7 (\texttt{DistanceEmitter})}
 
