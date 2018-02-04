@@ -76,7 +76,7 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
         nodes_ids_received.clear();
 
 
-        node_retransmitted = 1; // initiator so transmits so retransmits
+        node_retransmitted = 0; // initiator so transmits so retransmits
 
         GossipData data = new GossipData(id, id_initiator);
         data.id = id;
@@ -166,13 +166,11 @@ public class GossipProtocolImpl  extends Observable implements GossipProtocol, E
 
             if (local_sent == 0) {
                 /* Rien ne se passe. Le noeud a reçu le message mais ne ré-emet pas, et ne retransmet pas donc. */
-                // TODO: Does this mean that we're all alone and that there's noone in the scope?
                 return;
             }
 
             // We didn't initiate this bcast
             if (node.getID() != data.id_initiator) {
-                // TODO: Wtf is going on here? retransmitted = 0? Shouldn't it be =1 ?
                 node_retransmitted = 0;
                 number_of_retransmits++;
             }
